@@ -29,7 +29,7 @@ def parse_args():
                         type=str, help='Trained state_dict file path to open')
 
     # eval
-    parser.add_argument('--gt_folder', default='./groundtruth_ucf_jhmdb',
+    parser.add_argument('--gt_folder', default='./evaluator/groundtruth_ucf_jhmdb',
                         type=str, help='path to grouondtruth of ucf & jhmdb')
     parser.add_argument('--dt_folder', default=None,
                         type=str, help='path to detection dir')
