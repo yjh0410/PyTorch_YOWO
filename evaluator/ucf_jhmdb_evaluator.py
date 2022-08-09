@@ -171,6 +171,7 @@ class UCF_JHMDB_Evaluator(object):
 
         return classification_accuracy, locolization_recall
 
+        
 
 if __name__ == "__main__":
     pass
