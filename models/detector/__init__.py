@@ -15,9 +15,9 @@ def build_model(args,
 
     # Basic config
     if trainable:
-        img_size = m_cfg['train_size']
+        img_size = d_cfg['train_size']
     else:
-        img_size = m_cfg['test_size']
+        img_size = d_cfg['test_size']
 
     # build YOWO
     if args.version in ['yowo-d19', 'yowo-d53']:

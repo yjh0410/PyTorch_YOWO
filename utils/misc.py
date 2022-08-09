@@ -13,19 +13,19 @@ from dataset.transforms import Augmentation, BaseTransform
 from evaluator.ucf_jhmdb_evaluator import UCF_JHMDB_Evaluator
 
 
-def build_dataset(d_cfg, m_cfg, args, is_train=False):
+def build_dataset(d_cfg, args, is_train=False):
     """
         d_cfg: dataset config
     """
     # transform
     augmentation = Augmentation(
-        img_size=m_cfg['train_size'],
+        img_size=d_cfg['train_size'],
         jitter=d_cfg['jitter'],
         hue=d_cfg['hue'],
         saturation=d_cfg['saturation'],
         exposure=d_cfg['exposure']
         )
-    basetransform = BaseTransform(img_size=m_cfg['test_size'])
+    basetransform = BaseTransform(img_size=d_cfg['test_size'])
 
     # dataset
     if args.dataset in ['ucf24', 'jhmdb21']:
@@ -33,7 +33,7 @@ def build_dataset(d_cfg, m_cfg, args, is_train=False):
         dataset = UCF_JHMDB_Dataset(
             data_root=d_cfg['data_root'],
             dataset=args.dataset,
-            img_size=m_cfg['train_size'],
+            img_size=d_cfg['train_size'],
             transform=augmentation,
             is_train=is_train,
             len_clip=d_cfg['len_clip'],
