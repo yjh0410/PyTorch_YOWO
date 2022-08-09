@@ -127,10 +127,10 @@ def train():
     m_cfg = build_model_config(args)
 
     # dataset and evaluator
-    dataset, evaluator, num_classes = build_dataset(d_cfg, args, is_train=True)
+    dataset, evaluator, num_classes = build_dataset(d_cfg, m_cfg, args, is_train=True)
 
     # dataloader
-    batch_size = d_cfg['batch_size'] * distributed_utils.get_world_size()
+    batch_size = m_cfg['batch_size'] * distributed_utils.get_world_size()
     dataloader = build_dataloader(args, dataset, batch_size, CollateFunc(), is_train=True)
 
     # build model
@@ -160,39 +160,39 @@ def train():
         model_copy = deepcopy(model_without_ddp)
         FLOPs_and_Params(
             model=model_copy,
-            img_size=d_cfg['test_size'],
+            img_size=m_cfg['test_size'],
             len_clip=d_cfg['len_clip'],
             device=device)
         del model_copy
         
     # optimizer
-    base_lr = d_cfg['base_lr']
+    base_lr = m_cfg['base_lr']
     optimizer, start_epoch = build_optimizer(
         model=model_without_ddp,
         base_lr=base_lr,
-        name=d_cfg['optimizer'],
-        momentum=d_cfg['momentum'],
-        weight_decay=d_cfg['weight_decay'],
+        name=m_cfg['optimizer'],
+        momentum=m_cfg['momentum'],
+        weight_decay=m_cfg['weight_decay'],
         resume=args.resume
         )
 
     # lr scheduler
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
         optimizer=optimizer,
-        milestones=d_cfg['lr_epoch'],
-        gamma=d_cfg['lr_decay_ratio']
+        milestones=m_cfg['lr_epoch'],
+        gamma=m_cfg['lr_decay_ratio']
         )
 
     # warmup scheduler
     warmup_scheduler = build_warmup(
-        name=d_cfg['warmup'],
+        name=m_cfg['warmup'],
         base_lr=base_lr,
-        wp_iter=d_cfg['wp_iter'],
-        warmup_factor=d_cfg['warmup_factor']
+        wp_iter=m_cfg['wp_iter'],
+        warmup_factor=m_cfg['warmup_factor']
         )
 
     # training configuration
-    max_epoch = d_cfg['max_epoch']
+    max_epoch = m_cfg['max_epoch']
     epoch_size = len(dataloader)
     best_frame_map = -1.
     warmup = True
@@ -214,10 +214,10 @@ def train():
             ni = iter_i + epoch * epoch_size
 
             # warmup
-            if ni < d_cfg['wp_iter'] and warmup:
+            if ni < m_cfg['wp_iter'] and warmup:
                 warmup_scheduler.warmup(ni, optimizer)
 
-            elif ni == d_cfg['wp_iter'] and warmup:
+            elif ni == m_cfg['wp_iter'] and warmup:
                 # warmup is over
                 print('Warmup is over')
                 warmup = False
@@ -245,20 +245,20 @@ def train():
 
             # Backward and Optimize
             if args.fp16:
-                scaler.scale(losses / d_cfg['accumulate']).backward()
+                scaler.scale(losses / m_cfg['accumulate']).backward()
 
                 # Optimize
-                if ni % d_cfg['accumulate'] == 0:
+                if ni % m_cfg['accumulate'] == 0:
                     scaler.step(optimizer)
                     scaler.update()
                     optimizer.zero_grad()
                     
             else:
                 # Backward
-                (losses / d_cfg['accumulate']).backward()
+                (losses / m_cfg['accumulate']).backward()
 
                 # Optimize
-                if ni % d_cfg['accumulate'] == 0:
+                if ni % m_cfg['accumulate'] == 0:
                     optimizer.step()
                     optimizer.zero_grad()
 

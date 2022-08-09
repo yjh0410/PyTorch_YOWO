@@ -31,7 +31,6 @@ yowo_config = {
         # train config
         'batch_size': 8,
         'accumulate': 16,
-        'len_clip': 16,
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 5e-4,
@@ -43,12 +42,6 @@ yowo_config = {
         'warmup': 'linear',
         'warmup_factor': 0.00066667,
         'wp_iter': 500,
-        # anchor size
-        'anchor_size': [[22, 38],
-                        [40, 81],
-                        [51, 130],
-                        [73, 158],
-                        [112, 189]], # 224
     },
 
 }

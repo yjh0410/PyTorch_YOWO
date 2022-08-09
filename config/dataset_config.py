@@ -5,13 +5,14 @@ dataset_config = {
     'ucf24': {
         # dataset
         'data_root': '/mnt/share/ssd2/dataset/STAD/ucf24',
-        # 'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/ucf24',
+        'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/ucf24',
         # transform
         'jitter': 0.2,
         'hue': 0.1,
         'saturation': 1.5,
         'exposure': 1.5,
         'sampling_rate': 1,
+        'len_clip': 16,
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
@@ -23,7 +24,13 @@ dataset_config = {
                     'PoleVault',      'RopeClimbing',      'SalsaSpin',         'SkateBoarding',
                     'Skiing',         'Skijet',            'SoccerJuggling',    'Surfing',
                     'TennisSwing',    'TrampolineJumping', 'VolleyballSpiking', 'WalkingWithDog'
-                )
+                ),
+        # anchor size
+        'anchor_size': [[22, 38],
+                        [40, 81],
+                        [51, 130],
+                        [73, 158],
+                        [112, 189]], # 224
     },
     
     'jhmdb21': {
@@ -40,6 +47,7 @@ dataset_config = {
         'saturation': 1.5,
         'exposure': 1.5,
         'sampling_rate': 1,
+        'len_clip': 16,
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
@@ -51,7 +59,13 @@ dataset_config = {
                     'shoot_ball',   'shoot_bow',      'shoot_gun',   'sit',
                     'stand',        'swing_baseball', 'throw',       'walk',
                     'wave'
-                )
+                ),
+        # anchor size
+        'anchor_size': [[30,  99],
+                        [53, 128],
+                        [56, 180],
+                        [98, 185],
+                        [157, 200]], # 224
     },
     
     'ava':{

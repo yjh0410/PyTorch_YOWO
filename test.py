@@ -64,8 +64,6 @@ def inference(args, model, device, dataset, class_names=None, class_colors=None)
         print('Video clip {:d}/{:d}....'.format(index+1, len(dataset)))
         frame_id, video_clip, target = dataset[index]
 
-        print(frame_id)
-
         orig_size = target['orig_size']  # width, height
 
         # prepare
@@ -125,14 +123,14 @@ if __name__ == '__main__':
     m_cfg = build_model_config(args)
 
     # transform
-    basetransform = BaseTransform(img_size=d_cfg['test_size'])
+    basetransform = BaseTransform(img_size=m_cfg['test_size'])
 
     # dataset
     if args.dataset in ['ucf24', 'jhmdb21']:
         dataset = UCF_JHMDB_Dataset(
             data_root=d_cfg['data_root'],
             dataset=args.dataset,
-            img_size=d_cfg['test_size'],
+            img_size=m_cfg['test_size'],
             transform=basetransform,
             is_train=False,
             len_clip=d_cfg['len_clip'],

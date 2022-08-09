@@ -50,7 +50,7 @@ def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn):
         dataset=args.dataset,
         batch_size=args.batch_size,
         data_root=d_cfg['data_root'],
-        img_size=d_cfg['test_size'],
+        img_size=m_cfg['test_size'],
         len_clip=d_cfg['len_clip'],
         conf_thresh=0.1,
         iou_thresh=0.5,
@@ -103,7 +103,7 @@ if __name__ == '__main__':
     model = model.to(device).eval()
 
     # transform
-    basetransform = BaseTransform(img_size=d_cfg['test_size'])
+    basetransform = BaseTransform(img_size=m_cfg['test_size'])
 
     # path to save inference results
     save_path = os.path.join(args.save_dir, args.dataset)
