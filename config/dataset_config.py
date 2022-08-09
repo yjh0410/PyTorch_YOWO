@@ -5,7 +5,7 @@ dataset_config = {
     'ucf24': {
         # dataset
         'data_root': '/mnt/share/ssd2/dataset/STAD/ucf24',
-        'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/ucf24',
+        # 'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/ucf24',
         # transform
         'jitter': 0.2,
         'hue': 0.1,
