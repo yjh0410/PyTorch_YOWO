@@ -25,7 +25,7 @@ def build_dataset(d_cfg, m_cfg, args, is_train=False):
         saturation=d_cfg['saturation'],
         exposure=d_cfg['exposure']
         )
-    basetransform = BaseTransform(img_size=d_cfg['test_size'])
+    basetransform = BaseTransform(img_size=m_cfg['test_size'])
 
     # dataset
     if args.dataset in ['ucf24', 'jhmdb21']:
