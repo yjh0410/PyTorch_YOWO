@@ -1,4 +1,5 @@
 import argparse
+from operator import gt
 import os
 import torch
 
@@ -24,8 +25,16 @@ def parse_args():
                         help='use cuda.')
     parser.add_argument('-mt', '--metrics', default=['frame_map', 'video_map'], type=str,
                         help='evaluation metrics')
-    parser.add_argument('--save_dir', default='inference_results/',
+    parser.add_argument('--save_path', default='results/',
                         type=str, help='Trained state_dict file path to open')
+
+    # eval
+    parser.add_argument('--gt_folder', default='./groundtruth_ucf_jhmdb',
+                        type=str, help='path to grouondtruth of ucf & jhmdb')
+    parser.add_argument('--dt_folder', default=None,
+                        type=str, help='path to detection dir')
+    parser.add_argument('--cal_mAP', action='store_true', default=False, 
+                        help='calculate_mAP.')
 
     # model
     parser.add_argument('-v', '--version', default='yowo-d19', type=str,
@@ -55,7 +64,11 @@ def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn):
         conf_thresh=0.1,
         iou_thresh=0.5,
         transform=transform,
-        collate_fn=collate_fn)
+        collate_fn=collate_fn,
+        cal_mAP=args.cal_mAP,
+        gt_folder=args.gt_folder,
+        dt_folder=args.dt_folder,
+        save_path=args.save_path)
 
     cls_accu, loc_recall = evaluator.evaluate(model)
 

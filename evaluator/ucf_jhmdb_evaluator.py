@@ -3,8 +3,10 @@ import torch
 
 from dataset.ucf_jhmdb import UCF_JHMDB_Dataset
 from utils.box_ops import rescale_bboxes
-from .utils import bbox_iou
 from utils.box_ops import rescale_bboxes
+
+from .cal_mAP import get_mAP
+from .utils import bbox_iou
 
 
 class UCF_JHMDB_Evaluator(object):
@@ -15,17 +17,25 @@ class UCF_JHMDB_Evaluator(object):
                  img_size=224,
                  len_clip=1,
                  batch_size=1,
-                 conf_thresh=0.1,
                  iou_thresh=0.5,
                  transform=None,
-                 collate_fn=None):
+                 collate_fn=None,
+                 cal_mAP=False,
+                 gt_folder=None,
+                 dt_folder=None,
+                 save_path=None):
         self.device = device
         self.data_root = data_root
         self.dataset = dataset
         self.img_size = img_size
         self.len_clip = len_clip
-        self.conf_thresh = conf_thresh
+        self.conf_thresh = 0.1
         self.iou_thresh = iou_thresh
+        self.cal_mAP = cal_mAP
+
+        self.dt_folder = dt_folder
+        self.save_path = save_path
+        self.gt_folder = gt_folder
 
         # dataset
         self.testset = UCF_JHMDB_Dataset(
@@ -148,7 +158,6 @@ class UCF_JHMDB_Evaluator(object):
 
                         if best_iou > self.iou_thresh:
                             total_detected += 1
-                            # print(labels[best_j], tgt_label)
                             if int(labels[best_j]) == int(tgt_label):
                                 correct_classification += 1
 
@@ -168,6 +177,18 @@ class UCF_JHMDB_Evaluator(object):
 
         print("Classification accuracy: %.3f" % classification_accuracy)
         print("Locolization recall: %.3f" % locolization_recall)
+
+        # frame mAP
+        if self.cal_mAP:
+            print('calculating Frame mAP ...')
+            if self.dt_folder is None:
+                result_path = current_dir
+            else:
+                result_path = self.dt_folder
+
+            metric_list = get_mAP(self.gt_folder, result_path, self.iou_thresh ,self.save_path)
+            print(metric_list)
+
 
         return classification_accuracy, locolization_recall
 
