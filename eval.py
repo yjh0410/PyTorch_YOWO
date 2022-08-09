@@ -35,6 +35,8 @@ def parse_args():
                         type=str, help='path to detection dir')
     parser.add_argument('--cal_mAP', action='store_true', default=False, 
                         help='calculate_mAP.')
+    parser.add_argument('--redo', action='store_true', default=False, 
+                        help='re-make inference on testset.')
 
     # model
     parser.add_argument('-v', '--version', default='yowo-d19', type=str,
@@ -65,6 +67,7 @@ def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn):
         iou_thresh=0.5,
         transform=transform,
         collate_fn=collate_fn,
+        redo=args.redo,
         cal_mAP=args.cal_mAP,
         gt_folder=args.gt_folder,
         dt_folder=args.dt_folder,
