@@ -10,7 +10,7 @@ from dataset.transforms import BaseTransform
 
 from utils.misc import load_weight
 from utils.box_ops import rescale_bboxes
-from utils.vis_tools import vis_detection
+from utils.vis_tools import convert_tensor_to_cv2img, vis_detection
 
 from config import build_dataset_config, build_model_config
 from models.detector import build_model
@@ -49,7 +49,7 @@ def parse_args():
 
     return parser.parse_args()
 
-
+    
 @torch.no_grad()
 def inference(args, model, device, dataset, class_names=None, class_colors=None):
     # path to save 
@@ -83,12 +83,13 @@ def inference(args, model, device, dataset, class_names=None, class_colors=None)
         bboxes = rescale_bboxes(bboxes, orig_size)
 
         # vis results of key-frame
-        key_frame = video_clip[0, :, -1, :, :]
-        key_frame = (key_frame * 255).permute(1, 2, 0)
-        key_frame = key_frame.cpu().numpy().astype(np.uint8)
-        key_frame = key_frame.copy()[..., (2, 1, 0)]  # to BGR
+        key_frame_tensor = video_clip[0, :, -1, :, :]
+        key_frame = convert_tensor_to_cv2img(key_frame_tensor)
+
+        # resize key_frame to orig size
         key_frame = cv2.resize(key_frame, orig_size)
 
+        # visualize detection
         vis_results = vis_detection(
             frame=key_frame,
             scores=scores,
