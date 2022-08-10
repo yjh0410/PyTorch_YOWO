@@ -38,4 +38,4 @@ Password: tcjd
 |    Model    |    Frame mAP    |    Cls Accu    |    Recall    |    Weight    |
 |-------------|-----------------|----------------|--------------|--------------|
 |    YOWO     |      80.4       |      94.5      |      93.5    |       -      |
-| YOWO (Ours) |      80.4       |      94.1      |      93.7    | [github]()   |
+| YOWO (Ours) |      80.4       |      94.1      |      93.7    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowof-d19_80.4.pth)   |
