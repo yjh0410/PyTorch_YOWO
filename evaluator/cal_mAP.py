@@ -606,7 +606,7 @@ class Evaluator:
                 os.makedirs(savePath, exist_ok=True)
                 savePath_ = os.path.join(savePath, self.dataset)
                 os.makedirs(savePath_, exist_ok=True)
-                print(os.path.join(savePath_, classId + '.png'))
+
                 # save fig
                 plt.savefig(os.path.join(savePath_, classId + '.png'))
 
