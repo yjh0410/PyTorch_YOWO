@@ -313,7 +313,7 @@ def train():
                     model_eval.eval()
 
                     # evaluate
-                    accu, recall = evaluator.evaluate_accu_recall(model_eval, epoch + 1)
+                    accu, recall, _ = evaluator.evaluate_accu_recall(model_eval, epoch + 1)
 
                     # save model
                     print('Saving state, epoch:', epoch + 1)

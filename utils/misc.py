@@ -48,6 +48,7 @@ def build_dataset(d_cfg, args, is_train=False):
             img_size=d_cfg['test_size'],
             len_clip=d_cfg['len_clip'],
             batch_size=d_cfg['test_batch_size'],
+            conf_thresh=0.01,
             iou_thresh=0.5,
             transform=basetransform,
             collate_fn=CollateFunc()            

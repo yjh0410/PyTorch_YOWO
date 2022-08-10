@@ -67,8 +67,8 @@ dataset_config = {
         'sampling_rate': 1,
         'len_clip': 16,
         # freeze backbone
-        'freeze_backbone_2d': False,
-        'freeze_backbone_3d': False,
+        'freeze_backbone_2d': True,
+        'freeze_backbone_3d': True,
         # train config
         'batch_size': 8,
         'test_batch_size': 8,
