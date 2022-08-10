@@ -907,7 +907,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     detCoordinates = 'abs'
     gtFolder = os.path.join(os.path.abspath('.'), gtFolder)
     detFolder = os.path.join(os.path.abspath('.'), detFolder)
-    print(os.path.join(os.path.abspath('.'), savePath))
+    savePath = os.path.join(os.path.abspath('.'), savePath)
 
     iouThreshold = threshold
 
@@ -922,8 +922,8 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     detCoordType = ValidateCoordinatesTypes(detCoordinates, '-detCoordinates', errors)
     imgSize = (0, 0)
 
-    # # Create directory to save results
-    # shutil.rmtree(savePath, ignore_errors=True)  # Clear folder
+    # Create directory to save results
+    shutil.rmtree(savePath, ignore_errors=True)  # Clear folder
     # if savePath is not None:
     #     os.makedirs(savePath)
     # Show plot during execution
@@ -958,7 +958,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
         method=MethodAveragePrecision.EveryPointInterpolation,
         showAP=True,  # Show Average Precision in the title of the plot
         showInterpolatedPrecision=show_pr_curve,  # plot the interpolated precision curve
-        savePath=os.path.join(os.path.abspath('.'), savePath),
+        savePath=savePath,
         showGraphic=False)
 
     # f = open(os.path.join(savePath, 'results.txt'), 'w')
