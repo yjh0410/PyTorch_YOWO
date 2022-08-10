@@ -957,7 +957,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
         method=MethodAveragePrecision.EveryPointInterpolation,
         showAP=True,  # Show Average Precision in the title of the plot
         showInterpolatedPrecision=show_pr_curve,  # plot the interpolated precision curve
-        savePath=savePath,
+        savePath=os.path.join(os.path.abspath('.'), savePath),
         showGraphic=False)
 
     # f = open(os.path.join(savePath, 'results.txt'), 'w')
