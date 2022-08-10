@@ -59,7 +59,6 @@ def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn, save_path)
         data_root=d_cfg['data_root'],
         img_size=d_cfg['test_size'],
         len_clip=d_cfg['len_clip'],
-        conf_thresh=0.1,
         iou_thresh=0.5,
         transform=transform,
         collate_fn=collate_fn,
