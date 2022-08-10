@@ -117,7 +117,7 @@ if __name__ == '__main__':
     model = model.to(device).eval()
 
     # transform
-    basetransform = BaseTransform(img_size=m_cfg['test_size'])
+    basetransform = BaseTransform(img_size=d_cfg['test_size'])
 
     # path to save inference results
     save_path = os.path.join(args.save_dir, args.dataset)

@@ -5,7 +5,8 @@ python eval.py \
         -bs 8 \
         -size 224 \
         --gt_folder ./evaluator/groundtruth_ucf_jhmdb/groundtruth_ucf/ \
-        # --dt_folder results/ucf_detections/detections_1/ \
-        # --save_path results/ \
-        # --redo \
-        # --cal_mAP \
+        --dt_folder ./results/ucf_detections/detections_1/ \
+        --save_path ./results/ \
+        --weight ./weight/ucf24/yowo-d19/yowof-d19_epoch_3.pth \ 
+        --redo \
+        --cal_mAP \
