@@ -1,7 +1,7 @@
 python eval.py \
         --cuda \
         -d ucf24 \
-        -v yowo-d19 \
+        -v yowo \
         -bs 8 \
         -size 224 \
         --gt_folder ./evaluator/groundtruths_ucf_jhmdb/groundtruths_ucf/ \

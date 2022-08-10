@@ -43,12 +43,6 @@ dataset_config = {
                     'Skiing',         'Skijet',            'SoccerJuggling',    'Surfing',
                     'TennisSwing',    'TrampolineJumping', 'VolleyballSpiking', 'WalkingWithDog'
                 ),
-        # anchor size
-        'anchor_size': [[22, 38],
-                        [40, 81],
-                        [51, 130],
-                        [73, 158],
-                        [112, 189]], # 224
     },
     
     'jhmdb21': {
@@ -93,12 +87,6 @@ dataset_config = {
                     'stand',        'swing_baseball', 'throw',       'walk',
                     'wave'
                 ),
-        # anchor size
-        'anchor_size': [[30,  99],
-                        [53, 128],
-                        [56, 180],
-                        [98, 185],
-                        [157, 200]], # 224
     },
     
     'ava':{

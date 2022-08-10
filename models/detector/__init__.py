@@ -20,11 +20,11 @@ def build_model(args,
         img_size = d_cfg['test_size']
 
     # build YOWO
-    if args.version in ['yowo-d19', 'yowo-d53']:
+    if args.version == 'yowo':
         model = YOWO(
             cfg=m_cfg,
             device=device,
-            anchor_size=d_cfg['anchor_size'],
+            anchor_size=d_cfg['anchor_size'][args.dataset],
             img_size=img_size,
             len_clip=d_cfg['len_clip'],
             num_classes=num_classes,

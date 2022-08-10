@@ -48,13 +48,13 @@ def parse_args():
     # Evaluation
     parser.add_argument('--eval', action='store_true', default=False, 
                         help='do evaluation during training.')
-    parser.add_argument('--eval_epoch', default=2, type=int, 
+    parser.add_argument('--eval_epoch', default=1, type=int, 
                         help='after eval epoch, the model is evaluated on val dataset.')
     parser.add_argument('--save_dir', default='inference_results/',
                         type=str, help='save inference results.')
 
     # Model
-    parser.add_argument('-v', '--version', default='yowo-d19', type=str,
+    parser.add_argument('-v', '--version', default='yowo', type=str,
                         help='build spatio-temporal action detector')
     parser.add_argument('--topk', default=40, type=int,
                         help='topk candidates for evaluation')

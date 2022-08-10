@@ -5,7 +5,7 @@ import torch.nn as nn
 
 from ...backbone import build_backbone_2d
 from ...backbone import build_backbone_3d
-from .encoder import ChannelEncoder
+from .encoder import ChannelEncoder, SpatialEncoder
 from .loss import Criterion
 
 
@@ -55,9 +55,16 @@ class YOWO(nn.Module):
             pretrained=cfg['pretrained_2d'] and trainable
         )
 
+        # spatial encoder
+        self.spatial_encoder = SpatialEncoder(
+            in_dim=bk_dim_2d,
+            out_dim=512,
+            act_type=cfg['head_act'],
+            norm_type=cfg['head_norm']
+        )
         # channel encoder
         self.channel_encoder = ChannelEncoder(
-            in_dim=bk_dim_2d + bk_dim_3d,
+            in_dim=512 + bk_dim_3d,
             out_dim=cfg['head_dim'],
             act_type=cfg['head_act'],
             norm_type=cfg['head_norm']
@@ -208,7 +215,8 @@ class YOWO(nn.Module):
         feat_2d = self.backbone_2d(key_frame)               # [B, C1, H, W]
         feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
-        # channel encoder
+        # spatial&channel encoder
+        feat_2d = self.spatial_encoder(feat_2d)
         feat = self.channel_encoder(torch.cat([feat_2d, feat_3d], dim=1))
 
         # pred
@@ -274,7 +282,8 @@ class YOWO(nn.Module):
             feat_2d = self.backbone_2d(key_frame)               # [B, C1, H, W]
             feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
-            # channel encoder
+            # spatial&channel encoder
+            feat_2d = self.spatial_encoder(feat_2d)
             feat = self.channel_encoder(torch.cat([feat_2d, feat_3d], dim=1))
 
             # pred

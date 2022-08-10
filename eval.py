@@ -41,7 +41,7 @@ def parse_args():
                         help='re-make inference on testset.')
 
     # model
-    parser.add_argument('-v', '--version', default='yowo-d19', type=str,
+    parser.add_argument('-v', '--version', default='yowo', type=str,
                         help='build yowo')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')

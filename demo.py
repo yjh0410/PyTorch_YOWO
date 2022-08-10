@@ -33,7 +33,7 @@ def parse_args():
                         help='path to video.')
 
     # model
-    parser.add_argument('-v', '--version', default='yowo-d19', type=str,
+    parser.add_argument('-v', '--version', default='yowo', type=str,
                         help='build yowo')
     parser.add_argument('--weight', default='weight/',
                         type=str, help='Trained state_dict file path to open')
