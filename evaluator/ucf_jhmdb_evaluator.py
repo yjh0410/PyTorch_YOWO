@@ -21,7 +21,6 @@ class UCF_JHMDB_Evaluator(object):
                  transform=None,
                  collate_fn=None,
                  redo=False,
-                 cal_mAP=False,
                  gt_folder=None,
                  dt_folder=None,
                  save_path=None):
@@ -34,10 +33,9 @@ class UCF_JHMDB_Evaluator(object):
         self.iou_thresh = iou_thresh
 
         self.redo = redo
-        self.cal_mAP = cal_mAP
+        self.gt_folder = gt_folder
         self.dt_folder = dt_folder
         self.save_path = save_path
-        self.gt_folder = gt_folder
 
         # dataset
         self.testset = UCF_JHMDB_Dataset(
@@ -62,7 +60,7 @@ class UCF_JHMDB_Evaluator(object):
             )
     
 
-    def inference(self, model, epoch=1):
+    def evaluate_accu_recall(self, model, epoch=1):
         # number of groundtruth
         total_num_gts = 0
         proposals   = 0.0
@@ -189,29 +187,15 @@ class UCF_JHMDB_Evaluator(object):
                 classification_accuracy,
                 locolization_recall,
                 current_dir
-            ) = self.inference(model, epoch)
+            ) = self.evaluate_accu_recall(model, epoch)
 
-        print('calculating Frame mAP ...')
-        if self.dt_folder is None:
             result_path = current_dir
         else:
             result_path = self.dt_folder
 
+        print('calculating Frame mAP ...')
         metric_list = get_mAP(self.gt_folder, result_path, self.iou_thresh ,self.save_path)
         print(metric_list)
-
-
-    def evaluate(self, model, epoch):
-        if self.cal_mAP:
-            self.evaluate_frame_map(model, epoch)
-        else:
-            (
-                classification_accuracy,
-                locolization_recall,
-                current_dir
-            ) = self.inference(model, epoch)
-
-        return classification_accuracy, locolization_recall,
 
 
 if __name__ == "__main__":

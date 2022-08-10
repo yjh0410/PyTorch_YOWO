@@ -23,13 +23,15 @@ def parse_args():
                         help='the size of input frame')
     parser.add_argument('--cuda', action='store_true', default=False, 
                         help='use cuda.')
-    parser.add_argument('-mt', '--metrics', default=['frame_map', 'video_map'], type=str,
-                        help='evaluation metrics')
     parser.add_argument('--save_path', default='results/',
                         type=str, help='Trained state_dict file path to open')
 
+    # dataset
+    parser.add_argument('-d', '--dataset', default='ucf24',
+                        help='ucf24, jhmdb, ava.')
+
     # eval
-    parser.add_argument('--gt_folder', default='./evaluator/groundtruth_ucf_jhmdb',
+    parser.add_argument('--gt_folder', default='./evaluator/groundtruth_ucf_jhmdb/groundtruth_ucf/',
                         type=str, help='path to grouondtruth of ucf & jhmdb')
     parser.add_argument('--dt_folder', default=None,
                         type=str, help='path to detection dir')
@@ -45,12 +47,6 @@ def parse_args():
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--topk', default=40, type=int,
                         help='NMS threshold')
-
-    # dataset
-    parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
-                        help='data root')
-    parser.add_argument('-d', '--dataset', default='coco',
-                        help='coco, voc.')
 
     return parser.parse_args()
 
@@ -68,12 +64,14 @@ def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn):
         transform=transform,
         collate_fn=collate_fn,
         redo=args.redo,
-        cal_mAP=args.cal_mAP,
         gt_folder=args.gt_folder,
         dt_folder=args.dt_folder,
         save_path=args.save_path)
 
-    cls_accu, loc_recall = evaluator.evaluate(model)
+    if args.cal_mAP:
+        evaluator.evaluate_frame_map(model)
+    else:
+        cls_accu, loc_recall = evaluator.evaluate_accu_recall(model)
 
 
 
