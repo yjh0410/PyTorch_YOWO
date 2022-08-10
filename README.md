@@ -31,3 +31,11 @@ For JHMDB21:
 Link: https://pan.baidu.com/s/1HSDqKFWhx_vF_9x6-Hb8jA 
 
 Password: tcjd 
+
+
+# Experiment
+## UCF24
+|    Model    |    Frame mAP    |    Cls Accu    |    Recall    |    Weight    |
+|-------------|-----------------|----------------|--------------|--------------|
+|    YOWO     |      80.4       |      94.5      |      93.5    |              |
+| YOWO (Ours) |      80.4       |      94.1      |      93.7    | [github]()   |
