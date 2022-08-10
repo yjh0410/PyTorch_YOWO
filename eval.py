@@ -58,6 +58,7 @@ def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
         data_root=d_cfg['data_root'],
         img_size=d_cfg['test_size'],
         len_clip=d_cfg['len_clip'],
+        conf_thresh=0.01,
         iou_thresh=0.5,
         transform=transform,
         collate_fn=collate_fn,
@@ -67,7 +68,7 @@ def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
         save_path=args.save_path)
 
     if args.cal_mAP:
-        evaluator.evaluate_frame_map(model)
+        evaluator.evaluate_frame_map(model, show_pr_curve=True)
     else:
         cls_accu, loc_recall = evaluator.evaluate_accu_recall(model)
 

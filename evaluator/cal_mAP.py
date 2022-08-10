@@ -606,6 +606,7 @@ class Evaluator:
                 os.makedirs(savePath, exist_ok=True)
                 savePath_ = os.path.join(savePath, self.dataset)
                 os.makedirs(savePath_, exist_ok=True)
+                print(os.path.join(savePath_, classId + '.png'))
                 # save fig
                 plt.savefig(os.path.join(savePath_, classId + '.png'))
 
@@ -897,7 +898,7 @@ def getBoundingBoxes(directory,
     return allBoundingBoxes, allClasses
 
 
-def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'ucf24'):
+def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'ucf24', show_pr_curve=False):
     # Get current path to set default folders
     #VERSION = '0.1 (beta)'
     gtFormat = 'xyrb'
@@ -955,7 +956,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
         IOUThreshold=iouThreshold,  # IOU threshold
         method=MethodAveragePrecision.EveryPointInterpolation,
         showAP=True,  # Show Average Precision in the title of the plot
-        showInterpolatedPrecision=True,  # Don't plot the interpolated precision curve
+        showInterpolatedPrecision=show_pr_curve,  # plot the interpolated precision curve
         savePath=savePath,
         showGraphic=False)
 

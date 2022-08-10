@@ -16,6 +16,7 @@ class UCF_JHMDB_Evaluator(object):
                  img_size=224,
                  len_clip=1,
                  batch_size=1,
+                 conf_thresh=0.01,
                  iou_thresh=0.5,
                  transform=None,
                  collate_fn=None,
@@ -27,7 +28,7 @@ class UCF_JHMDB_Evaluator(object):
         self.dataset = dataset
         self.img_size = img_size
         self.len_clip = len_clip
-        self.conf_thresh = 0.1
+        self.conf_thresh = conf_thresh
         self.iou_thresh = iou_thresh
 
         self.redo = redo
@@ -179,7 +180,7 @@ class UCF_JHMDB_Evaluator(object):
         return classification_accuracy, locolization_recall, current_dir
 
 
-    def evaluate_frame_map(self, model, epoch=1):
+    def evaluate_frame_map(self, model, epoch=1, show_pr_curve=False):
         if self.redo:
             (
                 classification_accuracy,
@@ -192,7 +193,8 @@ class UCF_JHMDB_Evaluator(object):
             result_path = self.dt_folder
 
         print('calculating Frame mAP ...')
-        metric_list = get_mAP(self.gt_folder, result_path, self.iou_thresh, self.save_path, self.dataset)
+        metric_list = get_mAP(self.gt_folder, result_path, self.iou_thresh,
+                              self.save_path, self.dataset, show_pr_curve)
         for metric in metric_list:
             print(metric)
 
