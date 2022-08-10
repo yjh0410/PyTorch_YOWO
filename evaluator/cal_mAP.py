@@ -951,6 +951,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     validClasses = 0
 
     # Plot Precision x Recall curve
+    print(savePath)
     detections = evaluator.PlotPrecisionRecallCurve(
         allBoundingBoxes,  # Object containing all bounding boxes (ground truths and detections)
         IOUThreshold=iouThreshold,  # IOU threshold
