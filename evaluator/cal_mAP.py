@@ -955,7 +955,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
         IOUThreshold=iouThreshold,  # IOU threshold
         method=MethodAveragePrecision.EveryPointInterpolation,
         showAP=True,  # Show Average Precision in the title of the plot
-        showInterpolatedPrecision=False,  # Don't plot the interpolated precision curve
+        showInterpolatedPrecision=True,  # Don't plot the interpolated precision curve
         savePath=savePath,
         showGraphic=False)
 
