@@ -9,4 +9,4 @@ python eval.py \
         --save_path ./eval_results/ \
         --weight ./weights/ucf24/yowo-d19/yowof-d19_epoch_3.pth \
         --cal_mAP \
-        --redo \
+        # --redo \
