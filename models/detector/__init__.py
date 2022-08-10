@@ -24,7 +24,7 @@ def build_model(args,
         model = YOWO(
             cfg=m_cfg,
             device=device,
-            anchor_size=d_cfg['anchor_size'][args.dataset],
+            anchor_size=m_cfg['anchor_size'][args.dataset],
             img_size=img_size,
             len_clip=d_cfg['len_clip'],
             num_classes=num_classes,
