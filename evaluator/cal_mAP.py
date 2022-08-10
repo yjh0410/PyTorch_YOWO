@@ -907,6 +907,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     detCoordinates = 'abs'
     gtFolder = os.path.join(os.path.abspath('.'), gtFolder)
     detFolder = os.path.join(os.path.abspath('.'), detFolder)
+    print(os.path.join(os.path.abspath('.'), savePath))
 
     iouThreshold = threshold
 
@@ -951,7 +952,6 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     validClasses = 0
 
     # Plot Precision x Recall curve
-    print(os.path.join(os.path.abspath('.'), savePath))
     detections = evaluator.PlotPrecisionRecallCurve(
         allBoundingBoxes,  # Object containing all bounding boxes (ground truths and detections)
         IOUThreshold=iouThreshold,  # IOU threshold
