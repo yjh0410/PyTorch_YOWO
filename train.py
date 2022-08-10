@@ -317,7 +317,7 @@ def train():
 
                     # save model
                     print('Saving state, epoch:', epoch + 1)
-                    weight_name = '{}_epoch_{}_{:.2f}_{:.2f}.pth'.format(args.version, epoch+1, accu, recall)
+                    weight_name = '{}_epoch_{}_{:.1f}_{:.1f}.pth'.format(args.version, epoch+1, accu*100, recall*100)
                     checkpoint_path = os.path.join(path_to_save, weight_name)
                     torch.save({'model': model_eval.state_dict(),
                                 # 'optimizer': optimizer.state_dict(),
