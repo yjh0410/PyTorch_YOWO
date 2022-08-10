@@ -5,4 +5,4 @@ python train.py \
         -v yowo-d19 \
         --num_workers 4 \
         --eval_epoch 1 \
-        # --eval \
+        --eval \
