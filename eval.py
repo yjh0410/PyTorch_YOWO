@@ -65,7 +65,7 @@ def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn, save_path)
         redo=args.redo,
         gt_folder=args.gt_folder,
         dt_folder=args.dt_folder,
-        save_path=save_path)
+        save_path=args.save_path)
 
     if args.cal_mAP:
         evaluator.evaluate_frame_map(model)
@@ -118,9 +118,6 @@ if __name__ == '__main__':
     # transform
     basetransform = BaseTransform(img_size=d_cfg['test_size'])
 
-    # path to save inference results
-    save_path = os.path.join(args.save_path, args.dataset)
-
     # run
     if args.dataset in ['ucf24', 'jhmdb21']:
         ucf_jhmdb_eval(
@@ -129,6 +126,5 @@ if __name__ == '__main__':
             d_cfg=d_cfg,
             model=model,
             transform=basetransform,
-            collate_fn=CollateFunc(),
-            save_path=save_path
+            collate_fn=CollateFunc()
             )
