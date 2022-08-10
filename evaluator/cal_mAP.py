@@ -388,6 +388,10 @@ class BoundingBoxes:
 
 
 class Evaluator:
+    def __init__(self, dataset='ucf24'):
+        self.dataset = dataset
+
+        
     def GetPascalVOCMetrics(self,
                             boundingboxes,
                             IOUThreshold=0.5,
@@ -599,7 +603,11 @@ class Evaluator:
             plt.grid()
 
             if savePath is not None:
-                plt.savefig(os.path.join(savePath, classId + '.png'))
+                os.makedirs(savePath, exist_ok=True)
+                savePath_ = os.path.join(savePath, self.dataset)
+                os.makedirs(savePath_, exist_ok=True)
+                # save fig
+                plt.savefig(os.path.join(savePath_, classId + '.png'))
 
             if showGraphic is True:
                 plt.show()
@@ -889,7 +897,7 @@ def getBoundingBoxes(directory,
     return allBoundingBoxes, allClasses
 
 
-def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None):
+def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'ucf24'):
     # Get current path to set default folders
     #VERSION = '0.1 (beta)'
     gtFormat = 'xyrb'
@@ -937,7 +945,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None):
         detFolder, False, detFormat, detCoordType, allBoundingBoxes, allClasses, imgSize=imgSize)
     allClasses.sort()
 
-    evaluator = Evaluator()
+    evaluator = Evaluator(dataset=datatset)
     acc_AP = 0
     validClasses = 0
 
