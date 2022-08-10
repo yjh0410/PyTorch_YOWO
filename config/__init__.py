@@ -6,7 +6,7 @@ def build_model_config(args):
     print('==============================')
     print('Model Config: {} '.format(args.version.upper()))
     
-    if args.version in ['yowo-d19', 'yowo-d53']:
+    if args.version == 'yowo':
         m_cfg = yowo_config[args.version]
 
     return m_cfg
