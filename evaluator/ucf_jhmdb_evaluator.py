@@ -11,7 +11,6 @@ from .utils import bbox_iou
 
 class UCF_JHMDB_Evaluator(object):
     def __init__(self,
-                 device,
                  data_root=None,
                  dataset='ucf24',
                  img_size=224,
@@ -24,7 +23,6 @@ class UCF_JHMDB_Evaluator(object):
                  gt_folder=None,
                  dt_folder=None,
                  save_path=None):
-        self.device = device
         self.data_root = data_root
         self.dataset = dataset
         self.img_size = img_size
@@ -75,7 +73,7 @@ class UCF_JHMDB_Evaluator(object):
 
         for iter_i, (batch_frame_id, batch_video_clip, batch_target) in enumerate(self.testloader):
             # to device
-            batch_video_clip = batch_video_clip.to(self.device)
+            batch_video_clip = batch_video_clip.to(model.device)
 
             with torch.no_grad():
                 # inference
@@ -195,7 +193,8 @@ class UCF_JHMDB_Evaluator(object):
 
         print('calculating Frame mAP ...')
         metric_list = get_mAP(self.gt_folder, result_path, self.iou_thresh, self.save_path, self.dataset)
-        print(metric_list)
+        for metric in metric_list:
+            print(metric)
 
 
 if __name__ == "__main__":

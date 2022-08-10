@@ -51,9 +51,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def ucf_jhmdb_eval(device, args, d_cfg, model, transform, collate_fn):
+def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
     evaluator = UCF_JHMDB_Evaluator(
-        device=device,
         dataset=args.dataset,
         batch_size=args.batch_size,
         data_root=d_cfg['data_root'],
@@ -121,7 +120,6 @@ if __name__ == '__main__':
     # run
     if args.dataset in ['ucf24', 'jhmdb21']:
         ucf_jhmdb_eval(
-            device=device,
             args=args,
             d_cfg=d_cfg,
             model=model,
