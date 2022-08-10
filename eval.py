@@ -43,7 +43,7 @@ def parse_args():
     # model
     parser.add_argument('-v', '--version', default='yowo-d19', type=str,
                         help='build yowo')
-    parser.add_argument('--weight', default='weight/',
+    parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--topk', default=40, type=int,
                         help='NMS threshold')
