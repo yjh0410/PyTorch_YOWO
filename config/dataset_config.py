@@ -48,7 +48,7 @@ dataset_config = {
     'jhmdb21': {
         # dataset
         'data_root': '/mnt/share/ssd2/dataset/STAD/jhmdb21',
-        'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/jhmdb21',
+        # 'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/jhmdb21',
         # input
         'train_size': 224,
         'test_size': 224,
