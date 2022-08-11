@@ -122,7 +122,6 @@ if __name__ == '__main__':
     # config
     d_cfg = build_dataset_config(args)
     m_cfg = build_model_config(args)
-    print(m_cfg)
 
     # transform
     basetransform = BaseTransform(img_size=d_cfg['test_size'])
