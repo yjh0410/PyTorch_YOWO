@@ -272,15 +272,15 @@ def resnet101(pretrained=False, **kwargs):
 def build_resnet_3d(model_name='resnet18', pretrained=False):
     if model_name == 'resnet18':
         model = resnet18(pretrained=pretrained, shortcut_type='A')
-        feat = [128, 256, 512]
+        feat = 512
 
     elif model_name == 'resnet50':
         model = resnet50(pretrained=pretrained, shortcut_type='B')
-        feat = [512, 1024, 2048]
+        feat = 2048
 
     elif model_name == 'resnet101':
         model = resnet101(pretrained=pretrained, shortcut_type='b')
-        feat = [512, 1024, 2048]
+        feat = 2048
 
     return model, feat
 

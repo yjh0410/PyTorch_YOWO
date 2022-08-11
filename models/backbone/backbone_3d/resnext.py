@@ -236,15 +236,15 @@ def resnext152(pretrained=False, **kwargs):
 def build_resnext_3d(model_name='resnext50', pretrained=False):
     if model_name == 'resnext50':
         model = resnext50(pretrained=pretrained)
-        feat = [512, 1024, 2048]
+        feat = 2048
 
     elif model_name == 'resnext101':
         model = resnext101(pretrained=pretrained)
-        feat = [512, 1024, 2048]
+        feat = 2048
 
     elif model_name == 'resnext152':
         model = resnext152(pretrained=pretrained)
-        feat = [512, 1024, 2048]
+        feat = 2048
 
     return model, feat
 
