@@ -58,7 +58,6 @@ class YOWOv3(nn.Module):
         )
 
         # channel encoder
-        print(self.stride)
         self.channel_encoders = nn.ModuleList([
             ChannelEncoder(
                 in_dim=bk_dim_2d[i] + bk_dim_3d[i],
