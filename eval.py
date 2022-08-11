@@ -54,6 +54,7 @@ def parse_args():
 def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
     evaluator = UCF_JHMDB_Evaluator(
         dataset=args.dataset,
+        model_name=args.version,
         batch_size=args.batch_size,
         data_root=d_cfg['data_root'],
         img_size=d_cfg['test_size'],
