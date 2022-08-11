@@ -18,8 +18,18 @@ pip install -r requirements.txt
 ```
 
 # Dataset
-You can download **UCF24** and **JHMDB21** from the following link:
+You can download **UCF24** and **JHMDB21** from the following links:
 
+## Google Drive
+For UCF24:
+
+Link: https://drive.google.com/file/d/1Dwh90pRi7uGkH5qLRjQIFiEmMJrAog5J/view?usp=sharing
+
+For JHMDB21: 
+
+Link: https://drive.google.com/file/d/15nAIGrWPD4eH3y5OTWHiUbjwsr-9VFKT/view?usp=sharing
+
+## BaiduYunDisk
 For UCF24:
 
 Link: https://pan.baidu.com/s/11GZvbV0oAzBhNDVKXsVGKg
