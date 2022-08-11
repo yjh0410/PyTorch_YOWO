@@ -211,7 +211,7 @@ class YOWO(nn.Module):
         key_frame = video_clips[:, :, -1, :, :]
         # backbone
         feat_2d = self.backbone_2d(key_frame)                    # [B, C1, H, W]
-        feat_3d = self.backbone_3d(video_clips)[-1].squeeze(2)  # [B, C2, H, W]
+        feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
         # spatial&channel encoder
         feat_2d = self.spatial_encoder(feat_2d)
@@ -278,7 +278,7 @@ class YOWO(nn.Module):
             key_frame = video_clips[:, :, -1, :, :]
             # backbone
             feat_2d = self.backbone_2d(key_frame)                     # [B, C1, H, W]
-            feat_3d = self.backbone_3d(video_clips)[-1].squeeze(2)  # [B, C2, H, W]
+            feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
             # spatial&channel encoder
             feat_2d = self.spatial_encoder(feat_2d)
