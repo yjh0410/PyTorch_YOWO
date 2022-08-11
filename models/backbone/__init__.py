@@ -1,15 +1,21 @@
+# import 2D backbone
 from .backbone_2d.yolov2 import build_yolov2
+from .backbone_2d.yolov3 import build_yolov3
+# import 3D backbone
 from .backbone_3d.resnet import build_resnet_3d
 from .backbone_3d.resnext import build_resnext_3d
 
 
-def build_backbone_2d(model_name='yolov2', pretrained=False, res5_dilation=False):
+def build_backbone_2d(model_name='yolov2', pretrained=False):
     print('==============================')
     print('2D Backbone: {}'.format(model_name.upper()))
     print('--pretrained: {}'.format(pretrained))
 
     if model_name == 'yolov2':
         model, feat_dim = build_yolov2(pretrained)
+
+    elif model_name == 'yolov3':
+        model, feat_dim = build_yolov3(pretrained)
 
     else:
         print('Unknown 2D Backbone ...')

@@ -151,20 +151,22 @@ class ResNeXt(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.maxpool(x)
+        c1 = self.conv1(x)
+        c1 = self.bn1(c1)
+        c1 = self.relu(c1)
+        c2 = self.maxpool(c1)
 
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+        c2 = self.layer1(c2)
+        c3 = self.layer2(c2)
+        c4 = self.layer3(c3)
+        c5 = self.layer4(c4)
 
         if x.size(2) > 1:
             x = torch.mean(x, dim=2, keepdim=True)
 
-        return x
+        outputs = [c3, c4, c5]
+        
+        return outputs
 
 
 def load_weight(model, arch):
@@ -236,15 +238,15 @@ def resnext152(pretrained=False, **kwargs):
 def build_resnext_3d(model_name='resnext50', pretrained=False):
     if model_name == 'resnext50':
         model = resnext50(pretrained=pretrained)
-        feat = 2048
+        feat = [512, 1024, 2048]
 
     elif model_name == 'resnext101':
         model = resnext101(pretrained=pretrained)
-        feat = 2048
+        feat = [512, 1024, 2048]
 
     elif model_name == 'resnext152':
         model = resnext152(pretrained=pretrained)
-        feat = 2048
+        feat = [512, 1024, 2048]
 
     return model, feat
 

@@ -7,7 +7,7 @@ __all__ = ['YOLOv2', 'build_yolov2']
 
 
 model_urls = {
-    'yolov2': 'https://github.com/yjh0410/YOWOF/releases/download/yowof-weight/yolov2.pth'
+    'yolov2': 'https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yolov2.pth'
 }
 
 

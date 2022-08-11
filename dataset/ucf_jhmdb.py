@@ -50,17 +50,16 @@ class UCF_JHMDB_Dataset(Dataset):
 
 
     def __getitem__(self, index):
-        assert index <= len(self), 'index range error'
-        image_path = self.file_names[index].rstrip()
-
         # load a data
-        frame_idx, video_clip, target = self.pull_item(image_path)
+        frame_idx, video_clip, target = self.pull_item(index)
 
         return frame_idx, video_clip, target
 
 
-    def pull_item(self, image_path):
+    def pull_item(self, index):
         """ load a data """
+        assert index <= len(self), 'index range error'
+        image_path = self.file_names[index].rstrip()
 
         img_split = image_path.split('/')  # ex. ['labels', 'Basketball', 'v_Basketball_g08_c01', '00070.txt']
         # image name
@@ -126,6 +125,25 @@ class UCF_JHMDB_Dataset(Dataset):
 
         return frame_id, video_clip, target
 
+
+    def pull_anno(self, index):
+        """ load a data """
+        assert index <= len(self), 'index range error'
+        image_path = self.file_names[index].rstrip()
+
+        img_split = image_path.split('/')  # ex. ['labels', 'Basketball', 'v_Basketball_g08_c01', '00070.txt']
+        # image name
+        img_id = int(img_split[-1][:5])
+
+        # path to label
+        label_path = os.path.join(self.data_root, img_split[0], img_split[1], img_split[2], '{:05d}.txt'.format(img_id))
+
+        # load an annotation
+        target = np.loadtxt(label_path)
+        target = target.reshape(-1, 5)
+
+        return target
+        
 
 if __name__ == '__main__':
     import cv2
