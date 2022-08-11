@@ -119,6 +119,7 @@ class YOWOv2(nn.Module):
             # [HW, 2] -> [HW, KA, 2] -> [M, 2]
             anchor_xy = anchor_xy.unsqueeze(1).repeat(1, self.num_anchors, 1)
             anchor_xy = anchor_xy.view(-1, 2).to(self.device)
+            anchor_xy *= stride
 
             # [KA, 2] -> [1, KA, 2] -> [HW, KA, 2] -> [M, 2]
             anchor_wh = anchor_size.unsqueeze(0).repeat(fmp_h*fmp_w, 1, 1)
