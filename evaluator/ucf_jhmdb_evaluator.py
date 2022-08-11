@@ -100,15 +100,19 @@ class UCF_JHMDB_Evaluator(object):
                     if self.dataset == 'ucf24':
                         detection_path = os.path.join('results', 'ucf_detections', self.model_name, 'detections_' + str(epoch), frame_id)
                         current_dir = os.path.join('results', 'ucf_detections',  self.model_name, 'detections_' + str(epoch))
-                        if not os.path.exists('results/ucf_detections'):
-                            os.mkdir('results/ucf_detections')
+                        if not os.path.exists('results/ucf_detections/'):
+                            os.mkdir('results/ucf_detections/')
+                        if not os.path.exists('results/ucf_detections/'+self.model_name):
+                            os.mkdir('results/ucf_detections/'+self.model_name)
                         if not os.path.exists(current_dir):
                             os.mkdir(current_dir)
                     else:
                         detection_path = os.path.join('results', 'jhmdb_detections',  self.model_name, 'detections_' + str(epoch), frame_id)
                         current_dir = os.path.join('results', 'jhmdb_detections',  self.model_name, 'detections_' + str(epoch))
-                        if not os.path.exists('results/jhmdb_detections'):
-                            os.mkdir('results/jhmdb_detections')
+                        if not os.path.exists('results/jhmdb_detections/'):
+                            os.mkdir('results/jhmdb_detections/')
+                        if not os.path.exists('results/jhmdb_detections/'+self.model_name):
+                            os.mkdir('results/jhmdb_detections/'+self.model_name)
                         if not os.path.exists(current_dir):
                             os.mkdir(current_dir)
 
