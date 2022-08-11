@@ -62,7 +62,7 @@ dataset_config = {
         'freeze_backbone_2d': True,
         'freeze_backbone_3d': True,
         # train config
-        'batch_size': 1,
+        'batch_size': 8,
         'test_batch_size': 8,
         'accumulate': 16,
         'optimizer': 'adamw',
