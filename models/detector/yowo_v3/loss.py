@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .matcher import YoloMatcher
+from .matcher import Yolov3Matcher
 from utils.box_ops import get_ious
 from utils.misc import Softmax_FocalLoss
 from utils.vis_tools import vis_targets
@@ -29,7 +29,7 @@ class Criterion(object):
         self.loss_reg_weight = loss_reg_weight
 
         # Matcher
-        self.matcher = YoloMatcher(
+        self.matcher = Yolov3Matcher(
             num_classes=num_classes,
             num_anchors=num_anchors,
             anchor_size=anchor_size,
@@ -66,8 +66,9 @@ class Criterion(object):
             vis_targets(video_clips, targets)
 
         # target of key-frame
-        device = outputs['conf_pred'].device
-        batch_size = outputs['conf_pred'].shape[0]
+        batch_size = outputs['conf_pred'][0].shape[0]
+        device = outputs['conf_pred'][0].device
+        fpn_strides = outputs['strides']
 
         # Matcher for this frame
         (
@@ -75,12 +76,12 @@ class Criterion(object):
             gt_cls, 
             gt_bboxes
             ) = self.matcher(img_size=outputs['img_size'], 
-                             stride=outputs['stride'], 
+                             fpn_strides=fpn_strides, 
                              targets=targets)
 
-        pred_conf = outputs['conf_pred'].view(-1)                  # [BM,]
-        pred_cls = outputs['cls_pred'].view(-1, self.num_classes)  # [BM, C]
-        pred_box = outputs['box_pred'].view(-1, 4)                 # [BM, 4]
+        pred_conf = torch.cat(outputs['conf_pred'], dim=1).view(-1)                  # [BM,]
+        pred_cls = torch.cat(outputs['cls_pred'], dim=1).view(-1, self.num_classes)  # [BM, C]
+        pred_box = torch.cat(outputs['box_pred'], dim=1).view(-1, 4)                 # [BM, 4]
         
         gt_conf = gt_conf.flatten().to(device).float()        # [BM,]
         gt_cls = gt_cls.flatten().to(device).long()           # [BM,]

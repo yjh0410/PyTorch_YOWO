@@ -1,8 +1,9 @@
+import math
 import numpy as np
 import torch
 
 
-class YoloMatcher(object):
+class Yolov3Matcher(object):
     def __init__(self, num_classes, num_anchors, anchor_size, iou_thresh):
         self.num_classes = num_classes
         self.num_anchors = num_anchors
@@ -50,30 +51,37 @@ class YoloMatcher(object):
 
 
     @torch.no_grad()
-    def __call__(self, img_size, stride, targets):
+    def __call__(self, img_size, fpn_strides, targets):
         """
-            img_size: (Int) image size
-            stride: (Int) -> output stride of network.
+            fmp_size: (List) [fmp_h, fmp_w]
+            fpn_strides: (List) -> [8, 16, 32, ...] stride of network output.
             targets: (Dict) dict{'boxes': [...], 
                                  'labels': [...], 
                                  'orig_size': ...}
         """
-        
-        bs = len(targets)
-        fmp_h = fmp_w = img_size // stride
         # prepare
-        gt_conf = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 1])
-        gt_cls = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 1])
-        gt_bboxes = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 4])
+        bs = len(targets)
+        gt_conf = [
+            torch.zeros([bs, img_size//stride, img_size//stride, self.num_anchors, 1]) 
+            for stride in fpn_strides
+            ]
+        gt_cls = [
+            torch.zeros([bs, img_size//stride, img_size//stride, self.num_anchors, 1]) 
+            for stride in fpn_strides
+            ]
+        gt_bboxes = [
+            torch.zeros([bs, img_size//stride, img_size//stride, self.num_anchors, 4]) 
+            for stride in fpn_strides
+            ]
 
         for bi in range(bs):
             targets_per_image = targets[bi]
             # [N,]
-            tgt_labels = targets_per_image["labels"].numpy()
+            tgt_cls = targets_per_image["labels"].numpy()
             # [N, 4]
-            tgt_bboxes = targets_per_image['boxes'].numpy()
+            tgt_box = targets_per_image['boxes'].numpy()
 
-            for box, label in zip(tgt_bboxes, tgt_labels):
+            for box, label in zip(tgt_box, tgt_cls):
                 # get a bbox coords
                 label = int(label)
                 x1, y1, x2, y2 = box.tolist()
@@ -99,7 +107,13 @@ class YoloMatcher(object):
                 label_assignment_results = []
                 if iou_mask.sum() == 0:
                     # We assign the anchor box with highest IoU score.
-                    anchor_idx = np.argmax(iou)
+                    iou_ind = np.argmax(iou)
+
+                    level = iou_ind // self.num_anchors              # pyramid level
+                    anchor_idx = iou_ind - level * self.num_anchors  # anchor index
+
+                    # get the corresponding stride
+                    stride = fpn_strides[level]
 
                     # compute the grid cell
                     xc_s = xc / stride
@@ -107,39 +121,40 @@ class YoloMatcher(object):
                     grid_x = int(xc_s)
                     grid_y = int(yc_s)
 
-                    label_assignment_results.append([grid_x, grid_y, anchor_idx])
+                    label_assignment_results.append([grid_x, grid_y, level, anchor_idx])
                 else:            
                     for iou_ind, iou_m in enumerate(iou_mask):
                         if iou_m:
-                            anchor_idx = iou_ind
+                            level = iou_ind // self.num_anchors              # pyramid level
+                            anchor_idx = iou_ind - level * self.num_anchors  # anchor index
+
+                            # get the corresponding stride
+                            stride = fpn_strides[level]
+
                             # compute the gride cell
                             xc_s = xc / stride
                             yc_s = yc / stride
                             grid_x = int(xc_s)
                             grid_y = int(yc_s)
 
-                            label_assignment_results.append([grid_x, grid_y, anchor_idx])
+                            label_assignment_results.append([grid_x, grid_y, level, anchor_idx])
 
                 # label assignment
                 for result in label_assignment_results:
-                    grid_x, grid_y, anchor_idx = result
+                    grid_x, grid_y, level, anchor_idx = result
+                    stride = fpn_strides[level]
+                    fmp_h = fmp_w = img_size// stride
 
-                    # 3x3 center prior
                     is_valid = (grid_y >= 0 and grid_y < fmp_h) and (grid_x >= 0 and grid_x < fmp_w)
 
                     if is_valid:
-                        gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
-                        gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
-                        gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
+                        gt_conf[level][bi, grid_y, grid_x, anchor_idx, 0] = 1.0
+                        gt_cls[level][bi, grid_y, grid_x, anchor_idx, 0] = label
+                        gt_bboxes[level][bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
 
         # [B, M, C]
-        gt_conf =   gt_conf.view(bs, -1, 1).float()
-        gt_cls =    gt_cls.view(bs, -1, 1).long()
-        gt_bboxes = gt_bboxes.view(bs, -1, 4).float()
+        gt_conf = torch.cat([gt.view(bs, -1, 1) for gt in gt_conf], dim=1).float()
+        gt_cls = torch.cat([gt.view(bs, -1, 1) for gt in gt_cls], dim=1).float()
+        gt_bboxes = torch.cat([gt.view(bs, -1, 4) for gt in gt_bboxes], dim=1).float()
 
         return gt_conf, gt_cls, gt_bboxes
-
-
-
-if __name__ == "__main__":
-    pass

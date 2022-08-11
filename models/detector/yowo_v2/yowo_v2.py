@@ -33,12 +33,8 @@ class YOWOv2(nn.Module):
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
         self.topk = topk
-        ## anchor config
-        self.num_levels = len(cfg['stride'])
-        self.num_anchors = len(anchor_size) // len(cfg['stride'])
-        self.anchor_size = torch.as_tensor(
-            anchor_size
-            ).view(self.num_levels, self.num_anchors, 2) # [S, KA, 2]
+        self.num_anchors = len(anchor_size)
+        self.anchor_size = torch.as_tensor(anchor_size)
 
         # ------------------ Anchor Box --------------------
         # [M, 4]
@@ -57,22 +53,23 @@ class YOWOv2(nn.Module):
             pretrained=cfg['pretrained_2d'] and trainable
         )
 
+        # spatial encoder
+        self.spatial_encoder = SpatialEncoder(
+            in_dim=bk_dim_2d,
+            out_dim=512,
+            act_type=cfg['head_act'],
+            norm_type=cfg['head_norm']
+        )
         # channel encoder
-        self.channel_encoders = nn.ModuleList([
-            ChannelEncoder(
-                in_dim=bk_dim_2d[i] + bk_dim_3d[i],
-                out_dim=cfg['head_dim'][i],
-                act_type=cfg['head_act'],
-                norm_type=cfg['head_norm']
-                )
-            for i in range(len(self.stride))
-        ])
-        
+        self.channel_encoder = ChannelEncoder(
+            in_dim=512 + bk_dim_3d,
+            out_dim=cfg['head_dim'],
+            act_type=cfg['head_act'],
+            norm_type=cfg['head_norm']
+        )
+
         # output
-        self.preds = nn.ModuleList([
-            nn.Conv2d(cfg['head_dim'][i], self.num_anchors * (1 + num_classes + 4), kernel_size=1)
-            for i in range(len(self.stride))
-        ])
+        self.pred = nn.Conv2d(cfg['head_dim'], self.num_anchors * (1 + num_classes + 4), kernel_size=1)
 
 
         if trainable:
@@ -84,9 +81,9 @@ class YOWOv2(nn.Module):
             self.criterion = Criterion(
                 cfg=cfg,
                 device=device,
+                anchor_size=self.anchor_size,
                 num_anchors=self.num_anchors,
                 num_classes=self.num_classes,
-                anchor_size=anchor_size,
                 loss_obj_weight=cfg['loss_obj_weight'],
                 loss_noobj_weight=cfg['loss_noobj_weight'],
                 loss_cls_weight=cfg['loss_cls_weight'],
@@ -98,56 +95,53 @@ class YOWOv2(nn.Module):
         init_prob = 0.01
         bias_value = -torch.log(torch.tensor((1. - init_prob) / init_prob))
         # init bias
-        for pred in self.preds:
-            nn.init.constant_(pred.bias[..., :self.num_anchors], bias_value)
-            nn.init.constant_(pred.bias[..., self.num_anchors:self.num_anchors*(1 + self.num_classes)], bias_value)
+        nn.init.constant_(self.pred.bias[..., :self.num_anchors], bias_value)
+        nn.init.constant_(self.pred.bias[..., self.num_anchors:self.num_anchors*(1 + self.num_classes)], bias_value)
 
 
     def generate_anchors(self, img_size):
+        """fmp_size: list -> [H, W] \n
+           stride: int -> output stride
         """
-            fmp_size: (List) [H, W]
-        """
-        all_anchor_boxes = []
-        for level, stride in enumerate(self.stride):
-            fmp_h = fmp_w = img_size // stride
-            # [KA, 2]
-            anchor_size = self.anchor_size[level]
+        # generate grid cells
+        img_h = img_w = img_size
+        fmp_h, fmp_w = img_h // self.stride, img_w // self.stride
+        anchor_y, anchor_x = torch.meshgrid([torch.arange(fmp_h), torch.arange(fmp_w)])
+        # [H, W, 2] -> [HW, 2]
+        anchor_xy = torch.stack([anchor_x, anchor_y], dim=-1).float().view(-1, 2)
+        # [HW, 2] -> [HW, 1, 2] -> [HW, KA, 2] 
+        anchor_xy = anchor_xy[:, None, :].repeat(1, self.num_anchors, 1)
+        anchor_xy *= self.stride
 
-            # generate grid cells
-            anchor_y, anchor_x = torch.meshgrid([torch.arange(fmp_h), torch.arange(fmp_w)])
-            anchor_xy = torch.stack([anchor_x, anchor_y], dim=-1).float().view(-1, 2)
-            # [HW, 2] -> [HW, KA, 2] -> [M, 2]
-            anchor_xy = anchor_xy.unsqueeze(1).repeat(1, self.num_anchors, 1)
-            anchor_xy = anchor_xy.view(-1, 2).to(self.device)
-            anchor_xy *= stride
+        # [KA, 2] -> [1, KA, 2] -> [HW, KA, 2]
+        anchor_wh = self.anchor_size[None, :, :].repeat(fmp_h*fmp_w, 1, 1)
 
-            # [KA, 2] -> [1, KA, 2] -> [HW, KA, 2] -> [M, 2]
-            anchor_wh = anchor_size.unsqueeze(0).repeat(fmp_h*fmp_w, 1, 1)
-            anchor_wh = anchor_wh.view(-1, 2).to(self.device)
+        # [HW, KA, 4] -> [M, 4]
+        anchor_boxes = torch.cat([anchor_xy, anchor_wh], dim=-1)
+        anchor_boxes = anchor_boxes.view(-1, 4).to(self.device)
 
-            # [HW, KA, 4] -> [M, 4]
-            anchor_boxes = torch.cat([anchor_xy, anchor_wh], dim=-1)
-            anchor_boxes = anchor_boxes.view(-1, 4).to(self.device)
-
-            all_anchor_boxes.append(anchor_boxes)
-
-        return all_anchor_boxes
+        return anchor_boxes
         
 
-    def decode_boxes(self, level, anchors, pred_reg):
+    def decode_bbox(self, anchors, reg_pred):
         """
-            anchors:  (List[Tensor]) [M, 4]
-            pred_reg: (List[Tensor]) [M, 4]
+        Input:
+            anchors:  [B, M, 4] or [M, 4]
+            reg_pred: [B, M, 4] or [M, 4]
+        Output:
+            box_pred: [B, M, 4] or [M, 4]
         """
-        pred_ctr_delta = pred_reg[..., :2].sigmoid() * self.stride[level]
-        pred_ctr = anchors[..., :2] + pred_ctr_delta
-        pred_wh = anchors[..., 2:] * pred_reg[..., 2:].exp()
-        
-        pred_x1y1 = pred_ctr - pred_wh * 0.5
-        pred_x2y2 = pred_ctr + pred_wh * 0.5
-        pred_box = torch.cat([pred_x1y1, pred_x2y2], dim=-1)
+        # txty -> cxcy
+        xy_pred = reg_pred[..., :2].sigmoid() * self.stride + anchors[..., :2]
+        # twth -> wh
+        wh_pred = reg_pred[..., 2:].exp() * anchors[..., 2:]
 
-        return pred_box
+        # xywh -> x1y1x2y2
+        x1y1_pred = xy_pred - wh_pred * 0.5
+        x2y2_pred = xy_pred + wh_pred * 0.5
+        box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
+
+        return box_pred
 
 
     def nms(self, dets, scores):
@@ -170,19 +164,13 @@ class YOWOv2(nn.Module):
             xx2 = np.minimum(x2[i], x2[order[1:]])
             yy2 = np.minimum(y2[i], y2[order[1:]])
 
-            # intersection
-            w = np.maximum(1e-10, xx2 - xx1)
-            h = np.maximum(1e-10, yy2 - yy1)
+            w = np.maximum(1e-28, xx2 - xx1)
+            h = np.maximum(1e-28, yy2 - yy1)
             inter = w * h
 
-            # union
-            union = areas[i] + areas[order[1:]] - inter
-
-            # iou
-            iou = inter / np.clip(union, a_min=1e-10, a_max=np.inf)
-
-            #nms thresh
-            inds = np.where(iou <= self.nms_thresh)[0]
+            ovr = inter / (areas[i] + areas[order[1:]] - inter + 1e-14)
+            #reserve all the boundingbox whose ovr less than thresh
+            inds = np.where(ovr <= self.nms_thresh)[0]
             order = order[inds + 1]
 
         return keep
@@ -222,39 +210,23 @@ class YOWOv2(nn.Module):
         """                        
         key_frame = video_clips[:, :, -1, :, :]
         # backbone
-        feats_2d = self.backbone_2d(key_frame)    # [B, C1, H, W]
-        feats_3d = self.backbone_3d(video_clips)  # [B, C2, H, W]
+        feat_2d = self.backbone_2d(key_frame)               # [B, C1, H, W]
+        feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
-        conf_pred_list = []
-        cls_pred_list = []
-        box_pred_list = []
-        # head
-        for level in range(self.num_levels):
-            feat_2d = feats_2d[level]
-            feat_3d = feats_3d[level].mean(2)
-            # channel encoder
-            feat = torch.cat([feat_2d, feat_3d], dim=1)
-            feat = self.channel_encoders[level](feat)
-            
-            # pred
-            pred = self.preds[level](feat)
+        # spatial encoder
+        feat_2d = self.spatial_encoder(feat_2d)
 
-            B, K, C = pred.size(0), self.num_anchors, self.num_classes
-            # [B, K*C, H, W] -> [B, H, W, K*C] -> [B, M, C], M = HWK
-            conf_pred = pred[:, :K, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 1)
-            cls_pred = pred[:, K:K*(1 + C), :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, C)
-            reg_pred = pred[:, K*(1 + C):, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
-            # decode box
-            anchor_boxes = self.anchor_boxes[level]
-            box_pred = self.decode_boxes(level, anchor_boxes[None], reg_pred)
+        # channel encoder
+        feat = self.channel_encoder(torch.cat([feat_2d, feat_3d], dim=1))
 
-            conf_pred_list.append(conf_pred)
-            cls_pred_list.append(cls_pred)
-            box_pred_list.append(box_pred)
-        
-        conf_pred = torch.cat(conf_pred_list, dim=1)  # [B, M, 1]
-        cls_pred = torch.cat(cls_pred_list, dim=1)    # [B, M, C]
-        box_pred = torch.cat(box_pred_list, dim=1)    # [B, M, 4]
+        # pred
+        pred = self.pred(feat)
+
+        B, K, C = pred.size(0), self.num_anchors, self.num_classes
+        # [B, K*C, H, W] -> [B, H, W, K*C] -> [B, M, C], M = HWK
+        conf_pred = pred[:, :K, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 1)
+        cls_pred = pred[:, K:K*(1 + C), :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, C)
+        reg_pred = pred[:, K*(1 + C):, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
         batch_scores = []
         batch_labels = []
@@ -263,19 +235,23 @@ class YOWOv2(nn.Module):
             # [B, M, C] -> [M, C]
             cur_conf_pred = conf_pred[batch_idx]
             cur_cls_pred = cls_pred[batch_idx]
-            cur_box_pred = box_pred[batch_idx]
+            cur_reg_pred = reg_pred[batch_idx]
                         
             # scores
             scores, labels = torch.max(torch.sigmoid(cur_conf_pred) * torch.softmax(cur_cls_pred, dim=-1), dim=-1)
 
             # topk
+            anchor_boxes = self.anchor_boxes
             if scores.shape[0] > self.topk:
                 scores, indices = torch.topk(scores, self.topk)
                 labels = labels[indices]
-                cur_box_pred = cur_box_pred[indices]
+                cur_reg_pred = cur_reg_pred[indices]
+                anchor_boxes = anchor_boxes[indices]
 
+            # decode box
+            bboxes = self.decode_bbox(anchor_boxes, cur_reg_pred) # [N, 4]
             # normalize box
-            bboxes = torch.clamp(cur_box_pred / self.img_size, 0., 1.)
+            bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
             
             # to cpu
             scores = scores.cpu().numpy()
@@ -303,42 +279,33 @@ class YOWOv2(nn.Module):
         else:
             key_frame = video_clips[:, :, -1, :, :]
             # backbone
-            feats_2d = self.backbone_2d(key_frame)    # [B, C1, H, W]
-            feats_3d = self.backbone_3d(video_clips)  # [B, C2, H, W]
+            feat_2d = self.backbone_2d(key_frame)                     # [B, C1, H, W]
+            feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
-            all_conf_preds = []
-            all_cls_preds = []
-            all_box_preds = []
-            # head
-            for level in range(self.num_levels):
-                feat_2d = feats_2d[level]
-                feat_3d = feats_3d[level].mean(2)
-                # channel encoder
-                feat = torch.cat([feat_2d, feat_3d], dim=1)
-                feat = self.channel_encoders[level](feat)
-                
-                # pred
-                pred = self.preds[level](feat)
+            # spatial encoder
+            feat_2d = self.spatial_encoder(feat_2d)
+            
+            # channel encoder
+            feat = self.channel_encoder(torch.cat([feat_2d, feat_3d], dim=1))
 
-                B, K, C = pred.size(0), self.num_anchors, self.num_classes
-                # [B, K*C, H, W] -> [B, H, W, K*C] -> [B, M, C], M = HWK
-                conf_pred = pred[:, :K, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 1)
-                cls_pred = pred[:, K:K*(1 + C), :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, C)
-                reg_pred = pred[:, K*(1 + C):, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
+            # pred
+            pred = self.pred(feat)
 
-                # decode box
-                anchor_boxes = self.anchor_boxes[level]
-                box_pred = self.decode_boxes(level, anchor_boxes[None], reg_pred)
+            B, K, C = pred.size(0), self.num_anchors, self.num_classes
+            # [B, K*C, H, W] -> [B, H, W, K*C] -> [B, M, C], M = HWK
+            conf_pred = pred[:, :K, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 1)
+            cls_pred = pred[:, K:K*(1 + C), :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, C)
+            reg_pred = pred[:, K*(1 + C):, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
-                all_conf_preds.append(conf_pred)
-                all_cls_preds.append(cls_pred)
-                all_box_preds.append(box_pred)
+            # decode box
+            box_pred = self.decode_bbox(self.anchor_boxes[None], reg_pred)
 
-            outputs = {"conf_pred": all_conf_preds,
-                       "cls_pred": all_cls_preds,
-                       "box_pred": all_box_preds,
+            outputs = {"conf_pred": conf_pred,
+                       "cls_pred": cls_pred,
+                       "box_pred": box_pred,
+                       "anchor_size": self.anchor_size,
                        "img_size": self.img_size,
-                       "strides": self.stride}
+                       "stride": self.stride}
 
             # loss
             loss_dict = self.criterion(
