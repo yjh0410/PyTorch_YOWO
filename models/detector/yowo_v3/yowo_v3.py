@@ -2,6 +2,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from ...backbone import build_backbone_2d
 from ...backbone import build_backbone_3d
@@ -60,7 +61,7 @@ class YOWOv3(nn.Module):
         # channel encoder
         self.channel_encoders = nn.ModuleList([
             ChannelEncoder(
-                in_dim=bk_dim_2d[i] + bk_dim_3d[i],
+                in_dim=bk_dim_2d[i] + bk_dim_3d,
                 out_dim=cfg['head_dim'][i],
                 act_type=cfg['head_act'],
                 norm_type=cfg['head_norm']
@@ -222,8 +223,8 @@ class YOWOv3(nn.Module):
         """                        
         key_frame = video_clips[:, :, -1, :, :]
         # backbone
-        feats_2d = self.backbone_2d(key_frame)    # [B, C1, H, W]
-        feats_3d = self.backbone_3d(video_clips)  # [B, C2, H, W]
+        feats_2d = self.backbone_2d(key_frame)              # [B, C1, H, W]
+        feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
         conf_pred_list = []
         cls_pred_list = []
@@ -231,9 +232,15 @@ class YOWOv3(nn.Module):
         # head
         for level in range(self.num_levels):
             feat_2d = feats_2d[level]
-            feat_3d = feats_3d[level].mean(2)
+
+            # upsample
+            if level < self.num_levels - 1:
+                feat_3d_ = F.interpolate(feat_3d, scale_factor=2**(self.num_levels - 1 - level))
+            else:
+                feat_3d_ = feat_3d
+
             # channel encoder
-            feat = torch.cat([feat_2d, feat_3d], dim=1)
+            feat = torch.cat([feat_2d, feat_3d_], dim=1)
             feat = self.channel_encoders[level](feat)
             
             # pred
@@ -303,8 +310,8 @@ class YOWOv3(nn.Module):
         else:
             key_frame = video_clips[:, :, -1, :, :]
             # backbone
-            feats_2d = self.backbone_2d(key_frame)    # [B, C1, H, W]
-            feats_3d = self.backbone_3d(video_clips)  # [B, C2, H, W]
+            feats_2d = self.backbone_2d(key_frame)              # [B, C1, H, W]
+            feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
             all_conf_preds = []
             all_cls_preds = []
@@ -312,9 +319,15 @@ class YOWOv3(nn.Module):
             # head
             for level in range(self.num_levels):
                 feat_2d = feats_2d[level]
-                feat_3d = feats_3d[level].mean(2)
+
+                # upsample
+                if level < self.num_levels - 1:
+                    feat_3d_ = F.interpolate(feat_3d, scale_factor=2**(self.num_levels - 1 - level))
+                else:
+                    feat_3d_ = feat_3d
+
                 # channel encoder
-                feat = torch.cat([feat_2d, feat_3d], dim=1)
+                feat = torch.cat([feat_2d, feat_3d_], dim=1)
                 feat = self.channel_encoders[level](feat)
                 
                 # pred
