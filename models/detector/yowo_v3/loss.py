@@ -53,12 +53,10 @@ class Criterion(object):
             outputs['box_pred]: [B, M, 4]
             outputs['stride']: Int -> stride of the model output
             anchor_size: (Tensor) [K, 2]
-            targets: List[List] -> [List[B, N, 6], 
-                                    ...,
-                                    List[B, N, 6]],
-            video_clips: Lits[Tensor] -> [Tensor[B, C, H, W], 
-                                          ..., 
-                                          Tensor[B, C, H, W]]
+            targets: List[Dict] -> [{'boxes': (Tensor) [N, 4],
+                                     'labels': (Tensor) [N,]}, 
+                                     ...],
+            video_clips: (Tensor) -> [B, C, T, H, W]
         """
         if vis_data:
             # To DO: 

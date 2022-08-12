@@ -4,33 +4,40 @@ import numpy as np
 
 def vis_targets(video_clips, targets):
     """
-        video_clips: Lits[Tensor] -> [Tensor[B, C, H, W], ..., Tensor[B, C, H, W]]
-        targets: List[List] -> [List[B, N, 6], ..., List[B, N, 6]]
+        video_clips: (Tensor) -> [B, C, T, H, W]
+        targets: List[Dict] -> [{'boxes': (Tensor) [N, 4],
+                                 'labels': (Tensor) [N,]}, 
+                                 ...],
     """
-    pixel_mean=(123.675, 116.28, 103.53)
-    pixel_std=(58.395, 57.12, 57.375)
-    len_clip = len(video_clips)
-    batch_size = video_clips[0].shape[0]
-    for batch_index in range(batch_size):
-        for fid in range(len_clip):
-            frame = video_clips[fid][batch_index] # [C, H, W]
-            frame = frame.permute(1, 2, 0).cpu().numpy()
-            # denormalize
-            frame = frame * pixel_std + pixel_mean
-            # To BGR
-            frame = frame[:, :, (2, 1, 0)].astype(np.uint8)
-            frame = frame.copy()
+    batch_size = len(video_clips)
 
-            target = targets[fid][batch_index]
-            for tgt in target:
-                x1, y1, x2, y2, label, fid = tgt
-                # draw bbox
-                cv2.rectangle(frame,
-                                (int(x1), int(y1)),
-                                (int(x2), int(y2)),
-                                (255, 0, 0), 2)
-            cv2.imshow('groundtruth', frame)
-            cv2.waitKey(0)
+    for batch_index in range(batch_size):
+        video_clip = video_clips[batch_index]
+        target = targets[batch_index]
+
+        key_frame = video_clip[:, :, -1, :, :]
+        tgt_bboxes = target['boxes']
+        tgt_labels = target['labels']
+
+        key_frame = convert_tensor_to_cv2img(key_frame)
+        width, height = key_frame.shape[:-1]
+
+        for box, label in zip(tgt_bboxes, tgt_labels):
+            x1, y1, x2, y2 = box
+            label = int(label)
+
+            x1 *= width
+            y1 *= height
+            x2 *= width
+            y2 *= height
+
+            # draw bbox
+            cv2.rectangle(key_frame,
+                            (int(x1), int(y1)),
+                            (int(x2), int(y2)),
+                            (255, 0, 0), 2)
+        cv2.imshow('groundtruth', key_frame)
+        cv2.waitKey(0)
 
 
 def convert_tensor_to_cv2img(img_tensor):
