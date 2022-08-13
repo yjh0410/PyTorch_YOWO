@@ -113,8 +113,8 @@ class ChannelEncoder(nn.Module):
             Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
             CSAM(),
             Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-            SSAM(),
-            Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            # SSAM(),
+            # Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
             nn.Dropout(0.1, inplace=False),
             nn.Conv2d(out_dim, out_dim, kernel_size=1)
         )
