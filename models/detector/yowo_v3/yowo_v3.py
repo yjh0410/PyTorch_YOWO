@@ -60,7 +60,7 @@ class YOWOv3(nn.Module):
 
         # spatial encoder
         self.spatial_encoders = nn.ModuleList([
-            ChannelEncoder(
+            SpatialEncoder(
                 in_dim=bk_dim_2d[i],
                 out_dim=bk_dim_2d[i],
                 act_type=cfg['head_act'],
