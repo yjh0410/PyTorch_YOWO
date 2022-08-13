@@ -58,6 +58,17 @@ class YOWOv3(nn.Module):
             pretrained=cfg['pretrained_2d'] and trainable
         )
 
+        # spatial encoder
+        self.spatial_encoders = nn.ModuleList([
+            ChannelEncoder(
+                in_dim=bk_dim_2d[i],
+                out_dim=bk_dim_2d[i],
+                act_type=cfg['head_act'],
+                norm_type=cfg['head_norm']
+                )
+            for i in range(len(self.stride))
+        ])
+
         # channel encoder
         self.channel_encoders = nn.ModuleList([
             ChannelEncoder(
@@ -239,6 +250,9 @@ class YOWOv3(nn.Module):
             else:
                 feat_3d_ = feat_3d
 
+            # spatial encoder
+            feat_2d = self.spatial_encoders[level](feat_2d)
+            
             # channel encoder
             feat = torch.cat([feat_2d, feat_3d_], dim=1)
             feat = self.channel_encoders[level](feat)
@@ -325,6 +339,9 @@ class YOWOv3(nn.Module):
                     feat_3d_ = F.interpolate(feat_3d, scale_factor=2**(self.num_levels - 1 - level))
                 else:
                     feat_3d_ = feat_3d
+
+                # spatial encoder
+                feat_2d = self.spatial_encoders[level](feat_2d)
 
                 # channel encoder
                 feat = torch.cat([feat_2d, feat_3d_], dim=1)
