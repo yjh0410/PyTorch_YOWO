@@ -1,4 +1,3 @@
-# This is a frame-level model which is set as the Baseline
 import numpy as np
 import torch
 import torch.nn as nn
