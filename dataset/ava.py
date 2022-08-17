@@ -99,7 +99,7 @@ class AVA_Dataset(Dataset):
         )
 
         print("=== AVA dataset summary ===")
-        print("Split: {}".format(self._split))
+        print("Train: {}".format(self.is_train))
         print("Number of videos: {}".format(len(self._image_paths)))
         total_frames = sum(
             len(video_img_paths) for video_img_paths in self._image_paths
