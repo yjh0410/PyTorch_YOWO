@@ -274,6 +274,7 @@ if __name__ == '__main__':
     for i in range(len(train_dataset)):
         frame_id, video_clip, target = train_dataset[i]
         key_frame = video_clip[:, -1, :, :]
+        print(video_clip.shape)
 
         key_frame = key_frame.permute(1, 2, 0).numpy()
         key_frame = ((key_frame * std + mean) * 255).astype(np.uint8)
