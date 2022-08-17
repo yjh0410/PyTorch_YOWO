@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 
-import ava_helper
+import ava_helper, ava_eval_helper
 
 
 # Dataset for AVA
@@ -27,6 +27,7 @@ class AVA_Dataset(Dataset):
         self.frames_dir = os.path.join(cfg['data_root'], cfg['frames_dir'])
         self.frame_list = os.path.join(cfg['data_root'], cfg['frame_list'])
         self.annotation_dir = os.path.join(cfg['data_root'], cfg['annotation_dir'])
+        self.labelmap_file = os.path.join(cfg['data_root'], cfg['annotation_dir'], cfg['labelmap_file'])
         if is_train:
             self.gt_box_list = os.path.join(self.annotation_dir, cfg['train_gt_box_list'])
             self.exclusion_file = os.path.join(self.annotation_dir, cfg['train_exclusion_file'])
@@ -44,6 +45,10 @@ class AVA_Dataset(Dataset):
 
         # load ava data
         self._load_data()
+
+        # load label map
+        self.labelmap = ava_eval_helper.read_labelmap(self.labelmap_file)
+        print(self.labelmap)
 
 
     def _load_data(self):
