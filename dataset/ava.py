@@ -240,7 +240,7 @@ if __name__ == '__main__':
     dataset_config = {
         'data_root': '/mnt/share/sda1/dataset/STAD/AVA_Dataset',
         'frames_dir': 'frames/',
-        'frame_list': 'frame_list/',
+        'frame_list': 'frame_lists/',
         'annotation_dir': 'annotations/',
         'train_gt_box_list': 'ava_v2.2/ava_train_v2.2.csv',
         'val_gt_box_list': 'ava_v2.2/ava_val_v2.2.csv',
