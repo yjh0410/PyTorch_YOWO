@@ -62,12 +62,12 @@ def load_image_lists(frames_dir, frame_list, is_train):
 
     image_paths = [image_paths[i] for i in range(len(image_paths))]
 
-    print("Finished loading image paths from: %s" % ", ".join(list_filename))
+    print("Finished loading image paths from: {}".format(list_filename))
 
     return image_paths, video_idx_to_name
 
 
-def load_boxes_and_labels(gt_box_list, annotation_dir, exclusion_file, is_train=False, full_test_on_val=False):
+def load_boxes_and_labels(gt_box_list, exclusion_file, is_train=False, full_test_on_val=False):
     """
     Loading boxes and labels from csv files.
 
@@ -81,12 +81,11 @@ def load_boxes_and_labels(gt_box_list, annotation_dir, exclusion_file, is_train=
             coordinates of box and 'box_labels` are the corresponding
             labels for the box.
     """
-    gt_filename = gt_box_list
-    ann_filename = os.path.join(annotation_dir, gt_filename[0])
+    ann_filename = gt_box_list
     all_boxes = {}
     count = 0
     unique_box_count = 0
-    excluded_keys = read_exclusions(os.path.join(annotation_dir, exclusion_file))
+    excluded_keys = read_exclusions(exclusion_file)
 
     with open(ann_filename, 'r') as f:
         for line in f:

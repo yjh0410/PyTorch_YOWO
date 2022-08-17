@@ -67,7 +67,6 @@ class AVA_Dataset(Dataset):
         # boxes_and_labels: {'<video_name>': {<frame_num>: a list of [box_i, box_i_labels]} }
         boxes_and_labels = ava_helper.load_boxes_and_labels(
             self.gt_box_list,
-            self.annotation_dir,
             self.exclusion_file,
             self.is_train,
             full_test_on_val=False
