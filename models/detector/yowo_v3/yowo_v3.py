@@ -21,7 +21,8 @@ class YOWOv3(nn.Module):
                  conf_thresh = 0.05,
                  nms_thresh = 0.6,
                  topk = 1000,
-                 trainable = False):
+                 trainable = False,
+                 cls_prob = 'softmax'):
         super(YOWOv3, self).__init__()
         self.cfg = cfg
         self.device = device
@@ -30,6 +31,7 @@ class YOWOv3(nn.Module):
         self.len_clip = len_clip
         self.num_classes = num_classes
         self.trainable = trainable
+        self.cls_prob = cls_prob
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
         self.topk = topk
@@ -286,7 +288,12 @@ class YOWOv3(nn.Module):
             cur_box_pred = box_pred[batch_idx]
                         
             # scores
-            scores, labels = torch.max(torch.sigmoid(cur_conf_pred) * torch.softmax(cur_cls_pred, dim=-1), dim=-1)
+            if self.cls_prob == 'softmax':
+                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) * \
+                                           torch.softmax(cur_cls_pred, dim=-1), dim=-1)
+            elif self.cls_prob == 'sigmoid':
+                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) * \
+                                           torch.sigmoid(cur_cls_pred), dim=-1)
 
             # topk
             if scores.shape[0] > self.topk:

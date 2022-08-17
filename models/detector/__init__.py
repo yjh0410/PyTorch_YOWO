@@ -34,7 +34,8 @@ def build_model(args,
             conf_thresh=m_cfg['conf_thresh'],
             nms_thresh=m_cfg['nms_thresh'],
             topk=args.topk,
-            trainable=trainable
+            trainable=trainable,
+            cls_prob=d_cfg['cls_prob']
             )
 
     elif args.version == 'yowo_v2':
@@ -48,7 +49,8 @@ def build_model(args,
             conf_thresh=m_cfg['conf_thresh'],
             nms_thresh=m_cfg['nms_thresh'],
             topk=args.topk,
-            trainable=trainable
+            trainable=trainable,
+            cls_prob=d_cfg['cls_prob']
             )
             
     elif args.version == 'yowo_v3':
@@ -62,7 +64,8 @@ def build_model(args,
             conf_thresh=m_cfg['conf_thresh'],
             nms_thresh=m_cfg['nms_thresh'],
             topk=args.topk,
-            trainable=trainable
+            trainable=trainable,
+            cls_prob=d_cfg['cls_prob']
             )
 
     # Freeze backbone

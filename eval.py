@@ -117,7 +117,11 @@ if __name__ == '__main__':
     model = model.to(device).eval()
 
     # transform
-    basetransform = BaseTransform(img_size=d_cfg['test_size'])
+    basetransform = BaseTransform(
+        img_size=d_cfg['test_size'],
+        pixel_mean=d_cfg['pixel_mean'],
+        pixel_std=d_cfg['pixel_std']
+        )
 
     # run
     if args.dataset in ['ucf24', 'jhmdb21']:

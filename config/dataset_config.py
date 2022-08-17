@@ -18,6 +18,8 @@ dataset_config = {
         'exposure': 1.5,
         'sampling_rate': 1,
         'len_clip': 16,
+        # cls output
+        'cls_prob': 'softmax',
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
@@ -63,6 +65,8 @@ dataset_config = {
         'exposure': 1.5,
         'sampling_rate': 1,
         'len_clip': 16,
+        # cls output
+        'cls_prob': 'softmax',
         # freeze backbone
         'freeze_backbone_2d': True,
         'freeze_backbone_3d': True,
@@ -107,14 +111,16 @@ dataset_config = {
         'train_size': 224,
         'test_size': 224,
         # transform
-        'pixel_mean': [0., 0., 0.],
-        'pixel_std': [1., 1., 1.],
+        'pixel_mean': [0.45, 0.45, 0.45],
+        'pixel_std': [0.225, 0.225, 0.225],
         'jitter': 0.2,
         'hue': 0.1,
         'saturation': 1.5,
         'exposure': 1.5,
         'sampling_rate': 1,
         'len_clip': 16,
+        # cls output
+        'cls_prob': 'sigmoid',
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,

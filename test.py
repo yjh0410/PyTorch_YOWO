@@ -124,7 +124,11 @@ if __name__ == '__main__':
     m_cfg = build_model_config(args)
 
     # transform
-    basetransform = BaseTransform(img_size=d_cfg['test_size'])
+    basetransform = BaseTransform(
+        img_size=d_cfg['test_size'],
+        pixel_mean=d_cfg['pixel_mean'],
+        pixel_std=d_cfg['pixel_std']
+        )
 
     # dataset
     if args.dataset in ['ucf24', 'jhmdb21']:
