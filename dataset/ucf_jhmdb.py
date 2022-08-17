@@ -155,6 +155,8 @@ if __name__ == '__main__':
     img_size = 224
     len_clip = 16
     trans_config = {
+        'pixel_mean': [0., 0., 0.],
+        'pixel_std': [1., 1., 1.],
         'jitter': 0.2,
         'hue': 0.1,
         'saturation': 1.5,
@@ -162,11 +164,17 @@ if __name__ == '__main__':
     }
     transform = Augmentation(
         img_size=img_size,
+        pixel_mean=trans_config['pixel_mean'],
+        pixel_std=trans_config['pixel_std'],
         jitter=trans_config['jitter'],
         saturation=trans_config['saturation'],
         exposure=trans_config['exposure']
         )
-    transform = BaseTransform(img_size=img_size)
+    transform = BaseTransform(
+        img_size=img_size,
+        pixel_mean=trans_config['pixel_mean'],
+        pixel_std=trans_config['pixel_std']
+        )
 
     train_dataset = UCF_JHMDB_Dataset(
         data_root=data_root,

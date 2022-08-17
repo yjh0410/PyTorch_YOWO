@@ -20,12 +20,18 @@ def build_dataset(d_cfg, args, is_train=False):
     # transform
     augmentation = Augmentation(
         img_size=d_cfg['train_size'],
+        pixel_mean=d_cfg['pixel_mean'],
+        pixel_std=d_cfg['pixel_std'],
         jitter=d_cfg['jitter'],
         hue=d_cfg['hue'],
         saturation=d_cfg['saturation'],
         exposure=d_cfg['exposure']
         )
-    basetransform = BaseTransform(img_size=d_cfg['test_size'])
+    basetransform = BaseTransform(
+        img_size=d_cfg['test_size'],
+        pixel_mean=d_cfg['pixel_mean'],
+        pixel_std=d_cfg['pixel_std'],
+        )
 
     # dataset
     if args.dataset in ['ucf24', 'jhmdb21']:

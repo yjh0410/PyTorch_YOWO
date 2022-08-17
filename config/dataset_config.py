@@ -10,6 +10,8 @@ dataset_config = {
         'train_size': 224,
         'test_size': 224,
         # transform
+        'pixel_mean': [0., 0., 0.],
+        'pixel_std': [1., 1., 1.],
         'jitter': 0.2,
         'hue': 0.1,
         'saturation': 1.5,
@@ -52,6 +54,9 @@ dataset_config = {
         # input
         'train_size': 224,
         'test_size': 224,
+        # transform
+        'pixel_mean': [0., 0., 0.],
+        'pixel_std': [1., 1., 1.],
         'jitter': 0.2,
         'hue': 0.1,
         'saturation': 1.5,
@@ -87,10 +92,16 @@ dataset_config = {
                 ),
     },
     
-    'ava':{
+    'ava_v2.2':{
         # dataset
-        'data_root': '/mnt/share/ssd2/dataset/STAD/UCF101_24',
-        'anno_file': 'JHMDB-GT.pkl',
+        'data_root': '/mnt/share/sda1/dataset/STAD/AVA_Dataset',
+        'frames_dir': 'frames/',
+        'frame_list': 'frame_list/',
+        'annotation_dir': 'annotations/',
+        'train_gt_box_list': 'ava_v2.2/ava_train_v2.2.csv',
+        'val_gt_box_list': 'ava_v2.2/ava_val_v2.2.csv',
+        'train_exclusion_file': 'ava_v2.2/ava_train_excluded_timestamps_v2.2.csv',
+        'val_exclusion_file': 'ava_v2.2/ava_val_excluded_timestamps_v2.2.csv',
         # loss
     }
 }

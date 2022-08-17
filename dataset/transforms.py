@@ -7,8 +7,10 @@ from PIL import Image
 
 # Augmentation for Training
 class Augmentation(object):
-    def __init__(self, img_size=224, jitter=0.2, hue=0.1, saturation=1.5, exposure=1.5):
+    def __init__(self, img_size=224, pixel_mean=[0., 0., 0.], pixel_std=[1., 1., 1.], jitter=0.2, hue=0.1, saturation=1.5, exposure=1.5):
         self.img_size = img_size
+        self.pixel_mean = pixel_mean
+        self.pixel_std = pixel_std
         self.jitter = jitter
         self.hue = hue
         self.saturation = saturation
@@ -112,7 +114,7 @@ class Augmentation(object):
         
 
     def to_tensor(self, video_clip):
-        return [F.to_tensor(image) for image in video_clip]
+        return [F.normalize(F.to_tensor(image), self.pixel_mean, self.pixel_std) for image in video_clip]
 
 
     def __call__(self, video_clip, target):
@@ -151,11 +153,13 @@ class Augmentation(object):
 
 # Transform for Testing
 class BaseTransform(object):
-    def __init__(self, img_size=224):
+    def __init__(self, img_size=224, pixel_mean=[0., 0., 0.], pixel_std=[1., 1., 1.]):
         self.img_size = img_size
+        self.pixel_mean = pixel_mean
+        self.pixel_std = pixel_std
 
     def to_tensor(self, video_clip):
-        return [F.to_tensor(image) for image in video_clip]
+        return [F.normalize(F.to_tensor(image), self.pixel_mean, self.pixel_std) for image in video_clip]
 
 
     def __call__(self, video_clip, target=None):
