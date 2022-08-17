@@ -4,7 +4,11 @@
 import logging
 import os
 from collections import defaultdict
-from .ava_eval_helper import read_exclusions
+
+try:
+    from .ava_eval_helper import read_exclusions
+except:
+    from ava_eval_helper import read_exclusions
 
 logger = logging.getLogger(__name__)
 FPS = 30
