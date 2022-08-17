@@ -198,8 +198,8 @@ if __name__ == '__main__':
         frame_id, video_clip, target = train_dataset[i]
         key_frame = video_clip[:, -1, :, :]
 
-        key_frame = ((key_frame * std + mean) * 255).permute(1, 2, 0)
-        key_frame = key_frame.numpy().astype(np.uint8)
+        key_frame = key_frame.permute(1, 2, 0).numpy()
+        key_frame = ((key_frame * std + mean) * 255).astype(np.uint8)
         H, W, C = key_frame.shape
 
         key_frame = key_frame.copy()
