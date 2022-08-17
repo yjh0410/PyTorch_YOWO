@@ -94,7 +94,6 @@ class Augmentation(object):
             target[..., 2] = np.minimum(0.999, np.maximum(0, target[..., 2] / oh * sy - dy)) 
             target[..., 3] = np.minimum(0.999, np.maximum(0, target[..., 3] / ow * sx - dx)) 
             target[..., 4] = np.minimum(0.999, np.maximum(0, target[..., 4] / oh * sy - dy)) 
-            target[..., 0] = target[..., 0] - 1
 
             # refine target
             refine_target = []
@@ -174,7 +173,6 @@ class BaseTransform(object):
             target = target.reshape(-1, 5)
             target[..., [1, 3]] /= ow
             target[..., [2, 4]] /= oh
-            target[..., 0] = target[..., 0] - 1
         else:
             target = np.array([])
 

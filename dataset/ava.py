@@ -204,6 +204,7 @@ class AVA_Dataset(Dataset):
         boxes = []
         labels = []
         for box_labels in clip_label_list:
+            print(box_labels)
             boxes.append(box_labels[0])
             labels.append(box_labels[1])
 
@@ -211,7 +212,7 @@ class AVA_Dataset(Dataset):
         labels = np.array(labels).reshape(-1)
 
         # target: [N, 5]
-        target = np.concatenate([boxes, labels[..., None]], axis=-1)
+        target = np.concatenate([labels[..., None], boxes], axis=-1)
 
         # transform
         video_clip, target = self.transform(video_clip, target)

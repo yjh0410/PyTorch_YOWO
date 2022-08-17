@@ -118,8 +118,8 @@ class UCF_JHMDB_Dataset(Dataset):
 
         # reformat target
         target = {
-            'boxes': target[:, 1:5].float(),  # [N, 4]
-            'labels': target[:, 0].long(),    # [N,]
+            'boxes': target[:, 1:5].float(),      # [N, 4]
+            'labels': target[:, 0].long() - 1,    # [N,]
             'orig_size': [ow, oh]
         }
 
