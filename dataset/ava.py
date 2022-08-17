@@ -203,19 +203,20 @@ class AVA_Dataset(Dataset):
         # Get boxes and labels for current clip.
         boxes = []
         labels = []
-        print(len(clip_label_list))
         for box_labels in clip_label_list:
             bbox = box_labels[0]
             label = box_labels[1]
-            one_hot_label = np.eye(self.num_classes)[label]
-            boxes.append(box_labels[0])
-            labels.append(box_labels[1])
+            multi_hot_label = np.zeros(self.num_classes)
+            multi_hot_label[..., label] = 1.0
+
+            boxes.append(bbox)
+            labels.append(multi_hot_label.tolist())
 
         boxes = np.array(boxes).reshape(-1, 4)
-        labels = np.array(labels).reshape(-1)
+        labels = np.array(labels).reshape(-1, self.num_classes)
 
-        # target: [N, 5]
-        target = np.concatenate([labels[..., None], boxes], axis=-1)
+        # target: [N, 4 + C]
+        target = np.concatenate([boxes, labels], axis=-1)
 
         # transform
         video_clip, target = self.transform(video_clip, target)
@@ -224,8 +225,8 @@ class AVA_Dataset(Dataset):
 
         # reformat target
         target = {
-            'boxes': target[:, 1:5].float(),  # [N, 4]
-            'labels': target[:, 0].long(),    # [N,]
+            'boxes': target[:, :4].float(),  # [N, 4]
+            'labels': target[:, 4:].long(),  # [N, C]
             'orig_size': [ow, oh]
         }
 
