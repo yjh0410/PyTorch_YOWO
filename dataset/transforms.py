@@ -90,17 +90,17 @@ class Augmentation(object):
 
             sx, sy = 1./sx, 1./sy
             # apply deltas on bbox
-            target[..., 1] = np.minimum(0.999, np.maximum(0, target[..., 1] / ow * sx - dx)) 
-            target[..., 2] = np.minimum(0.999, np.maximum(0, target[..., 2] / oh * sy - dy)) 
-            target[..., 3] = np.minimum(0.999, np.maximum(0, target[..., 3] / ow * sx - dx)) 
-            target[..., 4] = np.minimum(0.999, np.maximum(0, target[..., 4] / oh * sy - dy)) 
+            target[..., 0] = np.minimum(0.999, np.maximum(0, target[..., 0] / ow * sx - dx)) 
+            target[..., 1] = np.minimum(0.999, np.maximum(0, target[..., 1] / oh * sy - dy)) 
+            target[..., 2] = np.minimum(0.999, np.maximum(0, target[..., 2] / ow * sx - dx)) 
+            target[..., 3] = np.minimum(0.999, np.maximum(0, target[..., 3] / oh * sy - dy)) 
 
             # refine target
             refine_target = []
             for i in range(target.shape[0]):
                 tgt = target[i]
-                bw = (tgt[3] - tgt[1]) * ow
-                bh = (tgt[4] - tgt[2]) * oh
+                bw = (tgt[2] - tgt[0]) * ow
+                bh = (tgt[3] - tgt[1]) * oh
 
                 if bw < 1. or bh < 1.:
                     continue
@@ -139,7 +139,7 @@ class Augmentation(object):
         if target is not None:
             target = self.apply_bbox(target, ow, oh, dx, dy, sx, sy)
             if flip:
-                target[..., [1, 3]] = 1.0 - target[..., [3, 1]]
+                target[..., [0, 2]] = 1.0 - target[..., [2, 0]]
         else:
             target = np.array([])
             
@@ -171,8 +171,8 @@ class BaseTransform(object):
         # normalize target
         if target is not None:
             target = target.reshape(-1, 5)
-            target[..., [1, 3]] /= ow
-            target[..., [2, 4]] /= oh
+            target[..., [0, 2]] /= ow
+            target[..., [1, 3]] /= oh
         else:
             target = np.array([])
 

@@ -110,6 +110,11 @@ class UCF_JHMDB_Dataset(Dataset):
             target = np.loadtxt(label_path)
         else:
             target = None
+
+        # [label, x1, y1, x2, y2] -> [x1, y1, x2, y2, label]
+        label = target[..., :1]
+        boxes = target[..., 1:]
+        target = np.concatenate([boxes, label], axis=-1)
             
         # transform
         video_clip, target = self.transform(video_clip, target)
@@ -118,8 +123,8 @@ class UCF_JHMDB_Dataset(Dataset):
 
         # reformat target
         target = {
-            'boxes': target[:, 1:5].float(),      # [N, 4]
-            'labels': target[:, 0].long() - 1,    # [N,]
+            'boxes': target[:, :4].float(),      # [N, 4]
+            'labels': target[:, -1].long() - 1,    # [N,]
             'orig_size': [ow, oh]
         }
 

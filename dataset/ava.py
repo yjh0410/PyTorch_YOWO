@@ -203,8 +203,11 @@ class AVA_Dataset(Dataset):
         # Get boxes and labels for current clip.
         boxes = []
         labels = []
+        print(len(clip_label_list))
         for box_labels in clip_label_list:
-            print(box_labels)
+            bbox = box_labels[0]
+            label = box_labels[1]
+            one_hot_label = np.eye(self.num_classes)[label]
             boxes.append(box_labels[0])
             labels.append(box_labels[1])
 
