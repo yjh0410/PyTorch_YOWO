@@ -206,11 +206,11 @@ class AVA_Dataset(Dataset):
         for box_labels in clip_label_list:
             bbox = box_labels[0]
             label = box_labels[1]
-            multi_hot_label = np.zeros(self.num_classes)
+            multi_hot_label = np.zeros(1 + self.num_classes)
             multi_hot_label[..., label] = 1.0
 
             boxes.append(bbox)
-            labels.append(multi_hot_label.tolist())
+            labels.append(multi_hot_label[..., 1:].tolist())
 
         boxes = np.array(boxes).reshape(-1, 4)
         labels = np.array(labels).reshape(-1, self.num_classes)
