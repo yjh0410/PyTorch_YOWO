@@ -192,11 +192,13 @@ if __name__ == '__main__':
     )
 
     print(len(train_dataset))
+    std = trans_config['pixel_std']
+    mean = trans_config['pixel_mean']
     for i in range(len(train_dataset)):
         frame_id, video_clip, target = train_dataset[i]
         key_frame = video_clip[:, -1, :, :]
 
-        key_frame = (key_frame * 255).permute(1, 2, 0)
+        key_frame = ((key_frame * std + mean) * 255).permute(1, 2, 0)
         key_frame = key_frame.numpy().astype(np.uint8)
         H, W, C = key_frame.shape
 
