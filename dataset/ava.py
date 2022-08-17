@@ -48,12 +48,6 @@ class AVA_Dataset(Dataset):
 
 
     def _load_data(self):
-        """
-        Load frame paths and annotations from files
-
-        Args:
-            cfg (CfgNode): config
-        """
         # Loading frame paths.
         (
             self._image_paths,
@@ -163,19 +157,6 @@ class AVA_Dataset(Dataset):
 
 
     def pull_item(self, idx):
-        """
-        Generate corresponding clips, boxes, labels and metadata for given idx.
-
-        Args:
-            idx (int): the video index provided by the pytorch sampler.
-        Returns:
-            frames (tensor): the frames of sampled from the video. The dimension
-                is `channel` x `num frames` x `height` x `width`.
-            label (ndarray): the label for correspond boxes for the current video.
-            idx (int): the video index provided by the pytorch sampler.
-            extra_data (dict): a dict containing extra data fields, like "boxes",
-                "ori_boxes" and "metadata".
-        """
         # Get the frame idxs for current clip. We can use it as center or latest
         video_idx, sec_idx, sec, frame_idx = self._keyframe_indices[idx]
         clip_label_list = self._keyframe_boxes_and_labels[video_idx][sec_idx]
@@ -242,7 +223,7 @@ if __name__ == '__main__':
     import cv2
     from transforms import Augmentation, BaseTransform
 
-    is_train = True
+    is_train = False
     img_size = 224
     len_clip = 16
     dataset_config = {
