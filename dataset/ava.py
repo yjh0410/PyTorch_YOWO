@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 
-import ava_helper, ava_eval_helper
+import ava_helper
 
 
 # Dataset for AVA
@@ -45,10 +45,6 @@ class AVA_Dataset(Dataset):
 
         # load ava data
         self._load_data()
-
-        # load label map
-        self.labelmap = ava_eval_helper.read_labelmap(self.labelmap_file)
-        print(self.labelmap)
 
 
     def _load_data(self):
@@ -218,6 +214,9 @@ class AVA_Dataset(Dataset):
             labels.append(multi_hot_label[..., 1:].tolist())
 
         boxes = np.array(boxes).reshape(-1, 4)
+        # renormalize bbox
+        boxes[..., [0, 2]] *= ow
+        boxes[..., [1, 3]] *= oh
         labels = np.array(labels).reshape(-1, self.num_classes)
 
         # target: [N, 4 + C]
