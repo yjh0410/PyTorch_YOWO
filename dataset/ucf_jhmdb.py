@@ -114,7 +114,7 @@ class UCF_JHMDB_Dataset(Dataset):
         # [label, x1, y1, x2, y2] -> [x1, y1, x2, y2, label]
         label = target[..., :1]
         boxes = target[..., 1:]
-        target = np.concatenate([boxes, label], axis=-1)
+        target = np.concatenate([boxes, label], axis=-1).reshape(-1, 5)
             
         # transform
         video_clip, target = self.transform(video_clip, target)

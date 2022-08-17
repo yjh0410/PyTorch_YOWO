@@ -145,7 +145,7 @@ class Augmentation(object):
             
         # to tensor
         video_clip = self.to_tensor(video_clip)
-        target = torch.as_tensor(target).float().view(-1, 5)
+        target = torch.as_tensor(target).float()
 
         return video_clip, target 
 
@@ -169,8 +169,10 @@ class BaseTransform(object):
         video_clip = [img.resize([self.img_size, self.img_size]) for img in video_clip]
 
         # normalize target
-        if target is not None:
+        if len(target.shape) < 2:
             target = target.reshape(-1, 5)
+
+        if target is not None:
             target[..., [0, 2]] /= ow
             target[..., [1, 3]] /= oh
         else:
@@ -178,7 +180,7 @@ class BaseTransform(object):
 
         # to tensor
         video_clip = self.to_tensor(video_clip)
-        target = torch.as_tensor(target).float().view(-1, 5)
+        target = torch.as_tensor(target).float()
 
         return video_clip, target 
 
