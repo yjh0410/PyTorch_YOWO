@@ -36,10 +36,10 @@ import pprint
 import time
 from collections import defaultdict
 
-from datasets.ava_evaluation import (
-    object_detection_evaluation,
-    standard_fields,
-)
+# from datasets.ava_evaluation import (
+#     object_detection_evaluation,
+#     standard_fields,
+# )
 
 logger = logging.getLogger(__name__)
 
@@ -132,163 +132,163 @@ def evaluate_ava_from_files(labelmap, groundtruth, detections, exclusions):
     run_evaluation(categories, groundtruth, detections, excluded_keys)
 
 
-def evaluate_ava(
-    preds,
-    original_boxes,
-    metadata,
-    excluded_keys,
-    class_whitelist,
-    categories,
-    groundtruth=None,
-    video_idx_to_name=None,
-    name="latest",
-):
-    """Run AVA evaluation given numpy arrays."""
+# def evaluate_ava(
+#     preds,
+#     original_boxes,
+#     metadata,
+#     excluded_keys,
+#     class_whitelist,
+#     categories,
+#     groundtruth=None,
+#     video_idx_to_name=None,
+#     name="latest",
+# ):
+#     """Run AVA evaluation given numpy arrays."""
 
-    eval_start = time.time()
+#     eval_start = time.time()
 
-    detections = get_ava_eval_data(
-        preds,
-        original_boxes,
-        metadata,
-        class_whitelist,
-        video_idx_to_name=video_idx_to_name,
-    )
+#     detections = get_ava_eval_data(
+#         preds,
+#         original_boxes,
+#         metadata,
+#         class_whitelist,
+#         video_idx_to_name=video_idx_to_name,
+#     )
 
-    logger.info("Evaluating with %d unique GT frames." % len(groundtruth[0]))
-    logger.info(
-        "Evaluating with %d unique detection frames" % len(detections[0])
-    )
+#     logger.info("Evaluating with %d unique GT frames." % len(groundtruth[0]))
+#     logger.info(
+#         "Evaluating with %d unique detection frames" % len(detections[0])
+#     )
 
-    write_results(detections, "detections_%s.csv" % name)
-    write_results(groundtruth, "groundtruth_%s.csv" % name)
+#     write_results(detections, "detections_%s.csv" % name)
+#     write_results(groundtruth, "groundtruth_%s.csv" % name)
 
-    results = run_evaluation(categories, groundtruth, detections, excluded_keys)
+#     results = run_evaluation(categories, groundtruth, detections, excluded_keys)
 
-    logger.info("AVA eval done in %f seconds." % (time.time() - eval_start))
-    return results["PascalBoxes_Precision/mAP@0.5IOU"]
-
-
-def run_evaluation(
-    categories, groundtruth, detections, excluded_keys, verbose=True
-):
-    """AVA evaluation main logic."""
-
-    pascal_evaluator = object_detection_evaluation.PascalDetectionEvaluator(
-        categories
-    )
-
-    boxes, labels, _ = groundtruth
-
-    gt_keys = []
-    pred_keys = []
-
-    for image_key in boxes:
-        if image_key in excluded_keys:
-            logging.info(
-                (
-                    "Found excluded timestamp in ground truth: %s. "
-                    "It will be ignored."
-                ),
-                image_key,
-            )
-            continue
-        pascal_evaluator.add_single_ground_truth_image_info(
-            image_key,
-            {
-                standard_fields.InputDataFields.groundtruth_boxes: np.array(
-                    boxes[image_key], dtype=float
-                ),
-                standard_fields.InputDataFields.groundtruth_classes: np.array(
-                    labels[image_key], dtype=int
-                ),
-                standard_fields.InputDataFields.groundtruth_difficult: np.zeros(
-                    len(boxes[image_key]), dtype=bool
-                ),
-            },
-        )
-
-        gt_keys.append(image_key)
-
-    '''detections format
-    boxes: dict, {'<video_name>,<sec>': [box1, box2,...(each box_i is normalized x1y1x2y2)]}
-    labels: dict, {'<video_name>,<sec>': [cls_id(1 based), ...]}
-    scores: dict, {'<video_name>,<sec>': [score...]}
-    each box_i corresponds to 60 classes (classwhite list otherwise should be 80) and 60 scores
-    '''
-    boxes, labels, scores = detections
-
-    for image_key in boxes:
-        if image_key in excluded_keys:
-            logging.info(
-                (
-                    "Found excluded timestamp in detections: %s. "
-                    "It will be ignored."
-                ),
-                image_key,
-            )
-            continue
-        pascal_evaluator.add_single_detected_image_info(
-            image_key,
-            {
-                standard_fields.DetectionResultFields.detection_boxes: np.array(
-                    boxes[image_key], dtype=float
-                ),
-                standard_fields.DetectionResultFields.detection_classes: np.array(
-                    labels[image_key], dtype=int
-                ),
-                standard_fields.DetectionResultFields.detection_scores: np.array(
-                    scores[image_key], dtype=float
-                ),
-            },
-        )
-
-        pred_keys.append(image_key)
-
-    metrics = pascal_evaluator.evaluate()
-
-    pprint.pprint(metrics, indent=2)
-    return metrics
+#     logger.info("AVA eval done in %f seconds." % (time.time() - eval_start))
+#     return results["PascalBoxes_Precision/mAP@0.5IOU"]
 
 
-def get_ava_eval_data(
-    scores,
-    boxes,
-    metadata,
-    class_whitelist,
-    verbose=False,
-    video_idx_to_name=None,
-):
-    """
-    Convert our data format into the data format used in official AVA
-    evaluation.
-    """
+# def run_evaluation(
+#     categories, groundtruth, detections, excluded_keys, verbose=True
+# ):
+#     """AVA evaluation main logic."""
 
-    out_scores = defaultdict(list)
-    out_labels = defaultdict(list)
-    out_boxes = defaultdict(list)
-    count = 0
-    for i in range(scores.shape[0]):
-        video_idx = int(np.round(metadata[i][0]))
-        sec = int(np.round(metadata[i][1]))
+#     pascal_evaluator = object_detection_evaluation.PascalDetectionEvaluator(
+#         categories
+#     )
 
-        video = video_idx_to_name[video_idx]
+#     boxes, labels, _ = groundtruth
 
-        key = video + "," + "%04d" % (sec)
-        batch_box = boxes[i].tolist()  # [batch_idx, x1, y1, x2, y2]
-        # The first is batch idx.
-        batch_box = [batch_box[j] for j in [0, 2, 1, 4, 3]]  # [batch_idx, y1, x1, y2, x2]
-        # here use this order is because below writing csv it use again use right order
+#     gt_keys = []
+#     pred_keys = []
 
-        one_scores = scores[i].tolist()
-        for cls_idx, score in enumerate(one_scores):
-            if cls_idx + 1 in class_whitelist:
-                out_scores[key].append(score)
-                out_labels[key].append(cls_idx + 1)
-                out_boxes[key].append(batch_box[1:])
-                count += 1
+#     for image_key in boxes:
+#         if image_key in excluded_keys:
+#             logging.info(
+#                 (
+#                     "Found excluded timestamp in ground truth: %s. "
+#                     "It will be ignored."
+#                 ),
+#                 image_key,
+#             )
+#             continue
+#         pascal_evaluator.add_single_ground_truth_image_info(
+#             image_key,
+#             {
+#                 standard_fields.InputDataFields.groundtruth_boxes: np.array(
+#                     boxes[image_key], dtype=float
+#                 ),
+#                 standard_fields.InputDataFields.groundtruth_classes: np.array(
+#                     labels[image_key], dtype=int
+#                 ),
+#                 standard_fields.InputDataFields.groundtruth_difficult: np.zeros(
+#                     len(boxes[image_key]), dtype=bool
+#                 ),
+#             },
+#         )
 
-    return out_boxes, out_labels, out_scores
+#         gt_keys.append(image_key)
+
+#     '''detections format
+#     boxes: dict, {'<video_name>,<sec>': [box1, box2,...(each box_i is normalized x1y1x2y2)]}
+#     labels: dict, {'<video_name>,<sec>': [cls_id(1 based), ...]}
+#     scores: dict, {'<video_name>,<sec>': [score...]}
+#     each box_i corresponds to 60 classes (classwhite list otherwise should be 80) and 60 scores
+#     '''
+#     boxes, labels, scores = detections
+
+#     for image_key in boxes:
+#         if image_key in excluded_keys:
+#             logging.info(
+#                 (
+#                     "Found excluded timestamp in detections: %s. "
+#                     "It will be ignored."
+#                 ),
+#                 image_key,
+#             )
+#             continue
+#         pascal_evaluator.add_single_detected_image_info(
+#             image_key,
+#             {
+#                 standard_fields.DetectionResultFields.detection_boxes: np.array(
+#                     boxes[image_key], dtype=float
+#                 ),
+#                 standard_fields.DetectionResultFields.detection_classes: np.array(
+#                     labels[image_key], dtype=int
+#                 ),
+#                 standard_fields.DetectionResultFields.detection_scores: np.array(
+#                     scores[image_key], dtype=float
+#                 ),
+#             },
+#         )
+
+#         pred_keys.append(image_key)
+
+#     metrics = pascal_evaluator.evaluate()
+
+#     pprint.pprint(metrics, indent=2)
+#     return metrics
+
+
+# def get_ava_eval_data(
+#     scores,
+#     boxes,
+#     metadata,
+#     class_whitelist,
+#     verbose=False,
+#     video_idx_to_name=None,
+# ):
+#     """
+#     Convert our data format into the data format used in official AVA
+#     evaluation.
+#     """
+
+#     out_scores = defaultdict(list)
+#     out_labels = defaultdict(list)
+#     out_boxes = defaultdict(list)
+#     count = 0
+#     for i in range(scores.shape[0]):
+#         video_idx = int(np.round(metadata[i][0]))
+#         sec = int(np.round(metadata[i][1]))
+
+#         video = video_idx_to_name[video_idx]
+
+#         key = video + "," + "%04d" % (sec)
+#         batch_box = boxes[i].tolist()  # [batch_idx, x1, y1, x2, y2]
+#         # The first is batch idx.
+#         batch_box = [batch_box[j] for j in [0, 2, 1, 4, 3]]  # [batch_idx, y1, x1, y2, x2]
+#         # here use this order is because below writing csv it use again use right order
+
+#         one_scores = scores[i].tolist()
+#         for cls_idx, score in enumerate(one_scores):
+#             if cls_idx + 1 in class_whitelist:
+#                 out_scores[key].append(score)
+#                 out_labels[key].append(cls_idx + 1)
+#                 out_boxes[key].append(batch_box[1:])
+#                 count += 1
+
+#     return out_boxes, out_labels, out_scores
 
 
 def write_results(detections, filename):
