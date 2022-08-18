@@ -222,8 +222,7 @@ class YOWO(nn.Module):
 
     def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
         # scores
-        scores = torch.max(torch.sigmoid(conf_pred) * torch.sigmoid(cls_pred), dim=-1)
-        labels = None
+        scores, labels = torch.max(torch.sigmoid(conf_pred) * torch.sigmoid(cls_pred), dim=-1)
 
         # topk
         anchor_boxes = self.anchor_boxes
@@ -302,7 +301,7 @@ class YOWO(nn.Module):
                         
             # post-process
             if self.multi_hot:
-                pass
+                scores, labels, bboxes = self.post_process_multi_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
             else:
                 scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
 
