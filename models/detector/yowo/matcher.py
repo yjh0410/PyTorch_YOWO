@@ -134,7 +134,7 @@ class YoloMatcher(object):
                         gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
                         gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
                         if self.multi_hot:
-                            gt_cls[bi, grid_y, grid_x, anchor_idx, :] = label.numpy()
+                            gt_cls[bi, grid_y, grid_x, anchor_idx, :] = torch.as_tensor(label)
                         else:
                             gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
 

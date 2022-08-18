@@ -172,7 +172,77 @@ class YOWO(nn.Module):
         return keep
 
 
-    def post_process(self, scores, labels, bboxes):
+    def post_process_one_hot(self, conf_pred, cls_pred, reg_pred):
+        # scores
+        scores, labels = torch.max(torch.sigmoid(conf_pred) *\
+                                    torch.softmax(cls_pred, dim=-1), dim=-1)
+
+        # topk
+        anchor_boxes = self.anchor_boxes
+        if scores.shape[0] > self.topk:
+            scores, indices = torch.topk(scores, self.topk)
+            labels = labels[indices]
+            reg_pred = reg_pred[indices]
+            anchor_boxes = anchor_boxes[indices]
+
+        # decode box
+        bboxes = self.decode_bbox(anchor_boxes, reg_pred) # [N, 4]
+        # normalize box
+        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        
+        # to cpu
+        scores = scores.cpu().numpy()
+        labels = labels.cpu().numpy()
+        bboxes = bboxes.cpu().numpy()
+        
+        # threshold
+        keep = np.where(scores >= self.conf_thresh)
+        scores = scores[keep]
+        labels = labels[keep]
+        bboxes = bboxes[keep]
+
+        # nms
+        keep = np.zeros(len(bboxes), dtype=np.int)
+        for i in range(self.num_classes):
+            inds = np.where(labels == i)[0]
+            if len(inds) == 0:
+                continue
+            c_bboxes = bboxes[inds]
+            c_scores = scores[inds]
+            c_keep = self.nms(c_bboxes, c_scores)
+            keep[inds[c_keep]] = 1
+
+        keep = np.where(keep > 0)
+        scores = scores[keep]
+        labels = labels[keep]
+        bboxes = bboxes[keep]
+
+        return scores, labels, bboxes
+    
+
+    def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
+        # scores
+        scores = torch.max(torch.sigmoid(conf_pred) * torch.sigmoid(cls_pred), dim=-1)
+        labels = None
+
+        # topk
+        anchor_boxes = self.anchor_boxes
+        if scores.shape[0] > self.topk:
+            scores, indices = torch.topk(scores, self.topk)
+            labels = labels[indices]
+            reg_pred = reg_pred[indices]
+            anchor_boxes = anchor_boxes[indices]
+
+        # decode box
+        bboxes = self.decode_bbox(anchor_boxes, reg_pred) # [N, 4]
+        # normalize box
+        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        
+        # to cpu
+        scores = scores.cpu().numpy()
+        labels = labels.cpu().numpy()
+        bboxes = bboxes.cpu().numpy()
+        
         # threshold
         keep = np.where(scores >= self.conf_thresh)
         scores = scores[keep]
@@ -230,34 +300,11 @@ class YOWO(nn.Module):
             cur_cls_pred = cls_pred[batch_idx]
             cur_reg_pred = reg_pred[batch_idx]
                         
-            # scores
-            if self.multi_hot:
-                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
-                                           torch.sigmoid(cur_cls_pred), dim=-1)
-            else :
-                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
-                                           torch.softmax(cur_cls_pred, dim=-1), dim=-1)
-
-            # topk
-            anchor_boxes = self.anchor_boxes
-            if scores.shape[0] > self.topk:
-                scores, indices = torch.topk(scores, self.topk)
-                labels = labels[indices]
-                cur_reg_pred = cur_reg_pred[indices]
-                anchor_boxes = anchor_boxes[indices]
-
-            # decode box
-            bboxes = self.decode_bbox(anchor_boxes, cur_reg_pred) # [N, 4]
-            # normalize box
-            bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
-            
-            # to cpu
-            scores = scores.cpu().numpy()
-            labels = labels.cpu().numpy()
-            bboxes = bboxes.cpu().numpy()
-
             # post-process
-            scores, labels, bboxes = self.post_process(scores, labels, bboxes)
+            if self.multi_hot:
+                pass
+            else:
+                scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
 
             batch_scores.append(scores)
             batch_labels.append(labels)
