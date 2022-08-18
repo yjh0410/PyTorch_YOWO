@@ -24,6 +24,7 @@ class Criterion(object):
         self.anchor_size = anchor_size
         self.num_anchors = num_anchors
         self.num_classes = num_classes
+        self.multi_hot = multi_hot
         self.loss_obj_weight = loss_obj_weight
         self.loss_noobj_weight = loss_noobj_weight
         self.loss_cls_weight = loss_cls_weight
@@ -87,9 +88,12 @@ class Criterion(object):
         pred_cls = outputs['cls_pred'].view(-1, self.num_classes)  # [BM, C]
         pred_box = outputs['box_pred'].view(-1, 4)                 # [BM, 4]
         
-        gt_conf = gt_conf.flatten().to(device).float()        # [BM,]
-        gt_cls = gt_cls.flatten().to(device).long()           # [BM,]
-        gt_bboxes = gt_bboxes.view(-1, 4).to(device).float()  # [BM, 4]
+        gt_conf = gt_conf.flatten().to(device).float()                     # [BM,]
+        gt_bboxes = gt_bboxes.view(-1, 4).to(device).float()               # [BM, 4]
+        if self.multi_hot:
+            gt_cls = gt_cls.view(-1, self.num_classes).to(device).float()  # [BM, C]
+        else:
+            gt_cls = gt_cls.flatten().to(device).long()                    # [BM,]
 
         # fore mask
         foreground_mask = (gt_conf > 0.)
