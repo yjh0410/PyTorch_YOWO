@@ -256,11 +256,11 @@ if __name__ == '__main__':
         saturation=trans_config['saturation'],
         exposure=trans_config['exposure']
         )
-    transform = BaseTransform(
-        img_size=img_size,
-        pixel_mean=trans_config['pixel_mean'],
-        pixel_std=trans_config['pixel_std']
-        )
+    # transform = BaseTransform(
+    #     img_size=img_size,
+    #     pixel_mean=trans_config['pixel_mean'],
+    #     pixel_std=trans_config['pixel_std']
+    #     )
 
     train_dataset = AVA_Dataset(
         cfg=dataset_config,

@@ -81,33 +81,26 @@ class Augmentation(object):
 
 
     def apply_bbox(self, target, ow, oh, dx, dy, sx, sy):
-        if target is None:
-            target = np.zeros([10, 5])
+        sx, sy = 1./sx, 1./sy
+        # apply deltas on bbox
+        target[..., 0] = np.minimum(0.999, np.maximum(0, target[..., 0] / ow * sx - dx)) 
+        target[..., 1] = np.minimum(0.999, np.maximum(0, target[..., 1] / oh * sy - dy)) 
+        target[..., 2] = np.minimum(0.999, np.maximum(0, target[..., 2] / ow * sx - dx)) 
+        target[..., 3] = np.minimum(0.999, np.maximum(0, target[..., 3] / oh * sy - dy)) 
 
-            return target
-        else:
-            target = np.reshape(target, (-1, 5))
+        # refine target
+        refine_target = []
+        for i in range(target.shape[0]):
+            tgt = target[i]
+            bw = (tgt[2] - tgt[0]) * ow
+            bh = (tgt[3] - tgt[1]) * oh
 
-            sx, sy = 1./sx, 1./sy
-            # apply deltas on bbox
-            target[..., 0] = np.minimum(0.999, np.maximum(0, target[..., 0] / ow * sx - dx)) 
-            target[..., 1] = np.minimum(0.999, np.maximum(0, target[..., 1] / oh * sy - dy)) 
-            target[..., 2] = np.minimum(0.999, np.maximum(0, target[..., 2] / ow * sx - dx)) 
-            target[..., 3] = np.minimum(0.999, np.maximum(0, target[..., 3] / oh * sy - dy)) 
+            if bw < 1. or bh < 1.:
+                continue
+            
+            refine_target.append(tgt)
 
-            # refine target
-            refine_target = []
-            for i in range(target.shape[0]):
-                tgt = target[i]
-                bw = (tgt[2] - tgt[0]) * ow
-                bh = (tgt[3] - tgt[1]) * oh
-
-                if bw < 1. or bh < 1.:
-                    continue
-                
-                refine_target.append(tgt)
-
-            refine_target = np.array(refine_target).reshape(-1, 5)
+        refine_target = np.array(refine_target).reshape(-1, target.shape[-1])
 
         return refine_target
         
