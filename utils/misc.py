@@ -1,4 +1,3 @@
-from random import shuffle
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,6 +7,7 @@ from copy import deepcopy
 import math
 
 from dataset.ucf_jhmdb import UCF_JHMDB_Dataset
+from dataset.ava import AVA_Dataset
 from dataset.transforms import Augmentation, BaseTransform
 
 from evaluator.ucf_jhmdb_evaluator import UCF_JHMDB_Evaluator
@@ -61,10 +61,17 @@ def build_dataset(d_cfg, args, is_train=False):
             collate_fn=CollateFunc()            
         )
 
-    elif args.dataset == 'ava':
+    elif args.dataset == 'ava_v2.2':
         # dataset
-        dataset = None
-        num_classes = None
+        dataset = AVA_Dataset(
+            cfg=d_cfg,
+            is_train=True,
+            img_size=d_cfg['train_size'],
+            transform=augmentation,
+            len_clip=d_cfg['len_clip'],
+            sampling_rate=d_cfg['sampling_rate']
+        )
+        num_classes = 80
 
         # evaluator
         evaluator = None
