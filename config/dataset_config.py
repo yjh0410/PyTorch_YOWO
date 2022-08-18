@@ -18,8 +18,8 @@ dataset_config = {
         'exposure': 1.5,
         'sampling_rate': 1,
         'len_clip': 16,
-        # cls output
-        'cls_prob': 'softmax',
+        # cls label
+        'multi_hot': False,  # one hot
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
@@ -65,8 +65,8 @@ dataset_config = {
         'exposure': 1.5,
         'sampling_rate': 1,
         'len_clip': 16,
-        # cls output
-        'cls_prob': 'softmax',
+        # cls label
+        'multi_hot': False,  # one hot
         # freeze backbone
         'freeze_backbone_2d': True,
         'freeze_backbone_3d': True,
@@ -119,8 +119,8 @@ dataset_config = {
         'exposure': 1.5,
         'sampling_rate': 1,
         'len_clip': 16,
-        # cls output
-        'cls_prob': 'sigmoid',
+        # cls label
+        'multi_hot': True,  # multi hot
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,

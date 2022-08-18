@@ -22,7 +22,7 @@ class YOWO(nn.Module):
                  nms_thresh = 0.6,
                  topk = 1000,
                  trainable = False,
-                 cls_prob = 'softmax'):
+                 multi_hot = False):
         super(YOWO, self).__init__()
         self.cfg = cfg
         self.device = device
@@ -31,7 +31,7 @@ class YOWO(nn.Module):
         self.len_clip = len_clip
         self.num_classes = num_classes
         self.trainable = trainable
-        self.cls_prob = cls_prob
+        self.multi_hot = multi_hot
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
         self.topk = topk
@@ -79,10 +79,11 @@ class YOWO(nn.Module):
                 anchor_size=self.anchor_size,
                 num_anchors=self.num_anchors,
                 num_classes=self.num_classes,
+                multi_hot=self.multi_hot,
                 loss_obj_weight=cfg['loss_obj_weight'],
                 loss_noobj_weight=cfg['loss_noobj_weight'],
                 loss_cls_weight=cfg['loss_cls_weight'],
-                loss_reg_weight=cfg['loss_reg_weight']
+                loss_reg_weight=cfg['loss_reg_weight'],
                 )
 
 
@@ -230,12 +231,12 @@ class YOWO(nn.Module):
             cur_reg_pred = reg_pred[batch_idx]
                         
             # scores
-            if self.cls_prob == 'softmax':
-                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
-                                           torch.softmax(cur_cls_pred, dim=-1), dim=-1)
-            elif self.cls_prob == 'sigmoid':
+            if self.multi_hot:
                 scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
                                            torch.sigmoid(cur_cls_pred), dim=-1)
+            else :
+                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
+                                           torch.softmax(cur_cls_pred, dim=-1), dim=-1)
 
             # topk
             anchor_boxes = self.anchor_boxes

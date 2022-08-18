@@ -3,10 +3,11 @@ import torch
 
 
 class YoloMatcher(object):
-    def __init__(self, num_classes, num_anchors, anchor_size, iou_thresh):
+    def __init__(self, num_classes, num_anchors, anchor_size, iou_thresh, multi_hot=False):
         self.num_classes = num_classes
         self.num_anchors = num_anchors
         self.iou_thresh = iou_thresh
+        self.multi_hot = multi_hot
         self.anchor_boxes = np.array(
             [[0., 0., anchor[0], anchor[1]]
             for anchor in anchor_size]
@@ -63,8 +64,11 @@ class YoloMatcher(object):
         fmp_h = fmp_w = img_size // stride
         # prepare
         gt_conf = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 1])
-        gt_cls = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 1])
         gt_bboxes = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 4])
+        if self.multi_hot:
+            gt_cls = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, self.num_classes])
+        else:
+            gt_cls = torch.zeros([bs, fmp_h, fmp_w, self.num_anchors, 1])
 
         for bi in range(bs):
             targets_per_image = targets[bi]
@@ -75,7 +79,6 @@ class YoloMatcher(object):
 
             for box, label in zip(tgt_bboxes, tgt_labels):
                 # get a bbox coords
-                label = int(label)
                 x1, y1, x2, y2 = box.tolist()
                 # rescale bbox
                 x1 *= img_size
@@ -129,13 +132,19 @@ class YoloMatcher(object):
 
                     if is_valid:
                         gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
-                        gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
                         gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
+                        if self.multi_hot:
+                            gt_cls[bi, grid_y, grid_x, anchor_idx, :] = label
+                        else:
+                            gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
 
         # [B, M, C]
-        gt_conf =   gt_conf.view(bs, -1, 1).float()
-        gt_cls =    gt_cls.view(bs, -1, 1).long()
+        gt_conf = gt_conf.view(bs, -1, 1).float()
         gt_bboxes = gt_bboxes.view(bs, -1, 4).float()
+        if self.multi_hot:
+            gt_cls = gt_cls.view(bs, -1, self.num_classes).long()
+        else:
+            gt_cls = gt_cls.view(bs, -1, 1).long()
 
         return gt_conf, gt_cls, gt_bboxes
 

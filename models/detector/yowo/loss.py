@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from .matcher import YoloMatcher
 from utils.box_ops import get_ious
-from utils.misc import Softmax_FocalLoss
+from utils.misc import Sigmoid_FocalLoss, Softmax_FocalLoss
 from utils.vis_tools import vis_targets
 
 
@@ -14,6 +14,7 @@ class Criterion(object):
                  anchor_size,
                  num_anchors,
                  num_classes,
+                 multi_hot=False,
                  loss_obj_weight=5.0,
                  loss_noobj_weight=1.0,
                  loss_cls_weight=1.0, 
@@ -33,13 +34,17 @@ class Criterion(object):
             num_classes=num_classes,
             num_anchors=num_anchors,
             anchor_size=anchor_size,
-            iou_thresh=cfg['ignore_thresh']
+            iou_thresh=cfg['ignore_thresh'],
+            multi_hot=multi_hot
             )
         
         # Loss
         self.conf_loss = nn.MSELoss(reduction='none')
-        # self.cls_loss = nn.CrossEntropyLoss(reduction='none')
-        self.cls_loss = Softmax_FocalLoss(num_classes=num_classes, gamma=2.0, reduction='none')
+        if multi_hot:
+            self.cls_loss = Sigmoid_FocalLoss(alpha=0.25, gamma=2.0, reduction='none')
+        else:
+            # self.cls_loss = nn.CrossEntropyLoss(reduction='none')
+            self.cls_loss = Softmax_FocalLoss(num_classes=num_classes, gamma=2.0, reduction='none')
 
 
     def __call__(self, 

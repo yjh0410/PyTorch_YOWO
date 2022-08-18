@@ -14,6 +14,7 @@ class Criterion(object):
                  anchor_size,
                  num_anchors,
                  num_classes,
+                 multi_hot=False,
                  loss_obj_weight=5.0,
                  loss_noobj_weight=1.0,
                  loss_cls_weight=1.0, 
@@ -33,7 +34,8 @@ class Criterion(object):
             num_classes=num_classes,
             num_anchors=num_anchors,
             anchor_size=anchor_size,
-            iou_thresh=cfg['ignore_thresh']
+            iou_thresh=cfg['ignore_thresh'],
+            multi_hot=multi_hot
             )
         
         # Loss
