@@ -184,6 +184,7 @@ if __name__ == '__main__':
 
     # run
     inference(
+        d_cfg=d_cfg,
         args=args,
         model=model,
         device=device,
