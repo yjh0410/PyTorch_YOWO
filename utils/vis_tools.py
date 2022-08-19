@@ -40,11 +40,14 @@ def vis_targets(video_clips, targets):
         cv2.waitKey(0)
 
 
-def convert_tensor_to_cv2img(img_tensor):
+def convert_tensor_to_cv2img(img_tensor, pixel_mean=[0., 0., 0.], pixel_std=[1., 1., 1.]):
     """ convert torch.tensor to cv2 image """
-    img_tensor = (img_tensor * 255).permute(1, 2, 0)
-    cv2_img = img_tensor.cpu().numpy().astype(np.uint8)
-    cv2_img = cv2_img.copy()[..., (2, 1, 0)]  # to BGR
+    # to numpy
+    img_tensor = img_tensor.permute(1, 2, 0).cpu().numpy()
+    # to cv2 img Mat
+    cv2_img = ((img_tensor * pixel_std + pixel_mean) * 255).astype(np.uint8)
+    # to BGR
+    cv2_img = cv2_img.copy()[..., (2, 1, 0)]
 
     return cv2_img
 
