@@ -221,33 +221,27 @@ class YOWO(nn.Module):
     
 
     def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
-        # scores
-        scores, labels = torch.max(torch.sigmoid(conf_pred) * torch.sigmoid(cls_pred), dim=-1)
-
-        # topk
-        anchor_boxes = self.anchor_boxes
-        if scores.shape[0] > self.topk:
-            scores, indices = torch.topk(scores, self.topk)
-            labels = labels[indices]
-            reg_pred = reg_pred[indices]
-            anchor_boxes = anchor_boxes[indices]
-
         # decode box
-        bboxes = self.decode_bbox(anchor_boxes, reg_pred) # [N, 4]
+        bboxes = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
         # normalize box
         bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        
+        # scores
+        scores = torch.sigmoid(conf_pred) * torch.sigmoid(cls_pred)  # [M, C]
+
+        # threshold
+        keep = np.where(scores >= self.conf_thresh)
+        i, j = (scores > self.conf_thresh).nonzero(as_tuple=False).T
+
+        bboxes = bboxes[i]         # [N, 4]
+        scores = scores[i, j]      # [N, 1]
+        labels = j[:, None]        # [N, 1]
         
         # to cpu
         scores = scores.cpu().numpy()
         labels = labels.cpu().numpy()
         bboxes = bboxes.cpu().numpy()
         
-        # threshold
-        keep = np.where(scores >= self.conf_thresh)
-        scores = scores[keep]
-        labels = labels[keep]
-        bboxes = bboxes[keep]
-
         # nms
         keep = np.zeros(len(bboxes), dtype=np.int)
         for i in range(self.num_classes):
