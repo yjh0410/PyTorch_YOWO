@@ -6,6 +6,7 @@ import numpy as np
 import torch
 
 from dataset.ucf_jhmdb import UCF_JHMDB_Dataset
+from dataset.ava import AVA_Dataset
 from dataset.transforms import BaseTransform
 
 from utils.misc import load_weight
@@ -144,13 +145,20 @@ if __name__ == '__main__':
         class_names = d_cfg['label_map']
         num_classes = dataset.num_classes
 
-    elif args.dataset == 'ava':
-        dataset = None
-        class_names = None
-        num_classes = None
+    elif args.dataset == 'ava_v2.2':
+        dataset = AVA_Dataset(
+            cfg=d_cfg,
+            is_train=False,
+            img_size=d_cfg['test_size'],
+            transform=basetransform,
+            len_clip=d_cfg['len_clip'],
+            sampling_rate=d_cfg['sampling_rate']
+        )
+        class_names = d_cfg['label_map']
+        num_classes = dataset.num_classes
 
     else:
-        print('unknow dataset !! Only support voc and coco !!')
+        print('unknow dataset !! Only support ucf24 & jhmdb21 & ava_v2.2 and coco !!')
         exit(0)
 
     np.random.seed(100)
