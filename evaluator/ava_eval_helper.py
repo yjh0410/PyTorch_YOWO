@@ -36,7 +36,7 @@ import pprint
 import time
 from collections import defaultdict
 
-from ava_evaluation import (
+from .ava_evaluation import (
     object_detection_evaluation,
     standard_fields,
 )
