@@ -204,9 +204,9 @@ class AVA_Evaluator(object):
                     video_idx = target['video_idx']
                     sec = target['sec']
 
-                    # rescale bbox
-                    orig_size = target['orig_size']
-                    bboxes = rescale_bboxes(bboxes, orig_size)
+                    # # rescale bbox
+                    # orig_size = target['orig_size']
+                    # bboxes = rescale_bboxes(bboxes, orig_size)
                     
                     for score, label, bbox in zip(scores, labels, bboxes):
                         x1 = round(bbox[0])
