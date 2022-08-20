@@ -3,7 +3,6 @@ import torch
 
 from dataset.ucf_jhmdb import UCF_JHMDB_Dataset
 from utils.box_ops import rescale_bboxes
-from utils.box_ops import rescale_bboxes
 
 from .cal_mAP import get_mAP
 from .utils import bbox_iou

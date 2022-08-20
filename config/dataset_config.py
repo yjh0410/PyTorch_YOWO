@@ -107,6 +107,7 @@ dataset_config = {
         'train_exclusion_file': 'ava_v2.2/ava_train_excluded_timestamps_v2.2.csv',
         'val_exclusion_file': 'ava_v2.2/ava_val_excluded_timestamps_v2.2.csv',
         'labelmap_file': 'ava_v2.2/ava_action_list_v2.2.pbtxt',
+        'backup_dir': 'results/',
         # input size
         'train_size': 224,
         'test_size': 224,

@@ -1,9 +1,8 @@
 import argparse
-from operator import gt
-import os
 import torch
 
 from evaluator.ucf_jhmdb_evaluator import UCF_JHMDB_Evaluator
+from evaluator.ava_evaluator import AVA_Evaluator
 
 from dataset.transforms import BaseTransform
 
@@ -28,7 +27,7 @@ def parse_args():
 
     # dataset
     parser.add_argument('-d', '--dataset', default='ucf24',
-                        help='ucf24, jhmdb, ava.')
+                        help='ucf24, jhmdb, ava_v2.2.')
 
     # eval
     parser.add_argument('--gt_folder', default='./evaluator/groundtruth_ucf_jhmdb/groundtruth_ucf/',
@@ -73,6 +72,20 @@ def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
     else:
         cls_accu, loc_recall = evaluator.evaluate_accu_recall(model)
 
+
+def ava_eval(args, d_cfg, model, transform, collate_fn):
+    evaluator = AVA_Evaluator(
+        d_cfg=d_cfg,
+        img_size=d_cfg['test_size'],
+        len_clip=d_cfg['len_clip'],
+        sampling_rate=d_cfg['sampling_rate'],
+        batch_size=args.batch_size,
+        transform=transform,
+        collate_fn=collate_fn,
+        full_test_on_val=False,
+        version='v2.2')
+
+    mAP = evaluator.evaluate_frame_map(model)
 
 
 if __name__ == '__main__':
@@ -126,6 +139,14 @@ if __name__ == '__main__':
     # run
     if args.dataset in ['ucf24', 'jhmdb21']:
         ucf_jhmdb_eval(
+            args=args,
+            d_cfg=d_cfg,
+            model=model,
+            transform=basetransform,
+            collate_fn=CollateFunc()
+            )
+    elif args == 'ava_v2.2':
+        ava_eval(
             args=args,
             d_cfg=d_cfg,
             model=model,

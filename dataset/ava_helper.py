@@ -3,16 +3,36 @@
 
 import logging
 import os
+import csv
 from collections import defaultdict
 
-try:
-    from .ava_eval_helper import read_exclusions
-except:
-    from ava_eval_helper import read_exclusions
 
 logger = logging.getLogger(__name__)
 FPS = 30
 AVA_VALID_FRAMES = range(902, 1799)
+
+
+def make_image_key(video_id, timestamp):
+    """Returns a unique identifier for a video id & timestamp."""
+    return "%s,%04d" % (video_id, int(timestamp))
+
+
+def read_exclusions(exclusions_file):
+    """Reads a CSV file of excluded timestamps.
+    Args:
+      exclusions_file: A file object containing a csv of video-id,timestamp.
+    Returns:
+      A set of strings containing excluded image keys, e.g. "aaaaaaaaaaa,0904",
+      or an empty set if exclusions file is None.
+    """
+    excluded = set()
+    if exclusions_file:
+        with open(exclusions_file, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                assert len(row) == 2, "Expected only 2 columns, got: " + row
+                excluded.add(make_image_key(row[0], row[1]))
+    return excluded
 
 
 def load_image_lists(frames_dir, frame_list, is_train):
