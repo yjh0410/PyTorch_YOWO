@@ -96,7 +96,10 @@ if __name__ == '__main__':
 
     elif args.dataset == 'jhmdb':
         num_classes = 21
-    
+
+    elif args.dataset == 'ava_v2.2':
+        num_classes = 80
+
     else:
         print('unknow dataset.')
         exit(0)
@@ -145,7 +148,7 @@ if __name__ == '__main__':
             transform=basetransform,
             collate_fn=CollateFunc()
             )
-    elif args == 'ava_v2.2':
+    elif args.dataset == 'ava_v2.2':
         ava_eval(
             args=args,
             d_cfg=d_cfg,
