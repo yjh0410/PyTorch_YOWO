@@ -44,7 +44,6 @@ class AVA_Evaluator(object):
         self.excluded_keys = read_exclusions(self.exclusion_file)
         self.categories, self.class_whitelist = read_labelmap(self.labelmap_file)
         self.full_groundtruth = read_csv(self.gt_box_list, self.class_whitelist)
-        self.mini_groundtruth = self.get_ava_mini_groundtruth(self.full_groundtruth)
         _, self.video_idx_to_name = self.load_image_lists(self.frames_dir, self.frame_list, is_train=False)
 
         # create output_json file
