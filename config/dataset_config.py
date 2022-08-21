@@ -106,7 +106,7 @@ dataset_config = {
         'val_gt_box_list': 'ava_v2.2/ava_val_v2.2.csv',
         'train_exclusion_file': 'ava_v2.2/ava_train_excluded_timestamps_v2.2.csv',
         'val_exclusion_file': 'ava_v2.2/ava_val_excluded_timestamps_v2.2.csv',
-        'labelmap_file': 'ava_v2.2/ava_action_list_v2.2.pbtxt',
+        'labelmap_file': 'ava_action_list_v2.2_for_activitynet_2019.pbtxt', # 'ava_v2.2/ava_action_list_v2.2.pbtxt',
         'backup_dir': 'results/',
         # input size
         'train_size': 224,
