@@ -209,10 +209,7 @@ class AVA_Evaluator(object):
                     # bboxes = rescale_bboxes(bboxes, orig_size)
                     
                     for score, label, bbox in zip(scores, labels, bboxes):
-                        x1 = round(bbox[0])
-                        y1 = round(bbox[1])
-                        x2 = round(bbox[2])
-                        y2 = round(bbox[3])
+                        x1, y1, x2, y2 = bbox
                         cls_id = int(label) + 1
                         
                         preds_list.append([[x1,y1,x2,y2], [score, cls_id], [video_idx, sec]])
