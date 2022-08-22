@@ -11,6 +11,7 @@ from dataset.ava import AVA_Dataset
 from dataset.transforms import Augmentation, BaseTransform
 
 from evaluator.ucf_jhmdb_evaluator import UCF_JHMDB_Evaluator
+from evaluator.ava_evaluator import AVA_Evaluator
 
 
 def build_dataset(d_cfg, args, is_train=False):
@@ -74,10 +75,20 @@ def build_dataset(d_cfg, args, is_train=False):
         num_classes = 80
 
         # evaluator
-        evaluator = None
+        evaluator = AVA_Evaluator(
+            d_cfg=d_cfg,
+            img_size=d_cfg['test_size'],
+            len_clip=d_cfg['len_clip'],
+            sampling_rate=d_cfg['sampling_rate'],
+            batch_size=d_cfg['test_batch_size'],
+            transform=basetransform,
+            collate_fn=CollateFunc(),
+            full_test_on_val=False,
+            version='v2.2'
+            )
 
     else:
-        print('unknow dataset !! Only support UCF24 and JHMDB !!')
+        print('unknow dataset !! Only support ucf24 & jhmdb21 & ava_v2.2 !!')
         exit(0)
 
     print('==============================')
