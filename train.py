@@ -209,46 +209,6 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)            
 
-        # evaluation
-        if (epoch) % args.eval_epoch == 0 or (epoch + 1) == max_epoch:
-            # check evaluator
-            model_eval = ema.ema if args.ema else model_without_ddp
-            if distributed_utils.is_main_process():
-                if evaluator is None:
-                    print('No evaluator ... save model and go on training.')
-                    
-                else:
-                    print('eval ...')
-                    # set eval mode
-                    model_eval.trainable = False
-                    model_eval.eval()
-
-                    # evaluate
-                    if args.dataset in ['ucf24', 'jhmdb21']:
-                        evaluator.evaluate_accu_recall(model_eval, epoch + 1)
-                    elif args.dataset in ['ava_v2.2']:
-                        evaluator.evaluate_frame_map(model_eval, epoch + 1)
-                        
-                    # set train mode.
-                    model_eval.trainable = True
-                    model_eval.train()
-        
-                # save model
-                print('Saving state, epoch:', epoch + 1)
-                weight_name = '{}_epoch_{}.pth'.format(args.version, epoch+1)
-                checkpoint_path = os.path.join(path_to_save, weight_name)
-                torch.save({'model': model_eval.state_dict(),
-                            # 'optimizer': optimizer.state_dict(),
-                            # 'lr_scheduler': lr_scheduler.state_dict(),
-                            'epoch': epoch,
-                            'args': args}, 
-                            checkpoint_path)                      
-
-            if args.distributed:
-                # wait for all processes to synchronize
-                dist.barrier()
-
-
         # train one epoch
         for iter_i, (frame_ids, video_clips, targets) in enumerate(dataloader):
             ni = iter_i + epoch * epoch_size
