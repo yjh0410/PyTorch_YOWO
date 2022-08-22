@@ -6,7 +6,6 @@ import torch
 import json
 
 from dataset.ava import AVA_Dataset
-from utils.box_ops import rescale_bboxes
 
 from .ava_eval_helper import (
     run_evaluation,
@@ -43,7 +42,6 @@ class AVA_Evaluator(object):
         # load data
         self.excluded_keys = read_exclusions(self.exclusion_file)
         self.categories, self.class_whitelist = read_labelmap(self.labelmap_file)
-        print(self.class_whitelist)
         self.full_groundtruth = read_csv(self.gt_box_list, self.class_whitelist)
         _, self.video_idx_to_name = self.load_image_lists(self.frames_dir, self.frame_list, is_train=False)
 
