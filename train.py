@@ -16,7 +16,7 @@ import torch.cuda.amp as amp
 
 from utils import distributed_utils
 from utils.com_flops_params import FLOPs_and_Params
-from utils.misc import CollateFunc, build_dataset, build_dataloader, ModelEMA
+from utils.misc import CollateFunc, build_dataset, build_dataloader
 from utils.solver.optimizer import build_optimizer
 from utils.solver.warmup_schedule import build_warmup
 
