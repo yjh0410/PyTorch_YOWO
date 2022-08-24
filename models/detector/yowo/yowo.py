@@ -228,7 +228,7 @@ class YOWO(nn.Module):
         
         # cls pred (for AVA dataset)
         conf_pred = torch.sigmoid(conf_pred)
-        cls_pred[..., :14] = torch.softmax(cls_pred[..., :14])
+        cls_pred[..., :14] = torch.softmax(cls_pred[..., :14], dim=-1)
         cls_pred[..., 14:] = torch.sigmoid(cls_pred[..., 14:])
 
         # scores
