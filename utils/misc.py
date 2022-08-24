@@ -216,7 +216,7 @@ class Sigmoid_FocalLoss(object):
         assert inputs.size(0) == targets.size(0)
 
         # process class pred
-        inputs[..., :14] = torch.softmax(inputs[..., :14])
+        inputs[..., :14] = torch.softmax(inputs[..., :14], dim=-1)
         inputs[..., 14:] = torch.sigmoid(inputs[..., 14:])
 
         weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
