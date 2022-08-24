@@ -19,8 +19,7 @@ class Criterion(object):
                  loss_obj_weight=5.0,
                  loss_noobj_weight=1.0,
                  loss_cls_weight=1.0, 
-                 loss_reg_weight=1.0,
-                 class_ratio_file=None,):
+                 loss_reg_weight=1.0):
         self.cfg = cfg
         self.device = device
         self.anchor_size = anchor_size
