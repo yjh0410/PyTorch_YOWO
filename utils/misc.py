@@ -206,7 +206,7 @@ class Sigmoid_FocalLoss(object):
             self.class_weight[i - 1] = 1 - self.class_ratio[str(i)]
 
 
-    def forward(self, inputs, targets):
+    def __call__(self, inputs, targets):
         '''
         inputs: (N, C) -- result of sigmoid
         targets: (N, C) -- one-hot variable
@@ -218,7 +218,7 @@ class Sigmoid_FocalLoss(object):
         # process class pred
         inputs[..., :14] = torch.softmax(inputs[..., :14])
         inputs[..., 14:] = torch.sigmoid(inputs[..., 14:])
-        
+
         weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
         weight_p1 = torch.exp(weight_matrix[targets == 1])
         weight_p0 = torch.exp(1 - weight_matrix[targets == 0])
