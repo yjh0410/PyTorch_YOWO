@@ -220,7 +220,7 @@ class AVA_FocalLoss(object):
         inputs[..., 14:] = torch.clamp(torch.sigmoid(inputs[..., 14:]), min=1e-4, max=1 - 1e-4)
 
         # weight matrix
-        weight_matrix = self.class_weight.expand(inputs.size(0), self.class_num)
+        weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
         weight_p1 = torch.exp(weight_matrix[targets == 1])
         weight_p0 = torch.exp(1 - weight_matrix[targets == 0])
 
