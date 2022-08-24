@@ -5,6 +5,7 @@ from torch.autograd import Variable
 
 from copy import deepcopy
 import math
+import json
 
 from dataset.ucf_jhmdb import UCF_JHMDB_Dataset
 from dataset.ava import AVA_Dataset
@@ -187,57 +188,59 @@ class CollateFunc(object):
         return batch_frame_id, batch_video_clips, batch_key_target
 
 
-class ModelEMA(object):
-    def __init__(self, model, decay=0.9999, updates=0):
-        # create EMA
-        self.ema = deepcopy(model.module if is_parallel(model) else model).eval()  # FP32 EMA
-        self.updates = updates
-        self.decay = lambda x: decay * (1 - math.exp(-x / 2000.))
-        for p in self.ema.parameters():
-            p.requires_grad_(False)
-
-    def update(self, model):
-        # Update EMA parameters
-        with torch.no_grad():
-            self.updates += 1
-            d = self.decay(self.updates)
-
-            msd = model.module.state_dict() if is_parallel(model) else model.state_dict()  # model state_dict
-            for k, v in self.ema.state_dict().items():
-                if v.dtype.is_floating_point:
-                    v *= d
-                    v += (1. - d) * msd[k].detach()
-
-
 class Sigmoid_FocalLoss(object):
-    def __init__(self, alpha=0.25, gamma=2.0, reduction='none'):
-        self.alpha = alpha
+    """ Focal loss for AVA"""
+    def __init__(self, device, gamma, num_classes, class_count_json, reduction='none'):
+        with open(class_count_json, 'r') as fb:
+            self.class_ratio = json.load(fb)
+        self.device = device
         self.gamma = gamma
+        self.num_classes = num_classes
         self.reduction = reduction
+        self.class_weight = torch.zeros(80).to(device)
+        self._init_class_weight()
 
+
+    def _init_class_weight(self):
+        for i in range(1, 81):
+            self.class_weight[i - 1] = 1 - self.class_ratio[str(i)]
+
+
+    def forward(self, inputs, targets):
+        '''
+        inputs: (N, C) -- result of sigmoid
+        targets: (N, C) -- one-hot variable
+        '''
+        assert self.num_classes == targets.size(1)
+        assert self.num_classes == inputs.size(1)
+        assert inputs.size(0) == targets.size(0)
+
+        # process class pred
+        inputs[..., :14] = torch.softmax(inputs[..., :14])
+        inputs[..., 14:] = torch.sigmoid(inputs[..., 14:])
         
-    def __call__(self, logits, targets):
-        p = torch.sigmoid(logits)
-        ce_loss = F.binary_cross_entropy_with_logits(input=logits, 
-                                                        target=targets, 
-                                                        reduction="none")
-        p_t = p * targets + (1.0 - p) * (1.0 - targets)
-        loss = ce_loss * ((1.0 - p_t) ** self.gamma)
+        weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
+        weight_p1 = torch.exp(weight_matrix[targets == 1])
+        weight_p0 = torch.exp(1 - weight_matrix[targets == 0])
 
-        if self.alpha >= 0:
-            alpha_t = self.alpha * targets + (1.0 - self.alpha) * (1.0 - targets)
-            loss = alpha_t * loss
+        p_1 = inputs[targets == 1]
+        p_0 = inputs[targets == 0]
 
-        if self.reduction == "mean":
-            loss = loss.mean()
+        # loss = torch.sum(torch.log(p_1)) + torch.sum(torch.log(1 - p_0))  # origin bce loss
+        loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1) * weight_p1
+        loss2 = torch.pow(p_0, self.gamma) * torch.log(1 - p_0) * weight_p0
+        loss = -torch.sum(loss1) - torch.sum(loss2)
 
-        elif self.reduction == "sum":
+        if self.reduction == 'sum':
             loss = loss.sum()
+        elif self.reduction == 'mean':
+            loss = loss.mean()
 
         return loss
 
 
 class Softmax_FocalLoss(nn.Module):
+    """ Focal loss for UCF24 & JHMDB21"""
     def __init__(self, num_classes, alpha=None, gamma=2.0, reduction='none'):
         super(Softmax_FocalLoss, self).__init__()
         if alpha is None:
@@ -248,7 +251,7 @@ class Softmax_FocalLoss(nn.Module):
             else:
                 self.alpha = Variable(alpha)
         self.gamma = gamma
-        self.class_num = num_classes
+        self.num_classes = num_classes
         self.reduction = reduction
 
 

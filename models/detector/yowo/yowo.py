@@ -226,8 +226,13 @@ class YOWO(nn.Module):
         # normalize box
         bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
         
+        # cls pred (for AVA dataset)
+        conf_pred = torch.sigmoid(conf_pred)
+        cls_pred[..., :14] = torch.softmax(cls_pred[..., :14])
+        cls_pred[..., 14:] = torch.sigmoid(cls_pred[..., 14:])
+
         # scores
-        scores = torch.sigmoid(conf_pred) * torch.sigmoid(cls_pred)  # [M, C]
+        scores = conf_pred * cls_pred  # [M, C]
 
         # threshold
         i, j = (scores > self.conf_thresh).nonzero(as_tuple=False).T
