@@ -219,22 +219,19 @@ class AVA_FocalLoss(object):
         inputs[..., :14] = torch.clamp(torch.softmax(inputs[..., :14], dim=-1), min=1e-4, max=1 - 1e-4)
         inputs[..., 14:] = torch.clamp(torch.sigmoid(inputs[..., 14:]), min=1e-4, max=1 - 1e-4)
 
-        pos_mask = (targets == 1).float()
-        neg_mask = (targets == 0).float()
-
         # weight matrix
-        weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
-        weight_p1 = torch.exp(weight_matrix) * pos_mask
-        weight_p0 = torch.exp(1 - weight_matrix) * neg_mask
+        weight_matrix = self.class_weight.expand(inputs.size(0), self.class_num)
+        weight_p1 = torch.exp(weight_matrix[targets == 1])
+        weight_p0 = torch.exp(1 - weight_matrix[targets == 0])
 
         # pos & neg output
-        p_1 = inputs * pos_mask
-        p_0 = inputs * neg_mask
+        p_1 = inputs[targets == 1]
+        p_0 = inputs[targets == 0]
 
         # loss = torch.sum(torch.log(p_1)) + torch.sum(torch.log(1 - p_0))  # origin bce loss
-        loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1 + 1e-4) * weight_p1
+        loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1) * weight_p1
         loss2 = torch.pow(p_0, self.gamma) * torch.log(1 - p_0) * weight_p0
-        loss = -loss1 - loss2
+        loss = -loss1.sum() - loss2.sum()
 
         if self.reduction == 'sum':
             loss = loss.sum()
