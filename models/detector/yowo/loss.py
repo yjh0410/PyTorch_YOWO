@@ -19,7 +19,8 @@ class Criterion(object):
                  loss_obj_weight=5.0,
                  loss_noobj_weight=1.0,
                  loss_cls_weight=1.0, 
-                 loss_reg_weight=1.0):
+                 loss_reg_weight=1.0,
+                 class_ratio_file=None,):
         self.cfg = cfg
         self.device = device
         self.anchor_size = anchor_size
@@ -43,7 +44,7 @@ class Criterion(object):
         # Loss
         self.conf_loss = nn.MSELoss(reduction='none')
         if multi_hot:
-            self.cls_loss = Sigmoid_FocalLoss(device, 0.5, num_classes, cfg['class_ratio_file'], reduction='none')
+            self.cls_loss = Sigmoid_FocalLoss(device, 0.5, num_classes, 'config/ava_categories_ratio.json', reduction='none')
         else:
             # self.cls_loss = nn.CrossEntropyLoss(reduction='none')
             self.cls_loss = Softmax_FocalLoss(num_classes=num_classes, gamma=2.0, reduction='none')
