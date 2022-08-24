@@ -194,15 +194,7 @@ def train():
     # training configuration
     max_epoch = d_cfg['max_epoch']
     epoch_size = len(dataloader)
-    best_frame_map = -1.
     warmup = True
-
-    # EMA
-    if args.ema:
-        print('use EMA ...')
-        ema = ModelEMA(model, start_epoch*epoch_size)
-    else:
-        ema = None
 
     t0 = time.time()
     for epoch in range(start_epoch, max_epoch):
@@ -264,10 +256,6 @@ def train():
                     optimizer.step()
                     optimizer.zero_grad()
 
-            # ema
-            if args.ema:
-                ema.update(model)
-
             # Display
             if distributed_utils.is_main_process() and iter_i % 10 == 0:
                 t1 = time.time()
@@ -294,7 +282,7 @@ def train():
         # evaluation
         if (epoch + 1) % args.eval_epoch == 0 or (epoch + 1) == max_epoch:
             # check evaluator
-            model_eval = ema.ema if args.ema else model_without_ddp
+            model_eval = model_without_ddp
             if distributed_utils.is_main_process():
                 if evaluator is None:
                     print('No evaluator ... save model and go on training.')
