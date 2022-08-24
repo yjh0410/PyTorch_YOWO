@@ -206,17 +206,19 @@ class AVA_FocalLoss(object):
             self.class_weight[i - 1] = 1 - self.class_ratio[str(i)]
 
 
-    def __call__(self, inputs, targets):
+    def __call__(self, logits, targets):
         '''
         inputs: (N, C) -- result of sigmoid
         targets: (N, C) -- one-hot variable
         '''
         # process class pred
-        inputs[..., :14] = torch.clamp(torch.softmax(inputs[..., :14], dim=-1), min=1e-4, max=1 - 1e-4)
-        inputs[..., 14:] = torch.clamp(torch.sigmoid(inputs[..., 14:]), min=1e-4, max=1 - 1e-4)
+        inputs1 = torch.clamp(torch.softmax(logits[..., :14], dim=-1), min=1e-4, max=1 - 1e-4)
+        inputs2 = torch.clamp(torch.sigmoid(logits[..., 14:]), min=1e-4, max=1 - 1e-4)
+
+        inputs = torch.cat([inputs1, inputs2], dim=-1)
 
         # weight matrix
-        weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
+        weight_matrix = self.class_weight.expand(logits.size(0), self.num_classes)
         weight_p1 = torch.exp(weight_matrix[targets == 1])
         weight_p0 = torch.exp(1 - weight_matrix[targets == 0])
 
