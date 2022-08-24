@@ -128,7 +128,7 @@ class Criterion(object):
                     loss * noobj_mask * self.loss_noobj_weight
         loss_conf = loss_conf.sum() / batch_size
 
-        loss_cls = torch.zeros_like(loss_conf)
+        # loss_cls = torch.zeros_like(loss_conf)
         # total loss
         losses = loss_conf + loss_cls + loss_box
 
