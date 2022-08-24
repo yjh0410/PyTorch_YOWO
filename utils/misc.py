@@ -216,8 +216,8 @@ class Sigmoid_FocalLoss(object):
         assert inputs.size(0) == targets.size(0)
 
         # process class pred
-        inputs[..., :14] = torch.softmax(inputs[..., :14], dim=-1)
-        inputs[..., 14:] = torch.sigmoid(inputs[..., 14:])
+        inputs[..., :14] = torch.clamp(torch.softmax(inputs[..., :14], dim=-1), min=1e-4, max=1 - 1e-4)
+        inputs[..., 14:] = torch.clamp(torch.sigmoid(inputs[..., 14:]), min=1e-4, max=1 - 1e-4)
 
         weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
         weight_p1 = torch.exp(weight_matrix[targets == 1])
@@ -229,7 +229,7 @@ class Sigmoid_FocalLoss(object):
         # loss = torch.sum(torch.log(p_1)) + torch.sum(torch.log(1 - p_0))  # origin bce loss
         loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1) * weight_p1
         loss2 = torch.pow(p_0, self.gamma) * torch.log(1 - p_0) * weight_p0
-        loss = -torch.sum(loss1) - torch.sum(loss2)
+        loss = -loss1 - loss2
 
         if self.reduction == 'sum':
             loss = loss.sum()

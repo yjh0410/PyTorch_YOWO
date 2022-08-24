@@ -234,6 +234,7 @@ def train():
                 loss_dict = model(video_clips, targets=targets)
                 
             losses = loss_dict['losses']
+            losses = losses / d_cfg['accumulate']
 
             # reduce            
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
@@ -243,9 +244,10 @@ def train():
                 print('loss is NAN !!')
                 continue
 
+            
             # Backward and Optimize
             if args.fp16:
-                scaler.scale(losses / d_cfg['accumulate']).backward()
+                scaler.scale(losses).backward()
 
                 # Optimize
                 if ni % d_cfg['accumulate'] == 0:
@@ -255,7 +257,7 @@ def train():
                     
             else:
                 # Backward
-                (losses / d_cfg['accumulate']).backward()
+                losses.backward()
 
                 # Optimize
                 if ni % d_cfg['accumulate'] == 0:
