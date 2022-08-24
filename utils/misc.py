@@ -221,6 +221,8 @@ class Sigmoid_FocalLoss(object):
 
         pos_mask = (targets == 1).float()
         neg_mask = (targets == 0).float()
+        print(pos_mask)
+        print(neg_mask)
 
         # weight matrix
         weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
