@@ -211,10 +211,6 @@ class AVA_FocalLoss(object):
         inputs: (N, C) -- result of sigmoid
         targets: (N, C) -- one-hot variable
         '''
-        assert self.num_classes == targets.size(1)
-        assert self.num_classes == inputs.size(1)
-        assert inputs.size(0) == targets.size(0)
-
         # process class pred
         inputs[..., :14] = torch.clamp(torch.softmax(inputs[..., :14], dim=-1), min=1e-4, max=1 - 1e-4)
         inputs[..., 14:] = torch.clamp(torch.sigmoid(inputs[..., 14:]), min=1e-4, max=1 - 1e-4)
@@ -231,7 +227,7 @@ class AVA_FocalLoss(object):
         # loss = torch.sum(torch.log(p_1)) + torch.sum(torch.log(1 - p_0))  # origin bce loss
         loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1) * weight_p1
         loss2 = torch.pow(p_0, self.gamma) * torch.log(1 - p_0) * weight_p0
-        loss = -loss1.sum() - loss2.sum()
+        loss = -loss1.sum() # - loss2.sum()
 
         if self.reduction == 'sum':
             loss = loss.sum()
