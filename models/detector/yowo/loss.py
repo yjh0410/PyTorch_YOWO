@@ -44,7 +44,7 @@ class Criterion(object):
         # Loss
         self.conf_loss = nn.MSELoss(reduction='none')
         if multi_hot:
-            self.cls_loss = Sigmoid_FocalLoss(device, 0.5, num_classes, 'config/ava_categories_ratio.json', reduction='none')
+            self.cls_loss = AVA_FocalLoss(device, 0.5, num_classes, reduction='none')
         else:
             # self.cls_loss = nn.CrossEntropyLoss(reduction='none')
             self.cls_loss = Softmax_FocalLoss(num_classes=num_classes, gamma=2.0, reduction='none')

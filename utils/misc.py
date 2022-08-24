@@ -188,10 +188,10 @@ class CollateFunc(object):
         return batch_frame_id, batch_video_clips, batch_key_target
 
 
-class Sigmoid_FocalLoss(object):
+class AVA_FocalLoss(object):
     """ Focal loss for AVA"""
-    def __init__(self, device, gamma, num_classes, class_count_json, reduction='none'):
-        with open(class_count_json, 'r') as fb:
+    def __init__(self, device, gamma, num_classes, reduction='none'):
+        with open('config/ava_categories_ratio.json', 'r') as fb:
             self.class_ratio = json.load(fb)
         self.device = device
         self.gamma = gamma
@@ -221,8 +221,6 @@ class Sigmoid_FocalLoss(object):
 
         pos_mask = (targets == 1).float()
         neg_mask = (targets == 0).float()
-        print(pos_mask)
-        print(neg_mask)
 
         # weight matrix
         weight_matrix = self.class_weight.expand(inputs.size(0), self.num_classes)
@@ -236,6 +234,7 @@ class Sigmoid_FocalLoss(object):
         # loss = torch.sum(torch.log(p_1)) + torch.sum(torch.log(1 - p_0))  # origin bce loss
         loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1) * weight_p1
         loss2 = torch.pow(p_0, self.gamma) * torch.log(1 - p_0) * weight_p0
+        print(loss1.sum(), loss2.sum())
         loss = -loss1 - loss2
 
         if self.reduction == 'sum':
