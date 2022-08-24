@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from .matcher import YoloMatcher
 from utils.box_ops import get_ious
-from utils.misc import Sigmoid_FocalLoss, Softmax_FocalLoss
+from utils.misc import AVA_FocalLoss, Softmax_FocalLoss
 from utils.vis_tools import vis_targets
 
 
