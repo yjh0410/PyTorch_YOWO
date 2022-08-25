@@ -172,6 +172,31 @@ class YOWO(nn.Module):
         return keep
 
 
+    def bbox_iou(self, box1, box2):
+        mx = min(box1[0], box2[0])
+        Mx = max(box1[2], box2[2])
+        my = min(box1[1], box2[1])
+        My = max(box1[3], box2[3])
+        w1 = box1[2] - box1[0]
+        h1 = box1[3] - box1[1]
+        w2 = box2[2] - box2[0]
+        h2 = box2[3] - box2[1]
+        uw = Mx - mx
+        uh = My - my
+        cw = w1 + w2 - uw
+        ch = h1 + h2 - uh
+        carea = 0
+        if cw <= 0 or ch <= 0:
+            return 0.0
+
+        area1 = w1 * h1
+        area2 = w2 * h2
+        carea = cw * ch
+        uarea = area1 + area2 - carea
+
+        return carea / uarea
+
+
     def post_process_one_hot(self, conf_pred, cls_pred, reg_pred):
         # scores
         scores, labels = torch.max(torch.sigmoid(conf_pred) *\
@@ -219,76 +244,6 @@ class YOWO(nn.Module):
 
         return scores, labels, bboxes
     
-
-    def post_process_multi_hot_(self, conf_pred, cls_pred, reg_pred):
-        # decode box
-        bboxes = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
-        # normalize box
-        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
-        
-        # cls pred (for AVA dataset)
-        conf_pred = torch.sigmoid(conf_pred)
-        cls_pred[..., :14] = torch.softmax(cls_pred[..., :14], dim=-1)
-        cls_pred[..., 14:] = torch.sigmoid(cls_pred[..., 14:])
-
-        # scores
-        scores = conf_pred * cls_pred  # [M, C]
-
-        # threshold
-        i, j = (scores > self.conf_thresh).nonzero(as_tuple=False).T
-
-        bboxes = bboxes[i]         # [N, 4]
-        scores = scores[i, j]      # [N, 1]
-        labels = j[:, None]        # [N, 1]
-        
-        # to cpu
-        scores = scores.cpu().numpy()
-        labels = labels.cpu().numpy()
-        bboxes = bboxes.cpu().numpy()
-        
-        # nms
-        keep = np.zeros(len(bboxes), dtype=np.int)
-        for i in range(self.num_classes):
-            inds = np.where(labels == i)[0]
-            if len(inds) == 0:
-                continue
-            c_bboxes = bboxes[inds]
-            c_scores = scores[inds]
-            c_keep = self.nms(c_bboxes, c_scores)
-            keep[inds[c_keep]] = 1
-
-        keep = np.where(keep > 0)
-        scores = scores[keep]
-        labels = labels[keep]
-        bboxes = bboxes[keep]
-
-        return scores, labels, bboxes
-    
-
-    def bbox_iou(self, box1, box2):
-        mx = min(box1[0], box2[0])
-        Mx = max(box1[2], box2[2])
-        my = min(box1[1], box2[1])
-        My = max(box1[3], box2[3])
-        w1 = box1[2] - box1[0]
-        h1 = box1[3] - box1[1]
-        w2 = box2[2] - box2[0]
-        h2 = box2[3] - box2[1]
-        uw = Mx - mx
-        uh = My - my
-        cw = w1 + w2 - uw
-        ch = h1 + h2 - uh
-        carea = 0
-        if cw <= 0 or ch <= 0:
-            return 0.0
-
-        area1 = w1 * h1
-        area2 = w2 * h2
-        carea = cw * ch
-        uarea = area1 + area2 - carea
-
-        return carea / uarea
-
 
     def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
         # decode box
