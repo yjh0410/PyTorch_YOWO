@@ -313,7 +313,6 @@ class YOWO(nn.Module):
                 box = [x1, y1, x2, y2, pred_box_conf, pred_cls_conf]
                 all_bboxes.append(box)
 
-        
         # nms
         if len(all_bboxes) > 0:
             det_confs = torch.zeros(len(all_bboxes))
