@@ -379,12 +379,17 @@ class YOWO(nn.Module):
             batch_scores = []
             batch_labels = []
             batch_bboxes = []
-            # post-process
-            scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
+            for batch_idx in range(conf_pred.size(0)):
+                # [B, M, C] -> [M, C]
+                cur_conf_pred = conf_pred[batch_idx]
+                cur_cls_pred = cls_pred[batch_idx]
+                cur_reg_pred = reg_pred[batch_idx]
+                # post-process
+                scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
 
-            batch_scores.append(scores)
-            batch_labels.append(labels)
-            batch_bboxes.append(bboxes)
+                batch_scores.append(scores)
+                batch_labels.append(labels)
+                batch_bboxes.append(bboxes)
 
             return batch_scores, batch_labels, batch_bboxes
 
