@@ -229,7 +229,7 @@ class AVA_FocalLoss(object):
         # loss = torch.sum(torch.log(p_1)) + torch.sum(torch.log(1 - p_0))  # origin bce loss
         loss1 = torch.pow(1 - p_1, self.gamma) * torch.log(p_1) * weight_p1
         loss2 = torch.pow(p_0, self.gamma) * torch.log(1 - p_0) * weight_p0
-        loss = -loss1.sum() # - loss2.sum()
+        loss = -loss1.sum() - loss2.sum()
 
         if self.reduction == 'sum':
             loss = loss.sum()

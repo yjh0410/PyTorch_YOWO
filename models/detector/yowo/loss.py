@@ -92,7 +92,7 @@ class Criterion(object):
         gt_conf = gt_conf.flatten().to(device).float()                     # [BM,]
         gt_bboxes = gt_bboxes.view(-1, 4).to(device).float()               # [BM, 4]
         if self.multi_hot:
-            gt_cls = gt_cls.view(-1, self.num_classes).to(device).float()  # [BM, C]
+            gt_cls = gt_cls.view(-1, self.num_classes).to(device).long()  # [BM, C]
         else:
             gt_cls = gt_cls.flatten().to(device).long()                    # [BM,]
 

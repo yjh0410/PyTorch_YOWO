@@ -97,9 +97,7 @@ class YoloMatcher(object):
 
                 # compute IoU
                 iou = self.compute_iou(self.anchor_boxes, gt_box)
-                iou_mask = (iou > self.iou_thresh)
-
-                label_assignment_results = []
+                
                 # We assign the anchor box with highest IoU score.
                 anchor_idx = np.argmax(iou)
 
