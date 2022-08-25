@@ -136,24 +136,26 @@ class AVA_Evaluator(object):
         out_boxes = defaultdict(list)
         count = 0
 
-        # each pred is [[x1, y1, x2, y2], [score, cls_id], [video_idx, src]]
+        # each pred is [[x1, y1, x2, y2], cls_out, [video_idx, src]]
         for i in range(len(self.all_preds)):
             pred = self.all_preds[i]
+            assert len(pred) == 3
             video_idx = int(np.round(pred[-1][0]))
             sec = int(np.round(pred[-1][1]))
             box = pred[0]
-            score = pred[1][0]
-            cls_id = pred[1][1]
+            scores = pred[1]
+            assert len(scores) == 80
 
             video = self.video_idx_to_name[video_idx]
             key = video + ',' + "%04d" % (sec)
             box = [box[1], box[0], box[3], box[2]]  # turn to y1,x1,y2,x2
 
-            if cls_id in self.class_whitelist:
-                out_scores[key].append(score)
-                out_labels[key].append(cls_id)
-                out_boxes[key].append(box)
-                count += 1
+            for cls_idx, score in enumerate(scores):
+                if cls_idx + 1 in self.class_whitelist:
+                    out_scores[key].append(score)
+                    out_labels[key].append(cls_idx + 1)
+                    out_boxes[key].append(box)
+                    count += 1
 
         return out_boxes, out_labels, out_scores
 
@@ -189,13 +191,11 @@ class AVA_Evaluator(object):
 
             with torch.no_grad():
                 # inference
-                batch_scores, batch_labels, batch_bboxes = model(batch_video_clip)
+                batch_bboxes = model(batch_video_clip)
 
                 # process batch
                 preds_list = []
-                for bi in range(len(batch_scores)):
-                    scores = batch_scores[bi]
-                    labels = batch_labels[bi]
+                for bi in range(len(batch_bboxes)):
                     bboxes = batch_bboxes[bi]
                     target = batch_target[bi]
 
@@ -203,15 +203,12 @@ class AVA_Evaluator(object):
                     video_idx = target['video_idx']
                     sec = target['sec']
 
-                    # # rescale bbox
-                    # orig_size = target['orig_size']
-                    # bboxes = rescale_bboxes(bboxes, orig_size)
-                    
-                    for score, label, bbox in zip(scores, labels, bboxes):
+                    for bbox in bboxes:
                         x1, y1, x2, y2 = bbox
-                        cls_id = int(label) + 1
-                        
-                        preds_list.append([[x1,y1,x2,y2], [score, cls_id], [video_idx, sec]])
+                        det_conf = float(bbox[4])
+                        cls_out = [det_conf * cls_conf.cpu().numpy() for cls_conf in bbox[5]]
+
+                        preds_list.append([[x1,y1,x2,y2], cls_out, [video_idx, sec]])
 
             self.update_stats(preds_list)
             if iter_i % 100 == 0:

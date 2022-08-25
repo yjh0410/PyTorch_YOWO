@@ -100,43 +100,64 @@ class YoloMatcher(object):
                 iou_mask = (iou > self.iou_thresh)
 
                 label_assignment_results = []
-                if iou_mask.sum() == 0:
-                    # We assign the anchor box with highest IoU score.
-                    anchor_idx = np.argmax(iou)
+                # We assign the anchor box with highest IoU score.
+                anchor_idx = np.argmax(iou)
 
-                    # compute the grid cell
-                    xc_s = xc / stride
-                    yc_s = yc / stride
-                    grid_x = int(xc_s)
-                    grid_y = int(yc_s)
+                # compute the grid cell
+                xc_s = xc / stride
+                yc_s = yc / stride
+                grid_x = int(xc_s)
+                grid_y = int(yc_s)
 
-                    label_assignment_results.append([grid_x, grid_y, anchor_idx])
-                else:            
-                    for iou_ind, iou_m in enumerate(iou_mask):
-                        if iou_m:
-                            anchor_idx = iou_ind
-                            # compute the gride cell
-                            xc_s = xc / stride
-                            yc_s = yc / stride
-                            grid_x = int(xc_s)
-                            grid_y = int(yc_s)
-
-                            label_assignment_results.append([grid_x, grid_y, anchor_idx])
+                # check
+                is_valid = (grid_y >= 0 and grid_y < fmp_h) and (grid_x >= 0 and grid_x < fmp_w)
 
                 # label assignment
-                for result in label_assignment_results:
-                    grid_x, grid_y, anchor_idx = result
+                if is_valid:
+                    gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
+                    gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
+                    if self.multi_hot:
+                        gt_cls[bi, grid_y, grid_x, anchor_idx, :] = torch.as_tensor(label)
+                    else:
+                        gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
 
-                    # 3x3 center prior
-                    is_valid = (grid_y >= 0 and grid_y < fmp_h) and (grid_x >= 0 and grid_x < fmp_w)
+                # if iou_mask.sum() == 0:
+                #     # We assign the anchor box with highest IoU score.
+                #     anchor_idx = np.argmax(iou)
 
-                    if is_valid:
-                        gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
-                        gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
-                        if self.multi_hot:
-                            gt_cls[bi, grid_y, grid_x, anchor_idx, :] = torch.as_tensor(label)
-                        else:
-                            gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
+                #     # compute the grid cell
+                #     xc_s = xc / stride
+                #     yc_s = yc / stride
+                #     grid_x = int(xc_s)
+                #     grid_y = int(yc_s)
+
+                #     label_assignment_results.append([grid_x, grid_y, anchor_idx])
+                # else:            
+                #     for iou_ind, iou_m in enumerate(iou_mask):
+                #         if iou_m:
+                #             anchor_idx = iou_ind
+                #             # compute the gride cell
+                #             xc_s = xc / stride
+                #             yc_s = yc / stride
+                #             grid_x = int(xc_s)
+                #             grid_y = int(yc_s)
+
+                #             label_assignment_results.append([grid_x, grid_y, anchor_idx])
+
+                # # label assignment
+                # for result in label_assignment_results:
+                #     grid_x, grid_y, anchor_idx = result
+
+                #     # 3x3 center prior
+                #     is_valid = (grid_y >= 0 and grid_y < fmp_h) and (grid_x >= 0 and grid_x < fmp_w)
+
+                #     if is_valid:
+                #         gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
+                #         gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
+                #         if self.multi_hot:
+                #             gt_cls[bi, grid_y, grid_x, anchor_idx, :] = torch.as_tensor(label)
+                #         else:
+                #             gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
 
         # [B, M, C]
         gt_conf = gt_conf.view(bs, -1, 1).float()

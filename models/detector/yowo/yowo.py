@@ -220,7 +220,7 @@ class YOWO(nn.Module):
         return scores, labels, bboxes
     
 
-    def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
+    def post_process_multi_hot_(self, conf_pred, cls_pred, reg_pred):
         # decode box
         bboxes = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
         # normalize box
@@ -265,6 +265,75 @@ class YOWO(nn.Module):
         return scores, labels, bboxes
     
 
+    def bbox_iou(self, box1, box2):
+        mx = min(box1[0], box2[0])
+        Mx = max(box1[2], box2[2])
+        my = min(box1[1], box2[1])
+        My = max(box1[3], box2[3])
+        w1 = box1[2] - box1[0]
+        h1 = box1[3] - box1[1]
+        w2 = box2[2] - box2[0]
+        h2 = box2[3] - box2[1]
+        uw = Mx - mx
+        uh = My - my
+        cw = w1 + w2 - uw
+        ch = h1 + h2 - uh
+        carea = 0
+        if cw <= 0 or ch <= 0:
+            return 0.0
+
+        area1 = w1 * h1
+        area2 = w2 * h2
+        carea = cw * ch
+        uarea = area1 + area2 - carea
+
+        return carea / uarea
+
+
+    def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
+        # decode box
+        bboxes = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
+        # normalize box
+        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        
+        # conf pred & cls pred (for AVA dataset)
+        conf_pred = torch.sigmoid(conf_pred)                         # [M, 1]
+        pose_cls_pred = torch.softmax(cls_pred[..., :14], dim=-1)
+        act_cls_pred = torch.sigmoid(cls_pred[..., 14:])
+        cls_pred = torch.cat([pose_cls_pred, act_cls_pred], dim=-1)  # [M, C]
+
+        all_bboxes = []
+        for i in range(conf_pred.shape[0]):
+            pred_box_conf =  conf_pred[i].item()
+            pred_box = bboxes[i]
+            pred_cls_conf = cls_pred[i]
+
+            if pred_box_conf > self.conf_thresh:
+                x1, y1, x2, y2 = pred_box
+                box = [x1, y1, x2, y2, pred_box_conf, pred_cls_conf]
+                all_bboxes.append(box)
+
+        
+        if len(all_bboxes) > 0:
+            det_confs = torch.zeros(len(all_bboxes))
+            for i in range(len(all_bboxes)):
+                det_confs[i] = 1.0 - all_bboxes[i][4]                
+
+            _,sortIds = torch.sort(det_confs)
+
+            out_boxes = []
+            for i in range(len(all_bboxes)):
+                box_i = all_bboxes[sortIds[i]]
+                if box_i[4] > 0:
+                    out_boxes.append(box_i)
+                    for j in range(i+1, len(all_bboxes)):
+                        box_j = all_bboxes[sortIds[j]]
+                        if self.bbox_iou(box_i, box_j, x1y1x2y2=False) > self.nms_thresh:
+                            box_j[4] = 0
+        else:
+            return out_boxes
+    
+
     @torch.no_grad()
     def inference(self, video_clips):
         """
@@ -288,20 +357,27 @@ class YOWO(nn.Module):
         cls_pred = pred[:, K:K*(1 + C), :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, C)
         reg_pred = pred[:, K*(1 + C):, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
-        batch_scores = []
-        batch_labels = []
-        batch_bboxes = []
-        for batch_idx in range(conf_pred.size(0)):
-            # [B, M, C] -> [M, C]
-            cur_conf_pred = conf_pred[batch_idx]
-            cur_cls_pred = cls_pred[batch_idx]
-            cur_reg_pred = reg_pred[batch_idx]
+        if self.multi_hot:
+            batch_bboxes = []
+            for batch_idx in range(conf_pred.size(0)):
+                # [B, M, C] -> [M, C]
+                cur_conf_pred = conf_pred[batch_idx]
+                cur_cls_pred = cls_pred[batch_idx]
+                cur_reg_pred = reg_pred[batch_idx]
+
+                out_boxes = self.post_process_multi_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
+
+                batch_bboxes.append(out_boxes)
+
+            return batch_bboxes
+            
+        else:
                         
+            batch_scores = []
+            batch_labels = []
+            batch_bboxes = []
             # post-process
-            if self.multi_hot:
-                scores, labels, bboxes = self.post_process_multi_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
-            else:
-                scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
+            scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
 
             batch_scores.append(scores)
             batch_labels.append(labels)
