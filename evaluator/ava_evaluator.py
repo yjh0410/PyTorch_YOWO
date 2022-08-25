@@ -43,6 +43,7 @@ class AVA_Evaluator(object):
         self.excluded_keys = read_exclusions(self.exclusion_file)
         self.categories, self.class_whitelist = read_labelmap(self.labelmap_file)
         self.full_groundtruth = read_csv(self.gt_box_list, self.class_whitelist)
+        self.mini_groundtruth = self.get_ava_mini_groundtruth(self.full_groundtruth)
         _, self.video_idx_to_name = self.load_image_lists(self.frames_dir, self.frame_list, is_train=False)
 
         # create output_json file
@@ -73,6 +74,24 @@ class AVA_Evaluator(object):
             pin_memory=True
             )
     
+
+    def get_ava_mini_groundtruth(self, full_groundtruth):
+        """
+        Get the groundtruth annotations corresponding the "subset" of AVA val set.
+        We define the subset to be the frames such that (second % 4 == 0).
+        We optionally use subset for faster evaluation during training
+        (in order to track training progress).
+        Args:
+            full_groundtruth(dict): list of groundtruth.
+        """
+        ret = [defaultdict(list), defaultdict(list), defaultdict(list)]
+
+        for i in range(3):
+            for key in full_groundtruth[i].keys():
+                if int(key.split(",")[1]) % 4 == 0:
+                    ret[i][key] = full_groundtruth[i][key]
+        return ret
+
 
     def load_image_lists(self, frames_dir, frame_list, is_train):
         """
@@ -163,7 +182,10 @@ class AVA_Evaluator(object):
     def calculate_mAP(self, epoch):
         eval_start = time.time()
         detections = self.get_ava_eval_data()
-        groundtruth = self.full_groundtruth
+        if self.full_ava_test:
+            groundtruth = self.full_groundtruth
+        else:
+            groundtruth = self.mini_groundtruth
 
         print("Evaluating with %d unique GT frames." % len(groundtruth[0]))
         print("Evaluating with %d unique detection frames" % len(detections[0]))
