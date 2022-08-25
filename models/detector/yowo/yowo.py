@@ -314,6 +314,7 @@ class YOWO(nn.Module):
                 all_bboxes.append(box)
 
         
+        # nms
         if len(all_bboxes) > 0:
             det_confs = torch.zeros(len(all_bboxes))
             for i in range(len(all_bboxes)):
