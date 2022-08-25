@@ -330,8 +330,11 @@ class YOWO(nn.Module):
                         box_j = all_bboxes[sortIds[j]]
                         if self.bbox_iou(box_i, box_j) > self.nms_thresh:
                             box_j[4] = 0
-        else:
+
             return out_boxes
+
+        else:
+            return all_bboxes
     
 
     @torch.no_grad()
@@ -383,7 +386,7 @@ class YOWO(nn.Module):
             batch_labels.append(labels)
             batch_bboxes.append(bboxes)
 
-        return batch_scores, batch_labels, batch_bboxes
+            return batch_scores, batch_labels, batch_bboxes
 
 
     def forward(self, video_clips, targets=None):
