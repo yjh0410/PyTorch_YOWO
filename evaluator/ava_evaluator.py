@@ -204,7 +204,7 @@ class AVA_Evaluator(object):
                     sec = target['sec']
 
                     for bbox in bboxes:
-                        x1, y1, x2, y2 = bbox
+                        x1, y1, x2, y2 = bbox[:4]
                         det_conf = float(bbox[4])
                         cls_out = [det_conf * cls_conf.cpu().numpy() for cls_conf in bbox[5]]
 
