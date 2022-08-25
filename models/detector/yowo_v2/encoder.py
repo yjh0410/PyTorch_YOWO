@@ -157,8 +157,8 @@ class SpatialEncoder(nn.Module):
         x2_1 = self.sam_2(x2)
         x2_2 = self.cam_2(x2, x1)
 
-        y1 = self.output_conv_1([x1_1, x1_2])
-        y2 = self.output_conv_2([x2_1, x2_2])
+        y1 = self.output_conv_1(torch.cat([x1_1, x1_2], dim=1))
+        y2 = self.output_conv_2(torch.cat([x2_1, x2_2], dim=1))
 
         return y1, y2
 
