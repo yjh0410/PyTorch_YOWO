@@ -328,7 +328,7 @@ class YOWO(nn.Module):
                     out_boxes.append(box_i)
                     for j in range(i+1, len(all_bboxes)):
                         box_j = all_bboxes[sortIds[j]]
-                        if self.bbox_iou(box_i, box_j, x1y1x2y2=False) > self.nms_thresh:
+                        if self.bbox_iou(box_i, box_j) > self.nms_thresh:
                             box_j[4] = 0
         else:
             return out_boxes
@@ -370,7 +370,7 @@ class YOWO(nn.Module):
                 batch_bboxes.append(out_boxes)
 
             return batch_bboxes
-            
+
         else:
                         
             batch_scores = []
