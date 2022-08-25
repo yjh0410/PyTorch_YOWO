@@ -12,6 +12,7 @@ def build_model(args,
                 device, 
                 num_classes=80, 
                 trainable=False,
+                eval_mode=False,
                 resume=None):
     print('==============================')
     print('Build {} ...'.format(args.version.upper()))
@@ -19,8 +20,13 @@ def build_model(args,
     # Basic config
     if trainable:
         img_size = d_cfg['train_size']
+        if eval_mode:
+            conf_thresh = m_cfg['conf_thresh_valid']
+        else:
+            conf_thresh = m_cfg['conf_thresh']
     else:
         img_size = d_cfg['test_size']
+        conf_thresh = m_cfg['conf_thresh']
 
     # build YOWO
     if args.version == 'yowo':
@@ -31,7 +37,7 @@ def build_model(args,
             img_size=img_size,
             len_clip=d_cfg['len_clip'],
             num_classes=num_classes,
-            conf_thresh=m_cfg['conf_thresh'],
+            conf_thresh=conf_thresh,
             nms_thresh=m_cfg['nms_thresh'],
             topk=args.topk,
             trainable=trainable,
@@ -46,7 +52,7 @@ def build_model(args,
             img_size=img_size,
             len_clip=d_cfg['len_clip'],
             num_classes=num_classes,
-            conf_thresh=m_cfg['conf_thresh'],
+            conf_thresh=conf_thresh,
             nms_thresh=m_cfg['nms_thresh'],
             topk=args.topk,
             trainable=trainable,
@@ -61,7 +67,7 @@ def build_model(args,
             img_size=img_size,
             len_clip=d_cfg['len_clip'],
             num_classes=num_classes,
-            conf_thresh=m_cfg['conf_thresh'],
+            conf_thresh=conf_thresh,
             nms_thresh=m_cfg['nms_thresh'],
             topk=args.topk,
             trainable=trainable,

@@ -123,7 +123,8 @@ if __name__ == '__main__':
         m_cfg=m_cfg,
         device=device, 
         num_classes=num_classes, 
-        trainable=False
+        trainable=False,
+        eval_mode=True
         )
 
     # load trained weight

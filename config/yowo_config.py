@@ -16,7 +16,8 @@ yowo_config = {
         'head_norm': 'BN',
         'head_act': 'lrelu',
         # post process
-        'conf_thresh': 0.01,
+        'conf_thresh': 0.1,
+        'conf_thresh_valid': 0.005,
         'nms_thresh': 0.5,
         # matcher
         'ignore_thresh': 0.5,
@@ -59,7 +60,8 @@ yowo_config = {
         'head_norm': 'BN',
         'head_act': 'lrelu',
         # post process
-        'conf_thresh': 0.01,
+        'conf_thresh': 0.1,
+        'conf_thresh_valid': 0.005,
         'nms_thresh': 0.5,
         # matcher
         'ignore_thresh': 0.5,
@@ -102,7 +104,8 @@ yowo_config = {
         'head_norm': 'BN',
         'head_act': 'lrelu',
         # post process
-        'conf_thresh': 0.01,
+        'conf_thresh': 0.1,
+        'conf_thresh_valid': 0.005,
         'nms_thresh': 0.5,
         # matcher
         'ignore_thresh': 0.5,
