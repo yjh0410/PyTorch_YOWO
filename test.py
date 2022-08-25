@@ -138,6 +138,8 @@ def inference_ava(d_cfg, args, model, device, dataset, class_names=None, class_c
         # vis results of key-frame
         key_frame_tensor = video_clip[0, :, -1, :, :]
         key_frame = convert_tensor_to_cv2img(key_frame_tensor, d_cfg['pixel_mean'], d_cfg['pixel_std'])
+        # resize key_frame to orig size
+        key_frame = cv2.resize(key_frame, orig_size)
 
         # batch size = 1
         bboxes = batch_bboxes[0]
@@ -158,7 +160,8 @@ def inference_ava(d_cfg, args, model, device, dataset, class_names=None, class_c
             indices = list(indices[0])
             scores = list(scores)
 
-            cv2.rectangle(key_frame, (x1, y1), (x2, y2), (0,255,0), 2)
+            print(x1, y1, x2, y2)
+            cv2.rectangle(key_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             if len(scores) > 0:
                 blk   = np.zeros(key_frame.shape, np.uint8)
