@@ -90,6 +90,8 @@ class SCAM(nn.Module):
         self.input_proj_1 = nn.Conv2d(in_dim_1, out_dim, kernel_size=1)
         self.input_proj_2 = nn.Conv2d(in_dim_2, out_dim, kernel_size=1)
 
+        self.output_conv = Conv2d(out_dim, out_dim, k=3, p=1, act_type='relu', norm_type='BN')
+
 
     def forward(self, x1, x2):
         """
@@ -117,6 +119,7 @@ class SCAM(nn.Module):
         out = torch.bmm(attention, value)
         out = out.permute(0, 2, 1).contiguous()
         out = out.view(B, C, H, W)
+        out = self.output_conv(out)
 
         return out
 
@@ -138,15 +141,8 @@ class SpatialEncoder(nn.Module):
             SSAM(),
             Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
         )
-        self.cam_1 = nn.Sequential(
-            SCAM(in_dim_1, in_dim_2, out_dim=inter_dim),
-            Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
-        )
-
-        self.cam_2 = nn.Sequential(
-            SCAM(in_dim_1, in_dim_2, out_dim=inter_dim),
-            Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
-        )
+        self.cam_1 = SCAM(in_dim_1, in_dim_2, out_dim=inter_dim)
+        self.cam_2 = SCAM(in_dim_1, in_dim_2, out_dim=inter_dim)
 
         self.output_conv_1 = Conv2d(inter_dim*2, inter_dim*2, k=1, act_type=act_type, norm_type=norm_type)
         self.output_conv_2 = Conv2d(inter_dim*2, inter_dim*2, k=1, act_type=act_type, norm_type=norm_type)
