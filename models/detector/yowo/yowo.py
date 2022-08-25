@@ -319,7 +319,7 @@ class YOWO(nn.Module):
             for i in range(len(all_bboxes)):
                 det_confs[i] = 1.0 - all_bboxes[i][4]                
 
-            _,sortIds = torch.sort(det_confs)
+            _, sortIds = torch.sort(det_confs)
 
             out_boxes = []
             for i in range(len(all_bboxes)):
