@@ -52,7 +52,7 @@ def parse_args():
 
     
 @torch.no_grad()
-def inference(d_cfg, args, model, device, dataset, class_names=None, class_colors=None):
+def inference_ucf24_jhmdb21(d_cfg, args, model, device, dataset, class_names=None, class_colors=None):
     # path to save 
     if args.save:
         save_path = os.path.join(
@@ -109,6 +109,81 @@ def inference(d_cfg, args, model, device, dataset, class_names=None, class_color
             # save result
             cv2.imwrite(os.path.join(save_path,
             '{:0>5}.jpg'.format(index)), vis_results)
+        
+
+@torch.no_grad()
+def inference_ava(d_cfg, args, model, device, dataset, class_names=None, class_colors=None):
+    # path to save 
+    if args.save:
+        save_path = os.path.join(
+            args.save_folder, args.dataset, 
+            args.version, 'video_clips')
+        os.makedirs(save_path, exist_ok=True)
+
+    # inference
+    for index in range(0, len(dataset)):
+        print('Video clip {:d}/{:d}....'.format(index+1, len(dataset)))
+        frame_id, video_clip, target = dataset[index]
+
+        orig_size = target['orig_size']  # width, height
+
+        # prepare
+        video_clip = video_clip.unsqueeze(0).to(device) # [B, 3, T, H, W], B=1
+
+        t0 = time.time()
+        # inference
+        batch_bboxes = model(video_clip)
+        print("inference time ", time.time() - t0, "s")
+
+        # vis results of key-frame
+        key_frame_tensor = video_clip[0, :, -1, :, :]
+        key_frame = convert_tensor_to_cv2img(key_frame_tensor, d_cfg['pixel_mean'], d_cfg['pixel_std'])
+
+        # batch size = 1
+        bboxes = batch_bboxes[0]
+
+        # visualize detection results
+        for bbox in bboxes:
+            x1, y1, x2, y2 = bbox[:4]
+            det_conf = float(bbox[4])
+            cls_out = [det_conf * cls_conf.cpu().numpy() for cls_conf in bbox[5]]
+        
+            # rescale bbox
+            x1, x2 = int(x1 * orig_size[0]), int(x2 * orig_size[0])
+            y1, y2 = int(y1 * orig_size[1]), int(y2 * orig_size[1])
+
+            cls_scores = np.array(cls_out)
+            indices = np.where(cls_scores > 0.4)
+            scores = cls_scores[indices]
+            indices = list(indices[0])
+            scores = list(scores)
+
+            cv2.rectangle(key_frame, (x1, y1), (x2, y2), (0,255,0), 2)
+
+            if len(scores) > 0:
+                blk   = np.zeros(key_frame.shape, np.uint8)
+                font  = cv2.FONT_HERSHEY_SIMPLEX
+                coord = []
+                text  = []
+                text_size = []
+                # scores, indices  = [list(a) for a in zip(*sorted(zip(scores,indices), reverse=True))] # if you want, you can sort according to confidence level
+                for _, cls_ind in enumerate(indices):
+                    text.append("[{:.2f}] ".format(scores[_]) + str(class_names[cls_ind]))
+                    text_size.append(cv2.getTextSize(text[-1], font, fontScale=0.25, thickness=1)[0])
+                    coord.append((x1+3, y1+7+10*_))
+                    cv2.rectangle(blk, (coord[-1][0]-1, coord[-1][1]-6), (coord[-1][0]+text_size[-1][0]+1, coord[-1][1]+text_size[-1][1]-4), (0, 255, 0), cv2.FILLED)
+                key_frame = cv2.addWeighted(key_frame, 1.0, blk, 0.25, 1)
+                for t in range(len(text)):
+                    cv2.putText(key_frame, text[t], coord[t], font, 0.25, (0, 0, 0), 1)
+        
+        if args.show:
+            cv2.imshow('key-frame detection', key_frame)
+            cv2.waitKey(0)
+
+        if args.save:
+            # save result
+            cv2.imwrite(os.path.join(save_path,
+            '{:0>5}.jpg'.format(index)), key_frame)
         
 
 if __name__ == '__main__':
@@ -183,12 +258,23 @@ if __name__ == '__main__':
     model = model.to(device).eval()
 
     # run
-    inference(
-        d_cfg=d_cfg,
-        args=args,
-        model=model,
-        device=device,
-        dataset=dataset,
-        class_names=class_names,
-        class_colors=class_colors
-        )
+    if args.dataset in ['ucf24', 'jhmdb21']:
+        inference_ucf24_jhmdb21(
+            d_cfg=d_cfg,
+            args=args,
+            model=model,
+            device=device,
+            dataset=dataset,
+            class_names=class_names,
+            class_colors=class_colors
+            )
+    elif args.dataset in ['ava_v2.2']:
+        inference_ava(
+            d_cfg=d_cfg,
+            args=args,
+            model=model,
+            device=device,
+            dataset=dataset,
+            class_names=class_names,
+            class_colors=class_colors
+            )
