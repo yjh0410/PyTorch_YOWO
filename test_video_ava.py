@@ -145,7 +145,7 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     # config
-    d_cfg = dataset_config('ava_v2.2')
+    d_cfg = dataset_config['ava_v2.2']
     class_names = d_cfg['label_map']
     num_classes = 80
 
