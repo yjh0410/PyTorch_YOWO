@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument('-vs', '--vis_thresh', default=0.35, type=float,
                         help='threshold for visualization')
     parser.add_argument('-video', default='9Y_l9NsnYE0.mp4', type=str,
-                        help='path to video.')
+                        help='AVA video name.')
 
     # model
     parser.add_argument('-v', '--version', default='yowo', type=str,
@@ -41,7 +41,7 @@ def parse_args():
     return parser.parse_args()
                     
 
-def run(args, d_cfg, model, device, transform=None, class_names=None):
+def run(args, d_cfg, model, device, transform, class_names):
     # path to save 
     save_path = os.path.join(args.save_folder, 'ava_video')
     os.makedirs(save_path, exist_ok=True)
@@ -49,6 +49,7 @@ def run(args, d_cfg, model, device, transform=None, class_names=None):
     # path to video
     path_to_video = os.path.join(d_cfg['data_root'], 'videos_15min', args.video)
 
+    # video
     video = cv2.VideoCapture(path_to_video)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     save_size = (640, 480)
