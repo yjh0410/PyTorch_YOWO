@@ -132,7 +132,7 @@ def run(args, d_cfg, model, device, transform, class_names):
             if args.show:
                 # show
                 cv2.imshow('key-frame detection', frame)
-                cv2.waitKey(0)
+                cv2.waitKey(1)
 
         else:
             break
