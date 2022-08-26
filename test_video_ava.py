@@ -27,7 +27,7 @@ def parse_args():
                         help='Dir to save results')
     parser.add_argument('-vs', '--vis_thresh', default=0.35, type=float,
                         help='threshold for visualization')
-    parser.add_argument('-video', default='9Y_l9NsnYE0.mp4', type=str,
+    parser.add_argument('--video', default='9Y_l9NsnYE0.mp4', type=str,
                         help='AVA video name.')
     parser.add_argument('-d', '--dataset', default='ava_v2.2',
                         help='ava_v2.2')
