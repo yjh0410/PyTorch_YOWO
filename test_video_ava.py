@@ -5,10 +5,9 @@ import time
 import numpy as np
 import torch
 
-from config import dataset_config
 from dataset.transforms import BaseTransform
 from utils.misc import load_weight
-from config import build_model_config
+from config import build_dataset_config, build_model_config
 from models.detector import build_model
 
 
@@ -29,6 +28,8 @@ def parse_args():
                         help='threshold for visualization')
     parser.add_argument('-video', default='9Y_l9NsnYE0.mp4', type=str,
                         help='AVA video name.')
+    parser.add_argument('-d', '--dataset', default='ava_v2.2',
+                        help='ava_v2.2')
 
     # model
     parser.add_argument('-v', '--version', default='yowo', type=str,
@@ -145,7 +146,9 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     # config
-    d_cfg = dataset_config['ava_v2.2']
+    d_cfg = build_dataset_config(args)
+    m_cfg = build_model_config(args)
+    
     class_names = d_cfg['label_map']
     num_classes = 80
 
@@ -157,7 +160,6 @@ if __name__ == '__main__':
         )
 
     # build model
-    m_cfg = build_model_config(args)
     model = build_model(
         args=args,
         d_cfg=d_cfg,
