@@ -80,6 +80,8 @@ def run(args, d_cfg, model, device, transform, class_names):
 
             # transform
             video_clip, _ = transform(video_clip)
+            # List [T, 3, H, W] -> [3, T, H, W]
+            video_clip = torch.stack(video_clip, dim=1)
             video_clip = video_clip.unsqueeze(0).to(device) # [B, 3, T, H, W], B=1
 
             t0 = time.time()
