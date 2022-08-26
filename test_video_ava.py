@@ -4,6 +4,7 @@ import os
 import time
 import numpy as np
 import torch
+from PIL import Image
 
 from dataset.transforms import BaseTransform
 from utils.misc import load_weight
@@ -63,12 +64,15 @@ def run(args, d_cfg, model, device, transform, class_names):
         ret, frame = video.read()
         
         if ret:
+            # to PIL image
+            frame_pil = Image.fromarray(frame.astype(np.uint8))
+
             # prepare
             if len(video_clip) <= 0:
                 for _ in range(d_cfg['len_clip']):
-                    video_clip.append(frame)
+                    video_clip.append(frame_pil)
 
-            video_clip.append(frame)
+            video_clip.append(frame_pil)
             del video_clip[0]
 
             # orig size
@@ -148,7 +152,7 @@ if __name__ == '__main__':
     # config
     d_cfg = build_dataset_config(args)
     m_cfg = build_model_config(args)
-    
+
     class_names = d_cfg['label_map']
     num_classes = 80
 
