@@ -79,14 +79,14 @@ def run(args, d_cfg, model, device, transform, class_names):
             orig_h, orig_w = frame.shape[:2]
 
             # transform
-            video_clip, _ = transform(video_clip)
+            x, _ = transform(video_clip)
             # List [T, 3, H, W] -> [3, T, H, W]
-            video_clip = torch.stack(video_clip, dim=1)
-            video_clip = video_clip.unsqueeze(0).to(device) # [B, 3, T, H, W], B=1
+            x = torch.stack(x, dim=1)
+            x = x.unsqueeze(0).to(device) # [B, 3, T, H, W], B=1
 
             t0 = time.time()
             # inference
-            batch_bboxes = model(video_clip)
+            batch_bboxes = model(x)
             print("inference time ", time.time() - t0, "s")
 
             # batch size = 1
