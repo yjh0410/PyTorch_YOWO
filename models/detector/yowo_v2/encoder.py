@@ -84,25 +84,23 @@ class SSAM(nn.Module):
 # Spatial Cross Attetion Module
 class SCAM(nn.Module):
     """ Spatial attention module """
-    def __init__(self, in_dim_1, in_dim_2, out_dim=256):
+    def __init__(self, in_dim_1, in_dim_2):
         super(SCAM, self).__init__()
+        self.out_dim = in_dim_1
+        self.gamma = nn.Parameter(torch.zeros(1))
         self.softmax  = nn.Softmax(dim=-1)
-        self.input_proj_1 = nn.Conv2d(in_dim_1, out_dim, kernel_size=1)
-        self.input_proj_2 = nn.Conv2d(in_dim_2, out_dim, kernel_size=1)
-
-        self.output_conv = Conv2d(out_dim, out_dim, k=3, p=1, act_type='relu', norm_type='BN')
+        self.input_proj = nn.Conv2d(in_dim_2, self.out_dim, kernel_size=1)
 
 
     def forward(self, x1, x2):
         """
             inputs :
-                x1 : (Tensor) [B, C1, H, W]
-                x2 : (Tensor) [B, C2, H, W]
+                x1 : (Tensor) [B, C1, H, W], it should be the 2D feature map from 2D backbone.
+                x2 : (Tensor) [B, C2, H, W], it should be the 3D feature map from 3D backbone.
             returns :
                 output : (Tensor) [B, C, H, W]
         """
-        x1 = self.input_proj_1(x1)
-        x2 = self.input_proj_2(x2)
+        x2 = self.input_proj(x2)
 
         B, C, H, W = x1.size()
         # query / key / value
@@ -119,48 +117,44 @@ class SCAM(nn.Module):
         out = torch.bmm(attention, value)
         out = out.permute(0, 2, 1).contiguous()
         out = out.view(B, C, H, W)
-        out = self.output_conv(out)
+
+        # output
+        out = self.gamma * out + x1
 
         return out
 
 
 # Spatial Encoder
 class SpatialEncoder(nn.Module):
-    def __init__(self, in_dim_1=425, in_dim_2=2048, inter_dim=256, act_type='', norm_type=''):
+    def __init__(self, in_dim_1=425, in_dim_2=2048, act_type='', norm_type=''):
         super().__init__()
-        self.out_dim = inter_dim * 2
-        self.sam_1 = nn.Sequential(
-            Conv2d(in_dim_1, inter_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-            SSAM(),
-            Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
+        self.out_dim = in_dim_1
+        # Spatial Self-Attention Module for 2D feat.
+        self.ssam = nn.Sequential(
+            Conv2d(in_dim_1, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            SSAM()
         )
-        self.sam_2 = nn.Sequential(
-            Conv2d(in_dim_2, inter_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-            SSAM(),
-            Conv2d(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
-        )
-        self.cam_1 = SCAM(in_dim_1, in_dim_2, out_dim=inter_dim)
-        self.cam_2 = SCAM(in_dim_2, in_dim_1, out_dim=inter_dim)
+        # Spatial Cross-Attention Module for 2D & 3D feat.
+        self.scam = SCAM(in_dim_1, in_dim_2)
 
-        self.output_conv_1 = Conv2d(inter_dim*2, inter_dim*2, k=1, act_type=act_type, norm_type=norm_type)
-        self.output_conv_2 = Conv2d(inter_dim*2, inter_dim*2, k=1, act_type=act_type, norm_type=norm_type)
+        # output
+        self.out_convs = nn.Sequential(
+            Conv2d(self.out_dim*2, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
+        )
 
 
     def forward(self, x1, x2):
         """
             x: [B, CN, H, W]
         """
-        x1_1 = self.sam_1(x1)
-        x1_2 = self.cam_1(x1, x2)
-        x2_1 = self.sam_2(x2)
-        x2_2 = self.cam_2(x2, x1)
+        x1_1 = self.ssam(x1)
+        x1_2 = self.scam(x1, x2)
 
-        y1 = self.output_conv_1(torch.cat([x1_1, x1_2], dim=1))
-        y2 = self.output_conv_2(torch.cat([x2_1, x2_2], dim=1))
+        out = self.out_convs(torch.cat([x1_1, x1_2], dim=1))
 
-        return y1, y2
+        return out
 
 
 # Channel Encoder

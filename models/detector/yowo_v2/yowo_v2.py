@@ -58,14 +58,13 @@ class YOWOv2(nn.Module):
         self.spatial_encoder = SpatialEncoder(
             in_dim_1=bk_dim_2d,
             in_dim_2=bk_dim_3d,
-            inter_dim=256,
             act_type=cfg['head_act'],
             norm_type=cfg['head_norm']
         )
 
         # channel encoder
         self.channel_encoder = ChannelEncoder(
-            in_dim=256*4,
+            in_dim=bk_dim_2d + bk_dim_3d,
             out_dim=cfg['head_dim'],
             act_type=cfg['head_act'],
             norm_type=cfg['head_norm']
@@ -218,7 +217,7 @@ class YOWOv2(nn.Module):
         feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
         # spatial encoder
-        feat_2d, feat_3d = self.spatial_encoder(feat_2d, feat_3d)
+        feat_2d = self.spatial_encoder(feat_2d, feat_3d)
 
         # channel encoder
         feat = self.channel_encoder(torch.cat([feat_2d, feat_3d], dim=1))

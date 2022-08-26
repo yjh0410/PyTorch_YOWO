@@ -51,3 +51,11 @@ Password: tcjd
 | YOWO (Ours) |      80.4       |      94.1      |      93.7    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
 | YOWOv2      |      82.4       |      93.0      |      95.6    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_v2_82.4.pth)   |
 | YOWOv3      |      83.5       |      93.0      |      96.5    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_v3_83.5.pth)   |
+
+
+## AVA v2.2
+|    Model    |    Clip    |    mAP    |    weight    |
+|-------------|------------|-----------|--------------|
+|    YOWO     |     16     |   17.9    |       -      |
+| YOWO (Ours) |     16     |       |  [github]()  |
+
