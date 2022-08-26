@@ -240,4 +240,8 @@ class AVA_Evaluator(object):
         mAP = self.calculate_mAP(epoch)
         print("mAP: {}".format(mAP))
 
+        # clear
+        del self.all_preds
+        self.all_preds = []
+
         return mAP
