@@ -291,7 +291,7 @@ class YOWOv2(nn.Module):
             feat_3d = self.backbone_3d(video_clips).squeeze(2)  # [B, C2, H, W]
 
             # spatial encoder
-            feat_2d, feat_3d = self.spatial_encoder(feat_2d, feat_3d)
+            feat_2d = self.spatial_encoder(feat_2d, feat_3d)
             
             # channel encoder
             feat = self.channel_encoder(torch.cat([feat_2d, feat_3d], dim=1))
