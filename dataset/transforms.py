@@ -163,13 +163,11 @@ class BaseTransform(object):
 
         # normalize target
         if target is not None:
-            target = target.reshape(-1, 5)
-
             target[..., [0, 2]] /= ow
             target[..., [1, 3]] /= oh
 
         else:
-            target = np.array([]).reshape(-1, 5)
+            target = np.array([])
 
         # to tensor
         video_clip = self.to_tensor(video_clip)
