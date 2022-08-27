@@ -141,7 +141,9 @@ class SpatialEncoder(nn.Module):
         # output
         self.out_convs = nn.Sequential(
             Conv2d(self.out_dim*2, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
+            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            nn.Dropout(0.1, inplace=False),
+            nn.Conv2d(self.out_dim, self.out_dim, kernel_size=1)
         )
 
 
