@@ -124,26 +124,54 @@ class SCAM(nn.Module):
         return out
 
 
+# # Spatial Encoder
+# class SpatialEncoder(nn.Module):
+#     def __init__(self, in_dim_1=425, in_dim_2=2048, act_type='', norm_type=''):
+#         super().__init__()
+#         self.out_dim = in_dim_1
+#         # Spatial Self-Attention Module for 2D feat.
+#         self.ssam = nn.Sequential(
+#             Conv2d(in_dim_1, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
+#             Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+#             SSAM()
+#         )
+#         # Spatial Cross-Attention Module for 2D & 3D feat.
+#         self.scam = SCAM(in_dim_1, in_dim_2)
+
+#         # output
+#         self.out_convs = nn.Sequential(
+#             Conv2d(self.out_dim*2, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
+#             Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+#             nn.Dropout(0.1, inplace=False),
+#             nn.Conv2d(self.out_dim, self.out_dim, kernel_size=1)
+#         )
+
+
+#     def forward(self, x1, x2):
+#         """
+#             x: [B, CN, H, W]
+#         """
+#         x1_1 = self.ssam(x1)
+#         x1_2 = self.scam(x1, x2)
+
+#         out = self.out_convs(torch.cat([x1_1, x1_2], dim=1))
+
+#         return out
+
+
 # Spatial Encoder
 class SpatialEncoder(nn.Module):
-    def __init__(self, in_dim_1=425, in_dim_2=2048, act_type='', norm_type=''):
+    def __init__(self, in_dim=425, out_dim=512, act_type='', norm_type=''):
         super().__init__()
-        self.out_dim = in_dim_1
+        self.out_dim = out_dim
         # Spatial Self-Attention Module for 2D feat.
         self.ssam = nn.Sequential(
-            Conv2d(in_dim_1, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-            SSAM()
-        )
-        # Spatial Cross-Attention Module for 2D & 3D feat.
-        self.scam = SCAM(in_dim_1, in_dim_2)
-
-        # output
-        self.out_convs = nn.Sequential(
-            Conv2d(self.out_dim*2, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(in_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            SSAM(),
+            Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
             nn.Dropout(0.1, inplace=False),
-            nn.Conv2d(self.out_dim, self.out_dim, kernel_size=1)
+            nn.Conv2d(out_dim, out_dim, kernel_size=1)
         )
 
 
@@ -151,12 +179,9 @@ class SpatialEncoder(nn.Module):
         """
             x: [B, CN, H, W]
         """
-        x1_1 = self.ssam(x1)
-        x1_2 = self.scam(x1, x2)
+        x1 = self.ssam(x1)
 
-        out = self.out_convs(torch.cat([x1_1, x1_2], dim=1))
-
-        return out
+        return x1
 
 
 # Channel Encoder

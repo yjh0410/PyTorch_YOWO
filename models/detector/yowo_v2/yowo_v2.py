@@ -56,15 +56,15 @@ class YOWOv2(nn.Module):
 
         # spatial encoder
         self.spatial_encoder = SpatialEncoder(
-            in_dim_1=bk_dim_2d,
-            in_dim_2=bk_dim_3d,
+            in_dim=bk_dim_2d,
+            out_dim=512,
             act_type=cfg['head_act'],
             norm_type=cfg['head_norm']
         )
 
         # channel encoder
         self.channel_encoder = ChannelEncoder(
-            in_dim=bk_dim_2d + bk_dim_3d,
+            in_dim=512 + bk_dim_3d,
             out_dim=cfg['head_dim'],
             act_type=cfg['head_act'],
             norm_type=cfg['head_norm']

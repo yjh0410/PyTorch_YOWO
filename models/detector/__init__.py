@@ -44,7 +44,7 @@ def build_model(args,
             multi_hot=d_cfg['multi_hot']
             )
 
-    elif args.version == 'yowo_v2':
+    elif args.version == 'yowo_v2_':
         model = YOWOv2(
             cfg=m_cfg,
             device=device,
