@@ -2,7 +2,7 @@
 python train.py \
         --cuda \
         -d ucf24 \
-        -v yowo_v2_ \
+        -v yowo_v2 \
         --num_workers 4 \
         --eval_epoch 1 \
         --eval \
