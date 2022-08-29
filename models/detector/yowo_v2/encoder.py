@@ -1,4 +1,3 @@
-import math
 import torch
 import torch.nn as nn
 from ...basic.conv import Conv2d
@@ -86,10 +85,9 @@ class SCAM(nn.Module):
     """ Spatial attention module """
     def __init__(self, in_dim_1, in_dim_2):
         super(SCAM, self).__init__()
-        self.out_dim = in_dim_1
         self.gamma = nn.Parameter(torch.zeros(1))
         self.softmax  = nn.Softmax(dim=-1)
-        self.input_proj = nn.Conv2d(in_dim_2, self.out_dim, kernel_size=1)
+        self.input_proj = nn.Conv2d(in_dim_2, in_dim_1, kernel_size=1)
 
 
     def forward(self, x1, x2):
@@ -126,24 +124,27 @@ class SCAM(nn.Module):
 
 # Spatial Encoder
 class SpatialEncoder(nn.Module):
-    def __init__(self, in_dim_1=425, in_dim_2=2048, act_type='', norm_type=''):
+    def __init__(self, in_dim_1=425, in_dim_2=2048, out_dim=512, act_type='', norm_type=''):
         super().__init__()
-        self.out_dim = in_dim_1
-        # Spatial Self-Attention Module for 2D feat.
-        self.ssam = nn.Sequential(
-            Conv2d(in_dim_1, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-            SSAM()
+        self.out_dim = out_dim
+        # input proj
+        self.input_proj = nn.Sequential(
+            Conv2d(in_dim_1, out_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
         )
+
+        # Spatial Self-Attention Module for 2D feat.
+        self.ssam = SSAM()
+
         # Spatial Cross-Attention Module for 2D & 3D feat.
-        self.scam = SCAM(in_dim_1, in_dim_2)
+        self.scam = SCAM(out_dim, in_dim_2)
 
         # output
         self.out_convs = nn.Sequential(
-            Conv2d(self.out_dim*2, self.out_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv2d(self.out_dim, self.out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(out_dim*2, out_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
             nn.Dropout(0.1, inplace=False),
-            nn.Conv2d(self.out_dim, self.out_dim, kernel_size=1)
+            nn.Conv2d(out_dim, out_dim, kernel_size=1)
         )
 
 
@@ -151,9 +152,15 @@ class SpatialEncoder(nn.Module):
         """
             x: [B, CN, H, W]
         """
+        x1 = self.input_proj(x1)
+
+        # SSAM
         x1_1 = self.ssam(x1)
+
+        # SCAM
         x1_2 = self.scam(x1, x2)
 
+        # output
         out = self.out_convs(torch.cat([x1_1, x1_2], dim=1))
 
         return out

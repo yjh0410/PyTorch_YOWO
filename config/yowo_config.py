@@ -55,6 +55,8 @@ yowo_config = {
         ## 3D
         'backbone_3d': 'resnext101',
         'pretrained_3d': True,
+        # spatial encoder
+        'se_out_dim': 512,
         # head
         'head_dim': 1024,
         'head_norm': 'BN',
