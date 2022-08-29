@@ -46,7 +46,7 @@ yowo_config = {
         }
     },
 
-    'yowo_v2_': {
+    'yowo_v2': {
         # backbone
         ## 2D
         'backbone_2d': 'yolov2',
