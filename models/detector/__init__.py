@@ -20,13 +20,13 @@ def build_model(args,
     # Basic config
     if trainable:
         img_size = d_cfg['train_size']
+        conf_thresh = m_cfg['conf_thresh_valid']
+    else:
+        img_size = d_cfg['test_size']
         if eval_mode:
             conf_thresh = m_cfg['conf_thresh_valid']
         else:
             conf_thresh = m_cfg['conf_thresh']
-    else:
-        img_size = d_cfg['test_size']
-        conf_thresh = m_cfg['conf_thresh']
 
     # build YOWO
     if args.version == 'yowo':
