@@ -61,7 +61,7 @@ def inference_ucf24_jhmdb21(d_cfg, args, model, device, dataset, class_names=Non
         os.makedirs(save_path, exist_ok=True)
 
     # inference
-    for index in range(0, len(dataset)):
+    for index in range(500, len(dataset)):
         print('Video clip {:d}/{:d}....'.format(index+1, len(dataset)))
         frame_id, video_clip, target = dataset[index]
 
