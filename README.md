@@ -45,11 +45,11 @@ Password: tcjd
 
 # Experiment
 ## UCF24
-|    Model    |    Frame mAP    |    Cls Accu    |    Recall    |    Weight    |
-|-------------|-----------------|----------------|--------------|--------------|
-|    YOWO     |      80.4       |      94.5      |      93.5    |       -      |
-| YOWO (Ours) |      80.4       |      94.1      |      93.7    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
-| YOWOv2      |      82.0       |      93.0      |      95.2    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_v2_82.4.pth)   |
+|    Model    |    Frame mAP    |   FPS   |    Cls Accu    |    Recall    |    Weight    |
+|-------------|-----------------|---------|----------------|--------------|--------------|
+|    YOWO     |      80.4       |    -    |      94.5      |      93.5    |       -      |
+| YOWO (Ours) |      80.4       |    36   |      94.1      |      93.7    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
+| YOWOv2      |      82.0       |    35   |      94.0      |      95.0    | [github]()   |
 <!-- | YOWOv3      |      83.5       |      93.0      |      96.5    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_v3_83.5.pth)   | -->
 
 
