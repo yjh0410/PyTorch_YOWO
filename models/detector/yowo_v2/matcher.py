@@ -127,14 +127,14 @@ class YoloMatcher(object):
                 for result in label_assignment_results:
                     grid_x, grid_y, anchor_idx = result
 
-                    # 3x3 center prior
+                    # check
                     is_valid = (grid_y >= 0 and grid_y < fmp_h) and (grid_x >= 0 and grid_x < fmp_w)
 
                     if is_valid:
                         gt_conf[bi, grid_y, grid_x, anchor_idx, 0] = 1.0
                         gt_bboxes[bi, grid_y, grid_x, anchor_idx] = torch.as_tensor([x1, y1, x2, y2])
                         if self.multi_hot:
-                            gt_cls[bi, grid_y, grid_x, anchor_idx, :] = label
+                            gt_cls[bi, grid_y, grid_x, anchor_idx, :] = torch.as_tensor(label)
                         else:
                             gt_cls[bi, grid_y, grid_x, anchor_idx, 0] = label
 

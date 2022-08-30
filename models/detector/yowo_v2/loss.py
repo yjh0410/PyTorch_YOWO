@@ -1,8 +1,9 @@
+from math import gamma
 import torch
 import torch.nn as nn
 from .matcher import YoloMatcher
 from utils.box_ops import get_ious
-from utils.misc import Softmax_FocalLoss
+from utils.misc import AVA_FocalLoss, Softmax_FocalLoss
 from utils.vis_tools import vis_targets
 
 
@@ -24,6 +25,7 @@ class Criterion(object):
         self.anchor_size = anchor_size
         self.num_anchors = num_anchors
         self.num_classes = num_classes
+        self.multi_hot = multi_hot
         self.loss_obj_weight = loss_obj_weight
         self.loss_noobj_weight = loss_noobj_weight
         self.loss_cls_weight = loss_cls_weight
@@ -40,8 +42,11 @@ class Criterion(object):
         
         # Loss
         self.conf_loss = nn.MSELoss(reduction='none')
-        # self.cls_loss = nn.CrossEntropyLoss(reduction='none')
-        self.cls_loss = Softmax_FocalLoss(num_classes=num_classes, gamma=2.0, reduction='none')
+        if multi_hot:
+            self.cls_loss = AVA_FocalLoss(device, 0.5, num_classes, reduction='none')
+        else:
+            # self.cls_loss = nn.CrossEntropyLoss(reduction='none')
+            self.cls_loss = Softmax_FocalLoss(num_classes=num_classes, gamma=2.0, reduction='none')
 
 
     def __call__(self, 
@@ -84,9 +89,12 @@ class Criterion(object):
         pred_cls = outputs['cls_pred'].view(-1, self.num_classes)  # [BM, C]
         pred_box = outputs['box_pred'].view(-1, 4)                 # [BM, 4]
         
-        gt_conf = gt_conf.flatten().to(device).float()        # [BM,]
-        gt_cls = gt_cls.flatten().to(device).long()           # [BM,]
-        gt_bboxes = gt_bboxes.view(-1, 4).to(device).float()  # [BM, 4]
+        gt_conf = gt_conf.flatten().to(device).float()                     # [BM,]
+        gt_bboxes = gt_bboxes.view(-1, 4).to(device).float()               # [BM, 4]
+        if self.multi_hot:
+            gt_cls = gt_cls.view(-1, self.num_classes).to(device).long()  # [BM, C]
+        else:
+            gt_cls = gt_cls.flatten().to(device).long()                    # [BM,]
 
         # fore mask
         foreground_mask = (gt_conf > 0.)
@@ -123,6 +131,7 @@ class Criterion(object):
         # total loss
         losses = loss_conf + loss_cls + loss_box
 
+        
         loss_dict = dict(
                 loss_conf = loss_conf,
                 loss_cls = loss_cls,
