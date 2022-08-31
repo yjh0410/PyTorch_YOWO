@@ -180,7 +180,54 @@ class YOWOv2(nn.Module):
         return keep
 
 
-    def post_process(self, scores, labels, bboxes):
+    def bbox_iou(self, box1, box2):
+        mx = min(box1[0], box2[0])
+        Mx = max(box1[2], box2[2])
+        my = min(box1[1], box2[1])
+        My = max(box1[3], box2[3])
+        w1 = box1[2] - box1[0]
+        h1 = box1[3] - box1[1]
+        w2 = box2[2] - box2[0]
+        h2 = box2[3] - box2[1]
+        uw = Mx - mx
+        uh = My - my
+        cw = w1 + w2 - uw
+        ch = h1 + h2 - uh
+        carea = 0
+        if cw <= 0 or ch <= 0:
+            return 0.0
+
+        area1 = w1 * h1
+        area2 = w2 * h2
+        carea = cw * ch
+        uarea = area1 + area2 - carea
+
+        return carea / uarea
+
+
+    def post_process_one_hot(self, conf_pred, cls_pred, reg_pred):
+        # scores
+        scores, labels = torch.max(torch.sigmoid(conf_pred) *\
+                                    torch.softmax(cls_pred, dim=-1), dim=-1)
+
+        # topk
+        anchor_boxes = self.anchor_boxes
+        if scores.shape[0] > self.topk:
+            scores, indices = torch.topk(scores, self.topk)
+            labels = labels[indices]
+            reg_pred = reg_pred[indices]
+            anchor_boxes = anchor_boxes[indices]
+
+        # decode box
+        bboxes = self.decode_bbox(anchor_boxes, reg_pred) # [N, 4]
+        # normalize box
+        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        
+        # to cpu
+        scores = scores.cpu().numpy()
+        labels = labels.cpu().numpy()
+        bboxes = bboxes.cpu().numpy()
+        
         # threshold
         keep = np.where(scores >= self.conf_thresh)
         scores = scores[keep]
@@ -204,6 +251,53 @@ class YOWOv2(nn.Module):
         bboxes = bboxes[keep]
 
         return scores, labels, bboxes
+    
+
+    def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
+        # decode box
+        bboxes = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
+        # normalize box
+        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        
+        # conf pred & cls pred (for AVA dataset)
+        conf_pred = torch.sigmoid(conf_pred)                         # [M, 1]
+        pose_cls_pred = torch.softmax(cls_pred[..., :14], dim=-1)
+        act_cls_pred = torch.sigmoid(cls_pred[..., 14:])
+        cls_pred = torch.cat([pose_cls_pred, act_cls_pred], dim=-1)  # [M, C]
+
+        all_bboxes = []
+        for i in range(conf_pred.shape[0]):
+            pred_box_conf =  conf_pred[i].item()
+            pred_box = bboxes[i]
+            pred_cls_conf = cls_pred[i]
+
+            if pred_box_conf > self.conf_thresh:
+                x1, y1, x2, y2 = pred_box
+                box = [x1, y1, x2, y2, pred_box_conf, pred_cls_conf]
+                all_bboxes.append(box)
+
+        # nms
+        if len(all_bboxes) > 0:
+            det_confs = torch.zeros(len(all_bboxes))
+            for i in range(len(all_bboxes)):
+                det_confs[i] = 1.0 - all_bboxes[i][4]                
+
+            _, sortIds = torch.sort(det_confs)
+
+            out_boxes = []
+            for i in range(len(all_bboxes)):
+                box_i = all_bboxes[sortIds[i]]
+                if box_i[4] > 0:
+                    out_boxes.append(box_i)
+                    for j in range(i+1, len(all_bboxes)):
+                        box_j = all_bboxes[sortIds[j]]
+                        if self.bbox_iou(box_i, box_j) > self.nms_thresh:
+                            box_j[4] = 0
+
+            return out_boxes
+
+        else:
+            return all_bboxes
     
 
     @torch.no_grad()
@@ -232,49 +326,38 @@ class YOWOv2(nn.Module):
         cls_pred = pred[:, K:K*(1 + C), :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, C)
         reg_pred = pred[:, K*(1 + C):, :, :].permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
-        batch_scores = []
-        batch_labels = []
-        batch_bboxes = []
-        for batch_idx in range(conf_pred.size(0)):
-            # [B, M, C] -> [M, C]
-            cur_conf_pred = conf_pred[batch_idx]
-            cur_cls_pred = cls_pred[batch_idx]
-            cur_reg_pred = reg_pred[batch_idx]
+        if self.multi_hot:
+            batch_bboxes = []
+            for batch_idx in range(conf_pred.size(0)):
+                # [B, M, C] -> [M, C]
+                cur_conf_pred = conf_pred[batch_idx]
+                cur_cls_pred = cls_pred[batch_idx]
+                cur_reg_pred = reg_pred[batch_idx]
+
+                out_boxes = self.post_process_multi_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
+
+                batch_bboxes.append(out_boxes)
+
+            return batch_bboxes
+
+        else:
                         
-            # scores
-            if self.multi_hot:
-                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
-                                           torch.sigmoid(cur_cls_pred), dim=-1)
-            else :
-                scores, labels = torch.max(torch.sigmoid(cur_conf_pred) *\
-                                           torch.softmax(cur_cls_pred, dim=-1), dim=-1)
+            batch_scores = []
+            batch_labels = []
+            batch_bboxes = []
+            for batch_idx in range(conf_pred.size(0)):
+                # [B, M, C] -> [M, C]
+                cur_conf_pred = conf_pred[batch_idx]
+                cur_cls_pred = cls_pred[batch_idx]
+                cur_reg_pred = reg_pred[batch_idx]
+                # post-process
+                scores, labels, bboxes = self.post_process_one_hot(cur_conf_pred, cur_cls_pred, cur_reg_pred)
 
-            # topk
-            anchor_boxes = self.anchor_boxes
-            if scores.shape[0] > self.topk:
-                scores, indices = torch.topk(scores, self.topk)
-                labels = labels[indices]
-                cur_reg_pred = cur_reg_pred[indices]
-                anchor_boxes = anchor_boxes[indices]
+                batch_scores.append(scores)
+                batch_labels.append(labels)
+                batch_bboxes.append(bboxes)
 
-            # decode box
-            bboxes = self.decode_bbox(anchor_boxes, cur_reg_pred) # [N, 4]
-            # normalize box
-            bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
-            
-            # to cpu
-            scores = scores.cpu().numpy()
-            labels = labels.cpu().numpy()
-            bboxes = bboxes.cpu().numpy()
-
-            # post-process
-            scores, labels, bboxes = self.post_process(scores, labels, bboxes)
-
-            batch_scores.append(scores)
-            batch_labels.append(labels)
-            batch_bboxes.append(bboxes)
-
-        return batch_scores, batch_labels, batch_bboxes
+            return batch_scores, batch_labels, batch_bboxes
 
 
     def forward(self, video_clips, targets=None):
