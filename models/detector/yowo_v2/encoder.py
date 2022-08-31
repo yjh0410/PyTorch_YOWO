@@ -166,31 +166,6 @@ class SpatialEncoder(nn.Module):
         return out
 
 
-# # Spatial Encoder
-# class SpatialEncoder(nn.Module):
-#     def __init__(self, in_dim=425, out_dim=512, act_type='', norm_type=''):
-#         super().__init__()
-#         self.out_dim = out_dim
-#         # Spatial Self-Attention Module for 2D feat.
-#         self.ssam = nn.Sequential(
-#             Conv2d(in_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type),
-#             Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-#             SSAM(),
-#             Conv2d(out_dim, out_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
-#             nn.Dropout(0.1, inplace=False),
-#             nn.Conv2d(out_dim, out_dim, kernel_size=1)
-#         )
-
-
-#     def forward(self, x1, x2):
-#         """
-#             x: [B, CN, H, W]
-#         """
-#         x1 = self.ssam(x1)
-
-#         return x1
-
-
 # Channel Encoder
 class ChannelEncoder(nn.Module):
     def __init__(self, in_dim, out_dim, act_type='', norm_type=''):
