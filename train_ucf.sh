@@ -1,4 +1,4 @@
-# Train YOWO-D19
+# Train YOWO
 python train.py \
         --cuda \
         -d ucf24 \

@@ -1,4 +1,4 @@
-# Train YOWOF-R18
+# Train YOWO
 python train.py \
         --cuda \
         -d jhmdb21 \
