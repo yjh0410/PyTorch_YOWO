@@ -13,7 +13,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='kmeans for anchor box')
     parser.add_argument('-d', '--dataset', default='ucf24',
                         help='ucf24, jhmdb21, ava')
-    parser.add_argument('-na', '--num_anchorbox', default=9, type=int,
+    parser.add_argument('-na', '--num_anchorbox', default=5, type=int,
                         help='number of anchor box.')
     parser.add_argument('-size', '--img_size', default=224, type=int,
                         help='input size.')

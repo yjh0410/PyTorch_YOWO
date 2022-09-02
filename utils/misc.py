@@ -97,6 +97,7 @@ def build_dataset(d_cfg, args, is_train=False):
     print('The dataset size:', len(dataset))
 
     if not args.eval:
+        # no evaluator during training stage
         evaluator = None
 
     return dataset, evaluator, num_classes
