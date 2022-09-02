@@ -1,5 +1,5 @@
 # YOWO
-You Only Watch Once: A Unified CNN Architecture for Real-Time Spatiotemporal Action Localization
+Big thanks to [YOWO](https://github.com/wei-tim/YOWO) for their open source. I reimplemented ```YOWO``` and reproduced the performance. On the ```AVA``` dataset, my reproduced YOWO is better than the official YOWO. I hope that such a real-time action detector with simple structure and superior performance can attract your interest in the task of spatio-temporal action detection.
 
 # Requirements
 - We recommend you to use Anaconda to create a conda environment:
