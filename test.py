@@ -33,18 +33,18 @@ def parse_args():
                         help='Dir to save results')
     parser.add_argument('-vs', '--vis_thresh', default=0.35, type=float,
                         help='threshold for visualization')
+    parser.add_argument('-sid', '--start_index', default=0, type=int,
+                        help='start index to test.')
 
     # model
     parser.add_argument('-v', '--version', default='yowo', type=str,
-                        help='build yowo')
+                        help='build YOWO')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--topk', default=40, type=int,
                         help='NMS threshold')
 
     # dataset
-    parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
-                        help='data root')
     parser.add_argument('-d', '--dataset', default='ucf24',
                         help='ucf24, ava.')
 
@@ -61,7 +61,7 @@ def inference_ucf24_jhmdb21(d_cfg, args, model, device, dataset, class_names=Non
         os.makedirs(save_path, exist_ok=True)
 
     # inference
-    for index in range(50000, len(dataset)):
+    for index in range(args.start_index, len(dataset)):
         print('Video clip {:d}/{:d}....'.format(index+1, len(dataset)))
         frame_id, video_clip, target = dataset[index]
 
@@ -121,7 +121,7 @@ def inference_ava(d_cfg, args, model, device, dataset, class_names=None, class_c
         os.makedirs(save_path, exist_ok=True)
 
     # inference
-    for index in range(0, len(dataset)):
+    for index in range(args.start_index, len(dataset)):
         print('Video clip {:d}/{:d}....'.format(index+1, len(dataset)))
         frame_id, video_clip, target = dataset[index]
 

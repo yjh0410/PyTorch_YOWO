@@ -34,7 +34,7 @@ def parse_args():
 
     # model
     parser.add_argument('-v', '--version', default='yowo', type=str,
-                        help='build yowo')
+                        help='build YOWO')
     parser.add_argument('--weight', default='weight/',
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--topk', default=40, type=int,
@@ -43,6 +43,7 @@ def parse_args():
     return parser.parse_args()
                     
 
+@torch.no_grad()
 def run(args, d_cfg, model, device, transform, class_names):
     # path to save 
     save_path = os.path.join(args.save_folder, 'ava_video')

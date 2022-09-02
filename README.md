@@ -49,8 +49,6 @@ Password: tcjd
 |-------------|-----------------|---------|----------------|--------------|--------------|
 |    YOWO     |      80.4       |    -    |      94.5      |      93.5    |       -      |
 | YOWO (Ours) |      80.4       |    36   |      94.1      |      93.7    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
-| YOWOv2      |      82.0       |    35   |      94.0      |      95.0    | [github]()   |
-<!-- | YOWOv3      |      83.5       |      93.0      |      96.5    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_v3_83.5.pth)   | -->
 
 
 ## AVA v2.2
@@ -59,5 +57,3 @@ Password: tcjd
 |    YOWO     |     16     |   17.9    |    33   |       -      |
 |    YOWO     |     32     |   19.1    |         |       -      |
 | YOWO (Ours) |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
-| YOWOv2      |     16     |       |       |  [github]()  |
-| YOWOv2      |     32     |       |       |  [github]()  |

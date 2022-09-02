@@ -55,7 +55,7 @@ def parse_args():
 
     # Model
     parser.add_argument('-v', '--version', default='yowo', type=str,
-                        help='build spatio-temporal action detector')
+                        help='build YOWO')
     parser.add_argument('--topk', default=40, type=int,
                         help='topk candidates for evaluation')
     parser.add_argument('-p', '--coco_pretrained', default=None, type=str,
