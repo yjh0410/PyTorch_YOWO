@@ -906,6 +906,8 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     detFormat = 'xyrb'
     gtCoordinates = 'abs'
     detCoordinates = 'abs'
+    exit()
+
     gtFolder = os.path.join(os.path.abspath('.'), gtFolder)
     detFolder = os.path.join(os.path.abspath('.'), detFolder)
     savePath = os.path.join(os.path.abspath('.'), savePath)
@@ -940,7 +942,6 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     # print('detCoordType = %s' % detCoordType)
     #print('showPlot %s' % showPlot)
 
-    exit()
     # Get groundtruth boxes
     allBoundingBoxes, allClasses = getBoundingBoxes(
         gtFolder, True, gtFormat, gtCoordType, imgSize=imgSize)
