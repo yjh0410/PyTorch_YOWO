@@ -915,7 +915,6 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
 
     # Arguments validation
     errors = []
-    exit()
     # Validate formats
     gtFormat = ValidateFormats(gtFormat, 'gtFormat', errors)
     detFormat = ValidateFormats(detFormat, '-detformat', errors)
@@ -925,6 +924,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     detCoordType = ValidateCoordinatesTypes(detCoordinates, '-detCoordinates', errors)
     imgSize = (0, 0)
 
+    exit()
     # Create directory to save results
     shutil.rmtree(savePath, ignore_errors=True)  # Clear folder
     # if savePath is not None:
