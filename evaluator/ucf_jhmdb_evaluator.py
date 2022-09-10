@@ -200,7 +200,7 @@ class UCF_JHMDB_Evaluator(object):
 
         print('calculating Frame mAP ...')
         metric_list = get_mAP(self.gt_folder, result_path, self.iou_thresh,
-                              self.save_path, self.dataset, show_pr_curve)
+                              self.save_path, self.dataset, False)
         for metric in metric_list:
             print(metric)
 
