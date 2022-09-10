@@ -940,10 +940,10 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     # print('detCoordType = %s' % detCoordType)
     #print('showPlot %s' % showPlot)
 
+    exit()
     # Get groundtruth boxes
     allBoundingBoxes, allClasses = getBoundingBoxes(
         gtFolder, True, gtFormat, gtCoordType, imgSize=imgSize)
-    exit()
     # Get detected boxes
     allBoundingBoxes, allClasses = getBoundingBoxes(
         detFolder, False, detFormat, detCoordType, allBoundingBoxes, allClasses, imgSize=imgSize)
