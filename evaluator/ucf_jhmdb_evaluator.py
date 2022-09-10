@@ -175,7 +175,6 @@ class UCF_JHMDB_Evaluator(object):
                 if iter_i % 100 == 0:
                     log_info = "[%d / %d] precision: %f, recall: %f, fscore: %f" % (iter_i, epoch_size, precision, recall, fscore)
                     print(log_info, flush=True)
-                break
 
         classification_accuracy = 1.0 * correct_classification / (total_detected + eps)
         locolization_recall = 1.0 * total_detected / (total_num_gts + eps)
