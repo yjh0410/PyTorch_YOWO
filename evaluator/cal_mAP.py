@@ -906,7 +906,6 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
     detFormat = 'xyrb'
     gtCoordinates = 'abs'
     detCoordinates = 'abs'
-    exit()
 
     gtFolder = os.path.join(os.path.abspath('.'), gtFolder)
     detFolder = os.path.join(os.path.abspath('.'), detFolder)
@@ -916,6 +915,7 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
 
     # Arguments validation
     errors = []
+    exit()
     # Validate formats
     gtFormat = ValidateFormats(gtFormat, 'gtFormat', errors)
     detFormat = ValidateFormats(detFormat, '-detformat', errors)
