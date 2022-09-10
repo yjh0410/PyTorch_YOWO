@@ -835,7 +835,7 @@ def getBoundingBoxes(directory,
     if allClasses is None:
         allClasses = []
     # Read ground truths
-    # os.chdir(directory)
+    os.chdir(directory)
     files = glob.glob("*.txt")
     files.sort()
     # print(files)
