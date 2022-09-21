@@ -26,7 +26,7 @@ dataset_config = {
         # train config
         'batch_size': 8,
         'test_batch_size': 8,
-        'accumulate': 16,
+        'accumulate': 8,
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 5e-4,
