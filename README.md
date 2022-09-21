@@ -55,6 +55,67 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 | YOWO (Ours) |      82.5       |    36   |      93.8      |      95.6    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
 
 
+## Train on UCF24
+
+```Shell
+python train.py --cuda -d ucf24 -v yowo --num_workers 4 --eval_epoch 1 --eval
+```
+
+or you can just run the script:
+
+```Shell
+sh train_ucf.sh
+```
+
+##  Test on UCF24
+
+```Shell
+python test.py --cuda -d ucf24 -v yowo --weight path/to/weight --show
+```
+
+## Evaluate on UCF24
+* on UCF24
+
+```Shell
+python eval.py \
+        --cuda \
+        -d ucf24 \
+        -v yowo \
+        --gt_folder ./evaluator/groundtruths_ucf_jhmdb/groundtruths_ucf/ \
+        --weight path/to/weight \
+        --cal_mAP \
+        --redo
+```
+
+Our YOWO on UCF24:
+```Shell
+AP: 80.48% (1)
+AP: 96.92% (10)
+AP: 79.54% (11)
+AP: 59.73% (12)
+AP: 75.80% (13)
+AP: 91.20% (14)
+AP: 87.41% (15)
+AP: 70.85% (16)
+AP: 71.06% (17)
+AP: 90.65% (18)
+AP: 94.51% (19)
+AP: 63.00% (2)
+AP: 90.06% (20)
+AP: 77.15% (21)
+AP: 80.50% (22)
+AP: 75.89% (23)
+AP: 89.57% (24)
+AP: 84.65% (3)
+AP: 76.58% (4)
+AP: 67.36% (5)
+AP: 95.81% (6)
+AP: 93.74% (7)
+AP: 93.07% (8)
+AP: 95.12% (9)
+mAP: 82.53%
+```
+
 ## AVA v2.2
 |    Model    |    Clip    |    mAP    |   FPS   |    weight    |
 |-------------|------------|-----------|---------|--------------|
