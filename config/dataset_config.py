@@ -17,7 +17,7 @@ dataset_config = {
         'saturation': 1.5,
         'exposure': 1.5,
         'sampling_rate': 1,
-        'len_clip': 16,
+        'len_clip': 8,
         # cls label
         'multi_hot': False,  # one hot
         # freeze backbone
@@ -26,7 +26,7 @@ dataset_config = {
         # train config
         'batch_size': 8,
         'test_batch_size': 8,
-        'accumulate': 8,
+        'accumulate': 16,
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 5e-4,
