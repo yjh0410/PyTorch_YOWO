@@ -54,40 +54,8 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |    YOWO     |      80.4       |    -    |      94.5      |      93.5    |       -      |
 | YOWO (Ours) |      82.5       |    36   |      93.8      |      95.6    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
 
+Our SOTA results on UCF24:
 
-## Train on UCF24
-
-```Shell
-python train.py --cuda -d ucf24 -v yowo --num_workers 4 --eval_epoch 1 --eval
-```
-
-or you can just run the script:
-
-```Shell
-sh train_ucf.sh
-```
-
-##  Test on UCF24
-
-```Shell
-python test.py --cuda -d ucf24 -v yowo --weight path/to/weight --show
-```
-
-## Evaluate on UCF24
-* on UCF24
-
-```Shell
-python eval.py \
-        --cuda \
-        -d ucf24 \
-        -v yowo \
-        --gt_folder ./evaluator/groundtruths_ucf_jhmdb/groundtruths_ucf/ \
-        --weight path/to/weight \
-        --cal_mAP \
-        --redo
-```
-
-Our YOWO on UCF24:
 ```Shell
 AP: 80.48% (1)
 AP: 96.92% (10)
@@ -122,3 +90,87 @@ mAP: 82.53%
 |    YOWO     |     16     |   17.9    |    33   |       -      |
 |    YOWO     |     32     |   19.1    |         |       -      |
 | YOWO (Ours) |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
+
+## Train YOWO
+* UCF101-24
+
+```Shell
+python train.py --cuda -d ucf24 -v yowo --num_workers 4 --eval_epoch 1 --eval
+```
+
+or you can just run the script:
+
+```Shell
+sh train_ucf.sh
+```
+
+* AVA
+```Shell
+python train.py --cuda -d ava_v2.2 -v yowo --num_workers 4 --eval_epoch 1 --eval
+```
+
+or you can just run the script:
+
+```Shell
+sh train_ava.sh
+```
+
+##  Test YOWO
+* UCF101-24
+
+```Shell
+python test.py --cuda -d ucf24 -v yowo --weight path/to/weight --show
+```
+
+* AVA
+
+```Shell
+python test.py --cuda -d ava_v2.2 -v yowo --weight path/to/weight --show
+```
+
+## Evaluate YOWO
+* UCF101-24
+
+The detection results have been saved after each epoch of training phase, so you can 
+run the following command to calculate mAP. For example, if you want calculate the mAP
+of YOWO trained for 2 epochs:
+
+```Shell
+python eval.py \
+        --cuda \
+        -d ucf24 \
+        -v yowo \
+        -bs 8 \
+        -size 224 \
+        --gt_folder ./evaluator/groundtruths_ucf_jhmdb/groundtruths_ucf/ \
+        --dt_folder ./results/ucf_detections/yowo/detections_2/ \
+        --save_path ./evaluator/eval_results/ \
+        --weight path/to/weight \
+        --cal_mAP \
+```
+
+If you want to evaluate from scratch, you can run the following command to recalucate
+`classification accuracy`, `recall` and `mAP`:
+
+```Shell
+python eval.py \
+        --cuda \
+        -d ucf24 \
+        -v yowo \
+        --gt_folder ./evaluator/groundtruths_ucf_jhmdb/groundtruths_ucf/ \
+        --weight path/to/weight \
+        --cal_mAP \
+        --redo
+```
+
+* AVA
+
+Run the following command to calculate ```mAP```:
+
+```Shell
+python eval.py \
+        --cuda \
+        -d ava_v2.2 \
+        -v yowo \
+        --weight path/to/weight
+```
