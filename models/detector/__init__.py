@@ -17,13 +17,16 @@ def build_model(args,
     # Basic config
     if trainable:
         img_size = d_cfg['train_size']
-        conf_thresh = d_cfg['conf_thresh_valid']
+        conf_thresh = d_cfg['conf_thresh_val']
+        nms_thresh = d_cfg['nms_thresh_val']
     else:
         img_size = d_cfg['test_size']
         if eval_mode:
-            conf_thresh = d_cfg['conf_thresh_valid']
+            conf_thresh = d_cfg['conf_thresh_val']
+            nms_thresh = d_cfg['nms_thresh_val']
         else:
             conf_thresh = d_cfg['conf_thresh']
+            nms_thresh = d_cfg['nms_thresh']
 
     # build YOWO
     if args.version == 'yowo':
@@ -35,7 +38,7 @@ def build_model(args,
             len_clip=d_cfg['len_clip'],
             num_classes=num_classes,
             conf_thresh=conf_thresh,
-            nms_thresh=d_cfg['nms_thresh'],
+            nms_thresh=nms_thresh,
             topk=args.topk,
             trainable=trainable,
             multi_hot=d_cfg['multi_hot']

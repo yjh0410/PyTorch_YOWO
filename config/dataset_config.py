@@ -22,8 +22,9 @@ dataset_config = {
         'multi_hot': False,  # one hot
         # post process
         'conf_thresh': 0.3,
-        'conf_thresh_valid': 0.005,
         'nms_thresh': 0.5,
+        'conf_thresh_val': 0.005,
+        'nms_thresh_val': 0.5,
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
@@ -73,8 +74,9 @@ dataset_config = {
         'multi_hot': False,  # one hot
         # post process
         'conf_thresh': 0.3,
-        'conf_thresh_valid': 0.005,
         'nms_thresh': 0.5,
+        'conf_thresh_val': 0.005,
+        'nms_thresh_val': 0.5,
         # freeze backbone
         'freeze_backbone_2d': True,
         'freeze_backbone_3d': True,
@@ -133,8 +135,9 @@ dataset_config = {
         'multi_hot': True,  # multi hot
         # post process
         'conf_thresh': 0.3,
-        'conf_thresh_valid': 0.1,
         'nms_thresh': 0.5,
+        'conf_thresh_val': 0.1,
+        'nms_thresh_val': 0.5,
         # freeze backbone
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
