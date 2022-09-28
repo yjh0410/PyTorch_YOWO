@@ -39,7 +39,7 @@ class UCF_JHMDB_Evaluator(object):
         self.save_path = save_path
 
         self.gt_file = os.path.join(data_root, 'splitfiles/finalAnnots.mat')
-        self.split_list = os.path.join(data_root, 'splitfiles/testlist01.txt')
+        self.testlist = os.path.join(data_root, 'splitfiles/testlist01.txt')
 
         # dataset
         if metric == 'fmap':
