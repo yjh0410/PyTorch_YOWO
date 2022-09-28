@@ -280,7 +280,7 @@ def train():
         lr_scheduler.step()
         
         # evaluation
-        if (epoch + 1) % args.eval_epoch == 0 or (epoch + 1) == max_epoch:
+        if epoch % args.eval_epoch == 0 or (epoch + 1) == max_epoch:
             # check evaluator
             model_eval = model_without_ddp
             if distributed_utils.is_main_process():
@@ -294,10 +294,7 @@ def train():
                     model_eval.eval()
 
                     # evaluate
-                    if args.dataset in ['ucf24', 'jhmdb21']:
-                        evaluator.evaluate_accu_recall(model_eval, epoch + 1)
-                    elif args.dataset in ['ava_v2.2']:
-                        evaluator.evaluate_frame_map(model_eval, epoch + 1)
+                    evaluator.evaluate_frame_map(model_eval, epoch + 1)
                         
                     # set train mode.
                     model_eval.trainable = True

@@ -32,12 +32,10 @@ def parse_args():
     # eval
     parser.add_argument('--gt_folder', default='./evaluator/groundtruth_ucf_jhmdb/groundtruth_ucf/',
                         type=str, help='path to grouondtruth of ucf & jhmdb')
-    parser.add_argument('--dt_folder', default=None,
-                        type=str, help='path to detection dir')
-    parser.add_argument('--cal_mAP', action='store_true', default=False, 
-                        help='calculate_mAP.')
-    parser.add_argument('--redo', action='store_true', default=False, 
-                        help='re-make inference on testset.')
+    parser.add_argument('--cal_frame_mAP', action='store_true', default=False, 
+                        help='calculate frame mAP.')
+    parser.add_argument('--cal_video mAP', action='store_true', default=False, 
+                        help='calculate video mAP.')
 
     # model
     parser.add_argument('-v', '--version', default='yowo', type=str,
@@ -51,26 +49,45 @@ def parse_args():
 
 
 def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
-    evaluator = UCF_JHMDB_Evaluator(
-        dataset=args.dataset,
-        model_name=args.version,
-        batch_size=args.batch_size,
-        data_root=d_cfg['data_root'],
-        img_size=d_cfg['test_size'],
-        len_clip=d_cfg['len_clip'],
-        conf_thresh=0.01,
-        iou_thresh=0.5,
-        transform=transform,
-        collate_fn=collate_fn,
-        redo=args.redo,
-        gt_folder=args.gt_folder,
-        dt_folder=args.dt_folder,
-        save_path=args.save_path)
-
-    if args.cal_mAP:
+    if args.cal_frame_mAP:
+        # Frame mAP evaluator
+        evaluator = UCF_JHMDB_Evaluator(
+            data_root=d_cfg['data_root'],
+            dataset=args.dataset,
+            model_name=args.version,
+            metric='fmap',
+            img_size=d_cfg['test_size'],
+            len_clip=d_cfg['len_clip'],
+            batch_size=args.batch_size,
+            conf_thresh=0.01,
+            iou_thresh=0.5,
+            transform=transform,
+            collate_fn=collate_fn,
+            gt_folder=args.gt_folder,
+            save_path=args.save_path
+            )
+        # evaluate
         evaluator.evaluate_frame_map(model, show_pr_curve=True)
-    else:
-        cls_accu, loc_recall = evaluator.evaluate_accu_recall(model)
+
+    elif args.cal_video_mAP:
+        # Video mAP evaluator
+        evaluator = UCF_JHMDB_Evaluator(
+            data_root=d_cfg['data_root'],
+            dataset=args.dataset,
+            model_name=args.version,
+            metric='vmap',
+            img_size=d_cfg['test_size'],
+            len_clip=d_cfg['len_clip'],
+            batch_size=args.batch_size,
+            conf_thresh=0.01,
+            iou_thresh=0.5,
+            transform=transform,
+            collate_fn=collate_fn,
+            gt_folder=args.gt_folder,
+            save_path=args.save_path
+            )
+        # evaluate
+        evaluator.evaluate_video_map(model)
 
 
 def ava_eval(args, d_cfg, model, transform, collate_fn):

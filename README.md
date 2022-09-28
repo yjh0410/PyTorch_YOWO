@@ -47,10 +47,10 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 
 # Experiment
 ## UCF24
-|    Model    |    Frame mAP    |   FPS   |    Cls Accu    |    Recall    |    Weight    |
-|-------------|-----------------|---------|----------------|--------------|--------------|
-|    YOWO     |      80.4       |    -    |      94.5      |      93.5    |       -      |
-| YOWO (Ours) |      82.5       |    36   |      93.8      |      95.6    | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
+|    Model    | Frame mAP | Video mAP |   FPS   |    Weight    |
+|-------------|-----------|-----------|---------|--------------|
+|    YOWO     |   80.4    |   80.4    |    -    |       -      |
+| YOWO (Ours) |   82.5    |   82.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
 
 Our SOTA results on UCF24:
 

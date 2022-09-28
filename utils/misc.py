@@ -54,11 +54,13 @@ def build_dataset(d_cfg, args, is_train=False):
             data_root=d_cfg['data_root'],
             dataset=args.dataset,
             model_name=args.version,
+            metric='fmap',
             img_size=d_cfg['test_size'],
             len_clip=d_cfg['len_clip'],
             batch_size=d_cfg['test_batch_size'],
             conf_thresh=0.01,
             iou_thresh=0.5,
+            gt_folder=d_cfg['gt_folder'],
             transform=basetransform,
             collate_fn=CollateFunc()            
         )

@@ -899,7 +899,7 @@ def getBoundingBoxes(directory,
     return allBoundingBoxes, allClasses
 
 
-def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'ucf24', show_pr_curve=False):
+def evaluate_frameAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'ucf24', show_pr_curve=False):
     # Get current path to set default folders
     #VERSION = '0.1 (beta)'
     gtFormat = 'xyrb'
@@ -1005,4 +1005,4 @@ def get_mAP(gtFolder, detFolder, threshold = 0.5, savePath = None, datatset = 'u
 
 
 if __name__ == '__main__':
-    get_mAP('groundtruths_ucf', 'detection_test')
+    evaluate_frameAP('groundtruths_ucf', 'detection_test')

@@ -4,6 +4,7 @@
 import os
 import random
 import numpy as np
+import glob
 
 import torch
 from torch.utils.data import Dataset
@@ -149,6 +150,97 @@ class UCF_JHMDB_Dataset(Dataset):
 
         return target
         
+
+# Video Dataset for UCF24 & JHMDB
+class UCF_JHMDB_VIDEO_Dataset(Dataset):
+    def __init__(self,
+                 data_root,
+                 dataset='ucf24',
+                 img_size=224,
+                 transform=None,
+                 len_clip=16,
+                 sampling_rate=1):
+        self.data_root = data_root
+        self.dataset = dataset
+        self.transform = transform
+        
+        self.img_size = img_size
+        self.len_clip = len_clip
+        self.sampling_rate = sampling_rate
+            
+        if dataset == 'ucf24':
+            self.num_classes = 24
+        elif dataset == 'jhmdb21':
+            self.num_classes = 21
+
+
+    def set_video_data(self, line):
+        self.line = line
+
+        # load a video
+        self.img_folder = os.path.join(self.data_root, 'rgb-images', self.line)
+
+        if self.dataset == 'ucf24':
+            self.label_paths = sorted(glob.glob(os.path.join(self.img_folder, '*.jpg')))
+        elif self.dataset == 'jhmdb21':
+            self.label_paths = sorted(glob.glob(os.path.join(self.img_folder, '*.png')))
+
+
+    def __getitem__(self, index):
+        return self.pull_item(index)
+
+
+    def pull_item(self, index):
+        image_path = self.label_paths[index]
+
+        video_split = self.line.split('/')
+        video_class = video_split[0]
+        video_file = video_split[1]
+        # for windows:
+        # img_split = image_path.split('\\')  # ex. [..., 'Basketball', 'v_Basketball_g08_c01', '00070.txt']
+        # for linux
+        img_split = image_path.split('/')  # ex. [..., 'Basketball', 'v_Basketball_g08_c01', '00070.txt']
+
+        # image name
+        img_id = int(img_split[-1][:5])
+        max_num = len(os.listdir(self.img_folder))
+        if self.dataset == 'ucf24':
+            img_name = os.path.join(video_class, video_file, '{:05d}.jpg'.format(img_id))
+        elif self.dataset == 'jhmdb21':
+            img_name = os.path.join(video_class, video_file, '{:05d}.png'.format(img_id))
+
+        # load video clip
+        video_clip = []
+        for i in reversed(range(self.len_clip)):
+            # make it as a loop
+            img_id_temp = img_id - i
+            if img_id_temp < 1:
+                img_id_temp = 1
+            elif img_id_temp > max_num:
+                img_id_temp = max_num
+
+            # load a frame
+            if self.dataset == 'ucf24':
+                path_tmp = os.path.join(self.data_root, 'rgb-images', video_class, video_file ,'{:05d}.jpg'.format(img_id_temp))
+            elif self.dataset == 'jhmdb21':
+                path_tmp = os.path.join(self.data_root, 'rgb-images', video_class, video_file ,'{:05d}.png'.format(img_id_temp))
+            frame = Image.open(path_tmp).convert('RGB')
+            ow, oh = frame.width, frame.height
+
+            video_clip.append(frame)
+
+        # transform
+        video_clip, _ = self.transform(video_clip)
+        # List [T, 3, H, W] -> [T, 3, H, W]
+        video_clip = torch.stack(video_clip)
+        orig_size = [ow, oh]  # width, height
+
+        target = {'orig_size': [ow, oh]}
+
+        return img_name, video_clip, target
+
+
+
 
 if __name__ == '__main__':
     import cv2
