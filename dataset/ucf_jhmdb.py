@@ -186,6 +186,10 @@ class UCF_JHMDB_VIDEO_Dataset(Dataset):
             self.label_paths = sorted(glob.glob(os.path.join(self.img_folder, '*.png')))
 
 
+    def __len__(self):
+        return len(self.label_paths)
+
+
     def __getitem__(self, index):
         return self.pull_item(index)
 
