@@ -50,36 +50,36 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |    Model    |  Clip  |Frame mAP | Video mAP |   FPS   |    Weight    |
 |-------------|--------|----------|-----------|---------|--------------|
 |    YOWO     |   16   |   80.4   |   48.8    |    -    |       -      |
-| YOWO (Ours) |   16   |   82.5   |   82.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
+| YOWO (Ours) |   16   |   84.9   |       |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_80.4.pth)   |
 
 Our SOTA results on UCF24:
 
 ```Shell
-AP: 80.48% (1)
-AP: 96.92% (10)
-AP: 79.54% (11)
-AP: 59.73% (12)
-AP: 75.80% (13)
-AP: 91.20% (14)
-AP: 87.41% (15)
-AP: 70.85% (16)
-AP: 71.06% (17)
-AP: 90.65% (18)
-AP: 94.51% (19)
-AP: 63.00% (2)
-AP: 90.06% (20)
-AP: 77.15% (21)
-AP: 80.50% (22)
-AP: 75.89% (23)
-AP: 89.57% (24)
-AP: 84.65% (3)
-AP: 76.58% (4)
-AP: 67.36% (5)
-AP: 95.81% (6)
-AP: 93.74% (7)
-AP: 93.07% (8)
-AP: 95.12% (9)
-mAP: 82.53%
+AP: 85.25% (1)
+AP: 96.94% (10)
+AP: 78.58% (11)
+AP: 68.61% (12)
+AP: 78.98% (13)
+AP: 94.92% (14)
+AP: 90.00% (15)
+AP: 77.44% (16)
+AP: 75.82% (17)
+AP: 91.07% (18)
+AP: 97.16% (19)
+AP: 62.71% (2)
+AP: 93.22% (20)
+AP: 79.16% (21)
+AP: 80.07% (22)
+AP: 76.10% (23)
+AP: 92.49% (24)
+AP: 86.29% (3)
+AP: 76.99% (4)
+AP: 74.89% (5)
+AP: 95.74% (6)
+AP: 93.68% (7)
+AP: 93.71% (8)
+AP: 97.13% (9)
+mAP: 84.87%
 ```
 
 ## AVA v2.2
