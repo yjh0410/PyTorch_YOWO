@@ -53,9 +53,6 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |    YOWO     |   16   |   80.4   |   48.8    |    -    |       -      |
 | YOWO (Ours) |   16   |   84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
 
-Our SOTA results on UCF24:
-
-
 * AVA v2.2
 
 |    Model    |    Clip    |    mAP    |   FPS   |    weight    |
