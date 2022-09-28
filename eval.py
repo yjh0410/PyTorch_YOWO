@@ -30,8 +30,6 @@ def parse_args():
                         help='ucf24, jhmdb, ava_v2.2.')
 
     # eval
-    parser.add_argument('--gt_folder', default='./evaluator/groundtruth_ucf_jhmdb/groundtruth_ucf/',
-                        type=str, help='path to grouondtruth of ucf & jhmdb')
     parser.add_argument('--cal_frame_mAP', action='store_true', default=False, 
                         help='calculate frame mAP.')
     parser.add_argument('--cal_video_mAP', action='store_true', default=False, 
@@ -63,7 +61,7 @@ def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
             iou_thresh=0.5,
             transform=transform,
             collate_fn=collate_fn,
-            gt_folder=args.gt_folder,
+            gt_folder=d_cfg['gt_folder'],
             save_path=args.save_path
             )
         # evaluate
@@ -83,7 +81,7 @@ def ucf_jhmdb_eval(args, d_cfg, model, transform, collate_fn):
             iou_thresh=0.5,
             transform=transform,
             collate_fn=collate_fn,
-            gt_folder=args.gt_folder,
+            gt_folder=d_cfg['gt_folder'],
             save_path=args.save_path
             )
         # evaluate
