@@ -229,7 +229,7 @@ class YOWO(nn.Module):
         anchors = anchors[anchor_idxs]
 
         # decode bbox
-        bboxes = self.decode_boxes(anchors, reg_pred)
+        bboxes = self.decode_bbox(anchors, reg_pred)
         # normalize box
         bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
 
