@@ -46,7 +46,8 @@ Password: tcjd
 You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to prepare **AVA** dataset.
 
 # Experiment
-## UCF24
+* UCF101-24
+
 |    Model    |  Clip  |Frame mAP | Video mAP |   FPS   |    Weight    |
 |-------------|--------|----------|-----------|---------|--------------|
 |    YOWO     |   16   |   80.4   |   48.8    |    -    |       -      |
@@ -55,7 +56,8 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 Our SOTA results on UCF24:
 
 
-## AVA v2.2
+* AVA v2.2
+
 |    Model    |    Clip    |    mAP    |   FPS   |    weight    |
 |-------------|------------|-----------|---------|--------------|
 |    YOWO     |     16     |   17.9    |    33   |       -      |
