@@ -238,6 +238,8 @@ class UCF_JHMDB_Evaluator(object):
                             img_annotation[cls_idx+1] = boxes
                         detected_boxes[img_name] = img_annotation
 
+            # delete testloader
+            del self.testloader
 
         iou_list = [0.05, 0.1, 0.2, 0.3, 0.5, 0.75]
         print('calculating video mAP ...')
