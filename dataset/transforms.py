@@ -154,7 +154,7 @@ class BaseTransform(object):
         return [F.normalize(F.to_tensor(image), self.pixel_mean, self.pixel_std) for image in video_clip]
 
 
-    def __call__(self, video_clip, target=None):
+    def __call__(self, video_clip, target=None, normalize=True):
         oh = video_clip[0].height
         ow = video_clip[0].width
 
@@ -163,8 +163,9 @@ class BaseTransform(object):
 
         # normalize target
         if target is not None:
-            target[..., [0, 2]] /= ow
-            target[..., [1, 3]] /= oh
+            if normalize:
+                target[..., [0, 2]] /= ow
+                target[..., [1, 3]] /= oh
 
         else:
             target = np.array([])

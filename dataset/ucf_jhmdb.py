@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # encoding: utf-8
 
+from locale import normalize
 import os
 import random
 import numpy as np
@@ -234,7 +235,7 @@ class UCF_JHMDB_VIDEO_Dataset(Dataset):
             video_clip.append(frame)
 
         # transform
-        video_clip, _ = self.transform(video_clip)
+        video_clip, _ = self.transform(video_clip, normalize=False)
         # List [T, 3, H, W] -> [3, T, H, W]
         video_clip = torch.stack(video_clip, dim=1)
         orig_size = [ow, oh]  # width, height
