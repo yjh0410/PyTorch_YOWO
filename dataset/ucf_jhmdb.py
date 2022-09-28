@@ -235,8 +235,8 @@ class UCF_JHMDB_VIDEO_Dataset(Dataset):
 
         # transform
         video_clip, _ = self.transform(video_clip)
-        # List [T, 3, H, W] -> [T, 3, H, W]
-        video_clip = torch.stack(video_clip)
+        # List [T, 3, H, W] -> [3, T, H, W]
+        video_clip = torch.stack(video_clip, dim=1)
         orig_size = [ow, oh]  # width, height
 
         target = {'orig_size': [ow, oh]}
