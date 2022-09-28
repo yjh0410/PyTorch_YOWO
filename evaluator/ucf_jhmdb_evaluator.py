@@ -136,6 +136,7 @@ class UCF_JHMDB_Evaluator(object):
                 if iter_i % 100 == 0:
                     log_info = "[%d / %d]" % (iter_i, epoch_size)
                     print(log_info, flush=True)
+            break
 
         print('calculating Frame mAP ...')
         metric_list = evaluate_frameAP(self.gt_folder, current_dir, self.iou_thresh,
