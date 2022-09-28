@@ -34,7 +34,7 @@ def parse_args():
                         type=str, help='path to grouondtruth of ucf & jhmdb')
     parser.add_argument('--cal_frame_mAP', action='store_true', default=False, 
                         help='calculate frame mAP.')
-    parser.add_argument('--cal_video mAP', action='store_true', default=False, 
+    parser.add_argument('--cal_video_mAP', action='store_true', default=False, 
                         help='calculate video mAP.')
 
     # model
