@@ -198,33 +198,45 @@ class YOWO(nn.Module):
 
 
     def post_process_one_hot(self, conf_pred, cls_pred, reg_pred):
-        # scores
-        scores, labels = torch.max(torch.sigmoid(conf_pred) *\
-                                    torch.softmax(cls_pred, dim=-1), dim=-1)
+        """
+        Input:
+            cls_pred: (Tensor) [H x W x KA, C]
+            reg_pred: (Tensor) [H x W x KA, 4]
+        """
+        anchors = self.anchor_boxes
+        
+        # (HxWxAxK,)
+        cls_pred = torch.sigmoid(conf_pred) * torch.softmax(cls_pred, dim=-1)
+        cls_pred = cls_pred.flatten()
 
-        # topk
-        anchor_boxes = self.anchor_boxes
-        if scores.shape[0] > self.topk:
-            scores, indices = torch.topk(scores, self.topk)
-            labels = labels[indices]
-            reg_pred = reg_pred[indices]
-            anchor_boxes = anchor_boxes[indices]
+        # Keep top k top scoring indices only.
+        num_topk = min(self.topk, reg_pred.size(0))
 
-        # decode box
-        bboxes = self.decode_bbox(anchor_boxes, reg_pred) # [N, 4]
+        # torch.sort is actually faster than .topk (at least on GPUs)
+        predicted_prob, topk_idxs = cls_pred.sort(descending=True)
+        topk_scores = predicted_prob[:num_topk]
+        topk_idxs = topk_idxs[:num_topk]
+
+        # filter out the proposals with low confidence score
+        keep_idxs = topk_scores > self.conf_thresh
+        scores = topk_scores[keep_idxs]
+        topk_idxs = topk_idxs[keep_idxs]
+
+        anchor_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
+        labels = topk_idxs % self.num_classes
+
+        reg_pred = reg_pred[anchor_idxs]
+        anchors = anchors[anchor_idxs]
+
+        # decode bbox
+        bboxes = self.decode_boxes(anchors, reg_pred)
         # normalize box
         bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
-        
+
         # to cpu
         scores = scores.cpu().numpy()
         labels = labels.cpu().numpy()
         bboxes = bboxes.cpu().numpy()
-        
-        # threshold
-        keep = np.where(scores >= self.conf_thresh)
-        scores = scores[keep]
-        labels = labels[keep]
-        bboxes = bboxes[keep]
 
         # nms
         keep = np.zeros(len(bboxes), dtype=np.int)
@@ -238,9 +250,9 @@ class YOWO(nn.Module):
             keep[inds[c_keep]] = 1
 
         keep = np.where(keep > 0)
+        bboxes = bboxes[keep]
         scores = scores[keep]
         labels = labels[keep]
-        bboxes = bboxes[keep]
 
         return scores, labels, bboxes
     
