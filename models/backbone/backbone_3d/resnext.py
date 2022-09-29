@@ -9,9 +9,9 @@ __all__ = ['resnext50', 'resnext101', 'resnet152']
 
 
 model_urls = {
-    "resnext50": "https://github.com/yjh0410/YOWOF/releases/download/yowof-weight/resnext-50-kinetics.pth",
-    "resnext101": "https://github.com/yjh0410/YOWOF/releases/download/yowof-weight/resnext-101-kinetics.pth",
-    "resnext152": "https://github.com/yjh0410/YOWOF/releases/download/yowof-weight/resnext-152-kinetics.pth"
+    "resnext50": "https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/resnext-50-kinetics.pth",
+    "resnext101": "https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/resnext-101-kinetics.pth",
+    "resnext152": "https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/resnext-152-kinetics.pth"
 }
 
 
