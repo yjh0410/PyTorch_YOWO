@@ -29,20 +29,19 @@ def build_model(args,
             nms_thresh = d_cfg['nms_thresh']
 
     # build YOWO
-    if args.version == 'yowo':
-        model = YOWO(
-            cfg=m_cfg,
-            device=device,
-            anchor_size=m_cfg['anchor_size'][args.dataset],
-            img_size=img_size,
-            len_clip=d_cfg['len_clip'],
-            num_classes=num_classes,
-            conf_thresh=conf_thresh,
-            nms_thresh=nms_thresh,
-            topk=args.topk,
-            trainable=trainable,
-            multi_hot=d_cfg['multi_hot']
-            )
+    model = YOWO(
+        cfg=m_cfg,
+        device=device,
+        anchor_size=m_cfg['anchor_size'][args.dataset],
+        img_size=img_size,
+        len_clip=d_cfg['len_clip'],
+        num_classes=num_classes,
+        conf_thresh=conf_thresh,
+        nms_thresh=nms_thresh,
+        topk=args.topk,
+        trainable=trainable,
+        multi_hot=d_cfg['multi_hot']
+        )
 
 
     # Freeze backbone

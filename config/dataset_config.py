@@ -5,7 +5,7 @@ dataset_config = {
     'ucf24': {
         # dataset
         'data_root': '/mnt/share/ssd2/dataset/STAD/ucf24',
-        # 'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/ucf24',
+        'data_root': 'D:/python_work/spatial-temporal_action_detection/dataset/ucf24',
         'gt_folder': './evaluator/groundtruths_ucf_jhmdb/groundtruths_ucf/',
         # input size
         'train_size': 224,
@@ -30,7 +30,7 @@ dataset_config = {
         'freeze_backbone_2d': False,
         'freeze_backbone_3d': False,
         # train config
-        'batch_size': 8,
+        'batch_size': 1,
         'test_batch_size': 8,
         'accumulate': 16,
         'optimizer': 'adamw',

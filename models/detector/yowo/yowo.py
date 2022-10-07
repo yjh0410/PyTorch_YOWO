@@ -44,16 +44,10 @@ class YOWO(nn.Module):
 
         # ------------------ Network ---------------------
         # 2D backbone
-        self.backbone_2d, bk_dim_2d = build_backbone_2d(
-            model_name=cfg['backbone_2d'], 
-            pretrained=cfg['pretrained_2d'] and trainable
-            )
+        self.backbone_2d, bk_dim_2d = build_backbone_2d(cfg, pretrained=cfg['pretrained_2d'] and trainable)
             
         # 3D backbone
-        self.backbone_3d, bk_dim_3d = build_backbone_3d(
-            model_name=cfg['backbone_3d'],
-            pretrained=cfg['pretrained_2d'] and trainable
-        )
+        self.backbone_3d, bk_dim_3d = build_backbone_3d(cfg, pretrained=cfg['pretrained_3d'] and trainable)
 
         # channel encoder
         self.channel_encoder = ChannelEncoder(
