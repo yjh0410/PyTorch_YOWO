@@ -36,7 +36,7 @@ def parse_args():
     # Visualization
     parser.add_argument('--tfboard', action='store_true', default=False,
                         help='use tensorboard')
-    parser.add_argument('--save_folder', default='weights/', type=str, 
+    parser.add_argument('--save_folder', default='./weights/', type=str, 
                         help='path to save weight')
     parser.add_argument('--vis_data', action='store_true', default=False,
                         help='use tensorboard')
@@ -201,6 +201,41 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)            
 
+        # evaluation
+        if epoch % args.eval_epoch == 0 or (epoch + 1) == max_epoch:
+            # check evaluator
+            model_eval = model_without_ddp
+            if distributed_utils.is_main_process():
+                if evaluator is None:
+                    print('No evaluator ... save model and go on training.')
+                    
+                else:
+                    print('eval ...')
+                    # set eval mode
+                    model_eval.trainable = False
+                    model_eval.eval()
+
+                    # # evaluate
+                    # evaluator.evaluate_frame_map(model_eval, epoch + 1)
+                        
+                    # set train mode.
+                    model_eval.trainable = True
+                    model_eval.train()
+        
+                # save model
+                print('Saving state, epoch:', epoch + 1)
+                weight_name = '{}_epoch_{}.pth'.format(args.version, epoch+1)
+                checkpoint_path = os.path.join(path_to_save, weight_name)
+                torch.save({'model': model_eval.state_dict(),
+                            'epoch': epoch,
+                            'args': args}, 
+                            checkpoint_path)                      
+
+            if args.distributed:
+                # wait for all processes to synchronize
+                dist.barrier()
+
+
         # train one epoch
         for iter_i, (frame_ids, video_clips, targets) in enumerate(dataloader):
             ni = iter_i + epoch * epoch_size
@@ -276,7 +311,6 @@ def train():
                 print(log, flush=True)
                 
                 t0 = time.time()
-            break
 
         lr_scheduler.step()
         
@@ -306,8 +340,6 @@ def train():
                 weight_name = '{}_epoch_{}.pth'.format(args.version, epoch+1)
                 checkpoint_path = os.path.join(path_to_save, weight_name)
                 torch.save({'model': model_eval.state_dict(),
-                            # 'optimizer': optimizer.state_dict(),
-                            # 'lr_scheduler': lr_scheduler.state_dict(),
                             'epoch': epoch,
                             'args': args}, 
                             checkpoint_path)                      

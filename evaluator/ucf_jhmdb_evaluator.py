@@ -78,70 +78,70 @@ class UCF_JHMDB_Evaluator(object):
         
         epoch_size = len(self.testloader)
 
-        # # inference
-        # for iter_i, (batch_frame_id, batch_video_clip, batch_target) in enumerate(self.testloader):
-        #     # to device
-        #     batch_video_clip = batch_video_clip.to(model.device)
+        # inference
+        for iter_i, (batch_frame_id, batch_video_clip, batch_target) in enumerate(self.testloader):
+            # to device
+            batch_video_clip = batch_video_clip.to(model.device)
 
-        #     with torch.no_grad():
-        #         # inference
-        #         batch_scores, batch_labels, batch_bboxes = model(batch_video_clip)
+            with torch.no_grad():
+                # inference
+                batch_scores, batch_labels, batch_bboxes = model(batch_video_clip)
 
-        #         # process batch
-        #         for bi in range(len(batch_scores)):
-        #             frame_id = batch_frame_id[bi]
-        #             scores = batch_scores[bi]
-        #             labels = batch_labels[bi]
-        #             bboxes = batch_bboxes[bi]
-        #             target = batch_target[bi]
+                # process batch
+                for bi in range(len(batch_scores)):
+                    frame_id = batch_frame_id[bi]
+                    scores = batch_scores[bi]
+                    labels = batch_labels[bi]
+                    bboxes = batch_bboxes[bi]
+                    target = batch_target[bi]
 
-        #             # rescale bbox
-        #             orig_size = target['orig_size']
-        #             bboxes = rescale_bboxes(bboxes, orig_size)
+                    # rescale bbox
+                    orig_size = target['orig_size']
+                    bboxes = rescale_bboxes(bboxes, orig_size)
 
-        #             if not os.path.exists('results'):
-        #                 os.mkdir('results')
+                    if not os.path.exists('results'):
+                        os.mkdir('results')
 
-        #             if self.dataset == 'ucf24':
-        #                 detection_path = os.path.join('results', 'ucf_detections', self.model_name, 'detections_' + str(epoch), frame_id)
-        #                 current_dir = os.path.join('results', 'ucf_detections',  self.model_name, 'detections_' + str(epoch))
-        #                 if not os.path.exists('results/ucf_detections/'):
-        #                     os.mkdir('results/ucf_detections/')
-        #                 if not os.path.exists('results/ucf_detections/'+self.model_name):
-        #                     os.mkdir('results/ucf_detections/'+self.model_name)
-        #                 if not os.path.exists(current_dir):
-        #                     os.mkdir(current_dir)
-        #             else:
-        #                 detection_path = os.path.join('results', 'jhmdb_detections',  self.model_name, 'detections_' + str(epoch), frame_id)
-        #                 current_dir = os.path.join('results', 'jhmdb_detections',  self.model_name, 'detections_' + str(epoch))
-        #                 if not os.path.exists('results/jhmdb_detections/'):
-        #                     os.mkdir('results/jhmdb_detections/')
-        #                 if not os.path.exists('results/jhmdb_detections/'+self.model_name):
-        #                     os.mkdir('results/jhmdb_detections/'+self.model_name)
-        #                 if not os.path.exists(current_dir):
-        #                     os.mkdir(current_dir)
+                    if self.dataset == 'ucf24':
+                        detection_path = os.path.join('results', 'ucf_detections', self.model_name, 'detections_' + str(epoch), frame_id)
+                        current_dir = os.path.join('results', 'ucf_detections',  self.model_name, 'detections_' + str(epoch))
+                        if not os.path.exists('results/ucf_detections/'):
+                            os.mkdir('results/ucf_detections/')
+                        if not os.path.exists('results/ucf_detections/'+self.model_name):
+                            os.mkdir('results/ucf_detections/'+self.model_name)
+                        if not os.path.exists(current_dir):
+                            os.mkdir(current_dir)
+                    else:
+                        detection_path = os.path.join('results', 'jhmdb_detections',  self.model_name, 'detections_' + str(epoch), frame_id)
+                        current_dir = os.path.join('results', 'jhmdb_detections',  self.model_name, 'detections_' + str(epoch))
+                        if not os.path.exists('results/jhmdb_detections/'):
+                            os.mkdir('results/jhmdb_detections/')
+                        if not os.path.exists('results/jhmdb_detections/'+self.model_name):
+                            os.mkdir('results/jhmdb_detections/'+self.model_name)
+                        if not os.path.exists(current_dir):
+                            os.mkdir(current_dir)
 
-        #             with open(detection_path, 'w+') as f_detect:
-        #                 for score, label, bbox in zip(scores, labels, bboxes):
-        #                     x1 = round(bbox[0])
-        #                     y1 = round(bbox[1])
-        #                     x2 = round(bbox[2])
-        #                     y2 = round(bbox[3])
-        #                     cls_id = int(label) + 1
+                    with open(detection_path, 'w+') as f_detect:
+                        for score, label, bbox in zip(scores, labels, bboxes):
+                            x1 = round(bbox[0])
+                            y1 = round(bbox[1])
+                            x2 = round(bbox[2])
+                            y2 = round(bbox[3])
+                            cls_id = int(label) + 1
 
-        #                     f_detect.write(
-        #                         str(cls_id) + ' ' + str(score) + ' ' \
-        #                             + str(x1) + ' ' + str(y1) + ' ' + str(x2) + ' ' + str(y2) + '\n')
+                            f_detect.write(
+                                str(cls_id) + ' ' + str(score) + ' ' \
+                                    + str(x1) + ' ' + str(y1) + ' ' + str(x2) + ' ' + str(y2) + '\n')
 
-        #         if iter_i % 100 == 0:
-        #             log_info = "[%d / %d]" % (iter_i, epoch_size)
-        #             print(log_info, flush=True)
+                if iter_i % 100 == 0:
+                    log_info = "[%d / %d]" % (iter_i, epoch_size)
+                    print(log_info, flush=True)
 
-        # print('calculating Frame mAP ...')
-        # metric_list = evaluate_frameAP(self.gt_folder, current_dir, self.iou_thresh,
-        #                       self.save_path, self.dataset, show_pr_curve)
-        # for metric in metric_list:
-        #     print(metric)
+        print('calculating Frame mAP ...')
+        metric_list = evaluate_frameAP(self.gt_folder, current_dir, self.iou_thresh,
+                              self.save_path, self.dataset, show_pr_curve)
+        for metric in metric_list:
+            print(metric)
 
 
     def evaluate_video_map(self, model):
