@@ -48,20 +48,20 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 # Experiment
 * UCF101-24
 
-|      Model     |  Clip  | GFLOPs |Frame mAP | Video mAP |   FPS   |    Weight    |
-|----------------|--------|--------|----------|-----------|---------|--------------|
-|     YOWO       |   16   |  43.8  |  80.4   |   48.8    |    -    |       -      |
-|  YOWO (Ours)   |   16   |  43.8  |  84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
-| YOWO-Nano-1.0x |   16   |   6.0  |     |       |       | [github]()   |
+|      Model   |  Clip  | GFLOPs |Frame mAP | Video mAP |   FPS   |    Weight    |
+|--------------|--------|--------|----------|-----------|---------|--------------|
+|     YOWO     |   16   |  43.8  |  80.4   |   48.8    |    -    |       -      |
+|  YOWO (Ours) |   16   |  43.8  |  84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
+|  YOWO-Nano   |   16   |   6.0  |     |       |       | [github]()   |
 
 * AVA v2.2
 
-|      Model     |    Clip    |    mAP    |   FPS   |    weight    |
-|----------------|------------|-----------|---------|--------------|
-|      YOWO      |     16     |   17.9    |    33   |       -      |
-|      YOWO      |     32     |   19.1    |         |       -      |
-|   YOWO (Ours)  |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
-| YOWO-Nano-1.0x |     16     |       |       |  [github]()  |
+|     Model     |    Clip    |    mAP    |   FPS   |    weight    |
+|---------------|------------|-----------|---------|--------------|
+|     YOWO      |     16     |   17.9    |    33   |       -      |
+|     YOWO      |     32     |   19.1    |         |       -      |
+|  YOWO (Ours)  |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
+|  YOWO-Nano    |     16     |       |       |  [github]()  |
 
 ## Train YOWO
 * UCF101-24
