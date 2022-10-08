@@ -105,7 +105,6 @@ class UCF_JHMDB_Evaluator(object):
                     if self.dataset == 'ucf24':
                         detection_path = os.path.join('results', 'ucf_detections', self.model_name, 'detections_' + str(epoch), frame_id)
                         current_dir = os.path.join('results', 'ucf_detections',  self.model_name, 'detections_' + str(epoch))
-                        break
                         if not os.path.exists('results/ucf_detections/'):
                             os.mkdir('results/ucf_detections/')
                         if not os.path.exists('results/ucf_detections/'+self.model_name):
@@ -137,7 +136,6 @@ class UCF_JHMDB_Evaluator(object):
                 if iter_i % 100 == 0:
                     log_info = "[%d / %d]" % (iter_i, epoch_size)
                     print(log_info, flush=True)
-            break
 
         print('calculating Frame mAP ...')
         metric_list = evaluate_frameAP(self.gt_folder, current_dir, self.iou_thresh,
