@@ -22,7 +22,7 @@ def parse_args():
                         help='the size of input frame')
     parser.add_argument('--cuda', action='store_true', default=False, 
                         help='use cuda.')
-    parser.add_argument('--save_path', default='results/',
+    parser.add_argument('--save_path', default='./results/',
                         type=str, help='Trained state_dict file path to open')
 
     # dataset

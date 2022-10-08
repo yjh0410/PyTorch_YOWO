@@ -29,7 +29,7 @@ def parse_args():
                         help='use cuda.')
     parser.add_argument('--save', action='store_true', default=False, 
                         help='save detection results.')
-    parser.add_argument('--save_folder', default='det_results/', type=str,
+    parser.add_argument('--save_folder', default='./det_results/', type=str,
                         help='Dir to save results')
     parser.add_argument('-vs', '--vis_thresh', default=0.35, type=float,
                         help='threshold for visualization')
