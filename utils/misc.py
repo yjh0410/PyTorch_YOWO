@@ -61,6 +61,7 @@ def build_dataset(d_cfg, args, is_train=False):
             conf_thresh=0.01,
             iou_thresh=0.5,
             gt_folder=d_cfg['gt_folder'],
+            save_path='results/',
             transform=basetransform,
             collate_fn=CollateFunc()            
         )
