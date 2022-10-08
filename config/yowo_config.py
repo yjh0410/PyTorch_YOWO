@@ -42,7 +42,7 @@ yowo_config = {
         }
     },
 
-    'yowo_nano_1.0x': {
+    'yowo_nano': {
         # backbone
         ## 2D
         'backbone_2d': 'yolov2',
