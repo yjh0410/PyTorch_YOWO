@@ -5,5 +5,5 @@ python train.py \
         -v yowo_nano \
         --num_workers 4 \
         --eval_epoch 1 \
-        --eval \
+        # --eval \
         # --fp16 \
