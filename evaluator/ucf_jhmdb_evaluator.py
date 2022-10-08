@@ -78,6 +78,8 @@ class UCF_JHMDB_Evaluator(object):
         
         epoch_size = len(self.testloader)
 
+        return -1
+
         # inference
         for iter_i, (batch_frame_id, batch_video_clip, batch_target) in enumerate(self.testloader):
             # to device
