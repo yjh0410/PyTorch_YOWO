@@ -59,9 +59,11 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |     Model     |    Clip    |    mAP    |   FPS   |    weight    |
 |---------------|------------|-----------|---------|--------------|
 |     YOWO      |     16     |   17.9    |    33   |       -      |
-|     YOWO      |     32     |   19.1    |         |       -      |
+|     YOWO      |     32     |   19.1    |    -    |       -      |
 |  YOWO (Ours)  |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
+|  YOWO (Ours)  |     32     |       |       |  [github]()  |
 |  YOWO-Nano    |     16     |       |       |  [github]()  |
+|  YOWO-Nano    |     32     |       |       |  [github]()  |
 
 ## Train YOWO
 * UCF101-24
