@@ -48,11 +48,11 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 # Experiment
 * UCF101-24
 
-|      Model   |  Clip  | GFLOPs |Frame mAP | Video mAP |   FPS   |    Weight    |
+|      Model   |  Clip  | GFLOPs | rame mAP | Video mAP |   FPS   |    Weight    |
 |--------------|--------|--------|----------|-----------|---------|--------------|
-|     YOWO     |   16   |  43.8  |  80.4   |   48.8    |    -    |       -      |
-|  YOWO (Ours) |   16   |  43.8  |  84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
-|  YOWO-Nano   |   16   |   6.0  |     |       |       | [github]()   |
+|     YOWO     |   16   |  43.8  |   80.4   |   48.8    |    -    |       -      |
+|  YOWO (Ours) |   16   |  43.8  |   84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
+|  YOWO-Nano   |   16   |   6.0  |   81.0   |   49.7    |    91   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_nano_81.0.pth)   |
 
 * AVA v2.2
 
@@ -115,7 +115,7 @@ python eval.py \
         --cal_frame_mAP \
 ```
 
-Our sota result of frame mAP@0.5 IoU on UCF101-24:
+Our YOWO's result of frame mAP@0.5 IoU on UCF101-24:
 ```Shell
 AP: 85.25% (1)
 AP: 96.94% (10)
@@ -144,6 +144,35 @@ AP: 97.13% (9)
 mAP: 84.87%
 ```
 
+Our YOWO-Nano's result of frame mAP@0.5 IoU on UCF101-24:
+```Shell
+AP: 65.53% (1)
+AP: 97.19% (10)
+AP: 78.60% (11)
+AP: 66.09% (12)
+AP: 70.95% (13)
+AP: 87.57% (14)
+AP: 84.48% (15)
+AP: 89.19% (16)
+AP: 77.62% (17)
+AP: 89.35% (18)
+AP: 94.54% (19)
+AP: 34.73% (2)
+AP: 93.34% (20)
+AP: 82.73% (21)
+AP: 80.11% (22)
+AP: 70.74% (23)
+AP: 88.19% (24)
+AP: 85.56% (3)
+AP: 66.48% (4)
+AP: 71.48% (5)
+AP: 94.33% (6)
+AP: 93.09% (7)
+AP: 90.36% (8)
+AP: 90.75% (9)
+mAP: 80.96%
+```
+
 ```Shell
 # Video mAP
 python eval.py \
@@ -153,11 +182,10 @@ python eval.py \
         -bs 8 \
         -size 224 \
         --weight path/to/weight \
-        --save_path ./evaluator/eval_results/ \
         --cal_video_mAP \
 ```
 
-Our sota result of video mAP@0.5 IoU on UCF101-24:
+Our YOWO's result of video mAP@0.5 IoU on UCF101-24:
 ```Shell
 -------------------------------
 V-mAP @ 0.05 IoU:
@@ -185,6 +213,34 @@ V-mAP @ 0.75 IoU:
 --mAP:  20.61
 ```
 
+Our YOWO-Nano's result of video mAP@0.5 IoU on UCF101-24:
+```Shell
+-------------------------------
+V-mAP @ 0.05 IoU:
+--Per AP:  [82.6, 99.22, 65.57, 96.8, 83.21, 100.0, 79.01, 100.0, 97.19, 96.08, 44.73, 93.47, 91.15, 98.48, 23.33, 95.97, 91.44, 96.55, 93.81, 63.46, 70.45, 51.44, 87.88, 87.19]
+--mAP:  82.88
+-------------------------------
+V-mAP @ 0.1 IoU:
+--Per AP:  [82.6, 95.29, 65.57, 94.81, 83.21, 100.0, 79.01, 100.0, 97.19, 96.08, 44.73, 93.47, 91.15, 98.48, 23.33, 95.97, 91.44, 96.55, 93.81, 63.46, 67.26, 51.44, 80.33, 87.19]
+--mAP:  82.18
+-------------------------------
+V-mAP @ 0.2 IoU:
+--Per AP:  [50.67, 78.87, 63.91, 82.36, 50.96, 100.0, 79.01, 100.0, 87.87, 96.08, 44.73, 90.49, 91.15, 98.48, 21.79, 95.97, 91.44, 96.55, 93.81, 63.46, 44.19, 48.75, 34.85, 87.19]
+--mAP:  74.69
+-------------------------------
+V-mAP @ 0.3 IoU:
+--Per AP:  [9.19, 29.82, 60.21, 68.02, 16.21, 86.67, 74.23, 100.0, 87.87, 92.76, 44.73, 80.86, 91.15, 98.48, 14.07, 95.97, 91.44, 96.55, 93.81, 52.13, 24.71, 43.26, 5.53, 77.27]
+--mAP:  63.96
+-------------------------------
+V-mAP @ 0.5 IoU:
+--Per AP:  [0.0, 0.0, 58.56, 26.91, 5.7, 40.87, 56.73, 91.42, 58.24, 90.68, 44.73, 66.93, 54.1, 98.48, 5.71, 95.97, 86.61, 89.4, 91.0, 46.61, 0.66, 18.85, 0.0, 65.44]
+--mAP:  49.73
+-------------------------------
+V-mAP @ 0.75 IoU:
+--Per AP:  [0.0, 0.0, 21.81, 0.0, 0.0, 1.11, 7.33, 56.58, 7.69, 39.05, 9.47, 20.53, 0.0, 36.57, 2.25, 66.92, 32.27, 12.78, 69.46, 10.47, 0.04, 0.34, 0.0, 29.66]
+--mAP:  17.68
+```
+
 * AVA
 
 Run the following command to calculate frame mAP@0.5 IoU:
@@ -197,7 +253,7 @@ python eval.py \
         --weight path/to/weight
 ```
 
-Our sota result of frame mAP@0.5 IoU on AVA-v2.2:
+Our YOWO's result of frame mAP@0.5 IoU on AVA-v2.2:
 ```Shell
 AP@0.5IOU/answer phone: 0.6200712155913068,
 AP@0.5IOU/bend/bow (at the waist): 0.3684199174015223,
