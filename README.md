@@ -112,7 +112,6 @@ python eval.py \
         -bs 8 \
         -size 224 \
         --weight path/to/weight \
-        --save_path ./evaluator/eval_results/ \
         --cal_frame_mAP \
 ```
 
