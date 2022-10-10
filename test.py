@@ -148,7 +148,7 @@ def inference_ava(d_cfg, args, model, device, dataset, class_names=None, class_c
         for bbox in bboxes:
             x1, y1, x2, y2 = bbox[:4]
             det_conf = float(bbox[4])
-            cls_out = [det_conf * cls_conf.cpu().numpy() for cls_conf in bbox[5]]
+            cls_out = [det_conf * cls_conf for cls_conf in bbox[5]]
         
             # rescale bbox
             x1, x2 = int(x1 * orig_size[0]), int(x2 * orig_size[0])

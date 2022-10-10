@@ -5,8 +5,8 @@ import torch.nn as nn
 
 from ...backbone import build_backbone_2d
 from ...backbone import build_backbone_3d
-from .encoder import ChannelEncoder
-from .loss import Criterion
+from .encoder import build_encoder
+from .loss import build_criterion
 
 
 
@@ -50,12 +50,7 @@ class YOWO(nn.Module):
         self.backbone_3d, bk_dim_3d = build_backbone_3d(cfg, pretrained=cfg['pretrained_3d'] and trainable)
 
         # channel encoder
-        self.channel_encoder = ChannelEncoder(
-            in_dim=bk_dim_2d + bk_dim_3d,
-            out_dim=cfg['head_dim'],
-            act_type=cfg['head_act'],
-            norm_type=cfg['head_norm']
-        )
+        self.channel_encoder = build_encoder(cfg, bk_dim_2d + bk_dim_3d)
 
         # output
         self.pred = nn.Conv2d(cfg['head_dim'], self.num_anchors * (1 + num_classes + 4), kernel_size=1)
@@ -67,18 +62,7 @@ class YOWO(nn.Module):
 
         # ------------------ Criterion ---------------------
         if self.trainable:
-            self.criterion = Criterion(
-                cfg=cfg,
-                device=device,
-                anchor_size=self.anchor_size,
-                num_anchors=self.num_anchors,
-                num_classes=self.num_classes,
-                multi_hot=self.multi_hot,
-                loss_obj_weight=cfg['loss_obj_weight'],
-                loss_noobj_weight=cfg['loss_noobj_weight'],
-                loss_cls_weight=cfg['loss_cls_weight'],
-                loss_reg_weight=cfg['loss_reg_weight'],
-                )
+            self.criterion = build_criterion(cfg, device, num_classes, self.anchor_size, multi_hot)
 
 
     def _init_bias(self):  
@@ -253,9 +237,9 @@ class YOWO(nn.Module):
 
     def post_process_multi_hot(self, conf_pred, cls_pred, reg_pred):
         # decode box
-        bboxes = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
+        box_pred = self.decode_bbox(self.anchor_boxes, reg_pred)       # [M, 4]
         # normalize box
-        bboxes = torch.clamp(bboxes / self.img_size, 0., 1.)
+        box_pred = torch.clamp(box_pred / self.img_size, 0., 1.)
         
         # conf pred & cls pred (for AVA dataset)
         conf_pred = torch.sigmoid(conf_pred)                         # [M, 1]
@@ -263,39 +247,64 @@ class YOWO(nn.Module):
         act_cls_pred = torch.sigmoid(cls_pred[..., 14:])
         cls_pred = torch.cat([pose_cls_pred, act_cls_pred], dim=-1)  # [M, C]
 
-        all_bboxes = []
-        for i in range(conf_pred.shape[0]):
-            pred_box_conf =  conf_pred[i].item()
-            pred_box = bboxes[i]
-            pred_cls_conf = cls_pred[i]
+        # to cpu
+        scores = conf_pred.squeeze(-1).cpu().numpy()    # [M,]
+        conf_pred = conf_pred.cpu().numpy()             # [M, 1]
+        cls_pred = cls_pred.cpu().numpy()               # [M, C]
+        box_pred = box_pred.cpu().numpy()               # [M, 4]
 
-            if pred_box_conf > self.conf_thresh:
-                x1, y1, x2, y2 = pred_box
-                box = [x1, y1, x2, y2, pred_box_conf, pred_cls_conf]
-                all_bboxes.append(box)
+        # threshold
+        keep = np.where(scores > self.conf_thresh)
+
+        scores = scores[keep]
+        conf_pred = conf_pred[keep]
+        cls_pred = cls_pred[keep]
+        box_pred = box_pred[keep]
 
         # nms
-        if len(all_bboxes) > 0:
-            det_confs = torch.zeros(len(all_bboxes))
-            for i in range(len(all_bboxes)):
-                det_confs[i] = 1.0 - all_bboxes[i][4]                
+        keep = self.nms(box_pred, scores)
+        conf_pred = conf_pred[keep]
+        cls_pred = cls_pred[keep]
+        box_pred = box_pred[keep]
 
-            _, sortIds = torch.sort(det_confs)
+        # [N2, 4 + C]
+        out_boxes = np.concatenate([box_pred, conf_pred, cls_pred], axis=-1)
 
-            out_boxes = []
-            for i in range(len(all_bboxes)):
-                box_i = all_bboxes[sortIds[i]]
-                if box_i[4] > 0:
-                    out_boxes.append(box_i)
-                    for j in range(i+1, len(all_bboxes)):
-                        box_j = all_bboxes[sortIds[j]]
-                        if self.bbox_iou(box_i, box_j) > self.nms_thresh:
-                            box_j[4] = 0
+        return out_boxes
 
-            return out_boxes
+        # all_bboxes = []
+        # for i in range(conf_pred.shape[0]):
+        #     pred_box_conf =  conf_pred[i].item()
+        #     pred_box = bboxes[i]
+        #     pred_cls_conf = cls_pred[i]
 
-        else:
-            return all_bboxes
+        #     if pred_box_conf > self.conf_thresh:
+        #         x1, y1, x2, y2 = pred_box
+        #         box = [x1, y1, x2, y2, pred_box_conf, pred_cls_conf]
+        #         all_bboxes.append(box)
+
+        # # nms
+        # if len(all_bboxes) > 0:
+        #     det_confs = torch.zeros(len(all_bboxes))
+        #     for i in range(len(all_bboxes)):
+        #         det_confs[i] = 1.0 - all_bboxes[i][4]                
+
+        #     _, sortIds = torch.sort(det_confs)
+
+        #     out_boxes = []
+        #     for i in range(len(all_bboxes)):
+        #         box_i = all_bboxes[sortIds[i]]
+        #         if box_i[4] > 0:
+        #             out_boxes.append(box_i)
+        #             for j in range(i+1, len(all_bboxes)):
+        #                 box_j = all_bboxes[sortIds[j]]
+        #                 if self.bbox_iou(box_i, box_j) > self.nms_thresh:
+        #                     box_j[4] = 0
+
+        #     return out_boxes
+
+        # else:
+        #     return all_bboxes
     
 
     @torch.no_grad()

@@ -63,3 +63,14 @@ class ChannelEncoder(nn.Module):
         x = self.fuse_convs(x)
 
         return x
+
+
+def build_encoder(cfg, in_dim):
+    encoder = ChannelEncoder(
+            in_dim=in_dim,
+            out_dim=cfg['head_dim'],
+            act_type=cfg['head_act'],
+            norm_type=cfg['head_norm']
+        )
+
+    return encoder

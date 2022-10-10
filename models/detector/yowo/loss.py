@@ -142,5 +142,22 @@ class Criterion(object):
         return loss_dict
     
 
+def build_criterion(cfg, device, num_classes, anchor_size, multi_hot=False):
+    criterion = Criterion(
+        cfg=cfg,
+        device=device,
+        anchor_size=anchor_size,
+        num_anchors=len(anchor_size),
+        num_classes=num_classes,
+        multi_hot=multi_hot,
+        loss_obj_weight=cfg['loss_obj_weight'],
+        loss_noobj_weight=cfg['loss_noobj_weight'],
+        loss_cls_weight=cfg['loss_cls_weight'],
+        loss_reg_weight=cfg['loss_reg_weight']
+        )
+
+    return criterion
+
+
 if __name__ == "__main__":
     pass
