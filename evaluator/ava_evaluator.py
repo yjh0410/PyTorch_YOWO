@@ -228,7 +228,7 @@ class AVA_Evaluator(object):
                     for bbox in bboxes:
                         x1, y1, x2, y2 = bbox[:4]
                         det_conf = float(bbox[4])
-                        cls_out = [det_conf * cls_conf.cpu().numpy() for cls_conf in bbox[5]]
+                        cls_out = [det_conf * cls_conf for cls_conf in bbox[5:]]
 
                         preds_list.append([[x1,y1,x2,y2], cls_out, [video_idx, sec]])
 
