@@ -1,4 +1,3 @@
-# This is a frame-level model which is set as the Baseline
 import numpy as np
 import torch
 import torch.nn as nn
@@ -9,7 +8,7 @@ from .encoder import build_encoder
 from .loss import build_criterion
 
 
-
+# You Only Watch Once
 class YOWO(nn.Module):
     def __init__(self, 
                  cfg,
