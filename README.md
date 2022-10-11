@@ -62,7 +62,7 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |     YOWO      |     32     |   19.1    |    -    |       -      |
 |  YOWO (Ours)  |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
 |  YOWO (Ours)  |     32     |       |       |  [github]()  |
-|  YOWO-Nano    |     16     |       |       |  [github]()  |
+|  YOWO-Nano    |     16     |   18.4    |   100   |  [github]()  |
 |  YOWO-Nano    |     32     |       |       |  [github]()  |
 
 ## Train YOWO
@@ -318,4 +318,68 @@ AP@0.5IOU/watch (e.g., TV): 0.11913599687628156,
 AP@0.5IOU/work on a computer: 0.18941724461502552,
 AP@0.5IOU/write: 0.022696113047944347,
 mAP@0.5IOU: 0.20553860351814546
+```
+
+```Shell
+AP@0.5IOU/answer phone: 0.5639651669314073,
+AP@0.5IOU/bend/bow (at the waist): 0.33601517221666766,
+AP@0.5IOU/carry/hold (an object): 0.4208577802547332,
+AP@0.5IOU/climb (e.g., a mountain): 0.015362037830534558,
+AP@0.5IOU/close (e.g., a door, a box): 0.05856722579699733,
+AP@0.5IOU/crouch/kneel: 0.16270710742985536,
+AP@0.5IOU/cut: 0.03259447757034726,
+AP@0.5IOU/dance: 0.19936510569452462,
+AP@0.5IOU/dress/put on clothing: 0.01974443432453662,
+AP@0.5IOU/drink: 0.09356501752959727,
+AP@0.5IOU/drive (e.g., a car, a truck): 0.5698893029493408,
+AP@0.5IOU/eat: 0.19427064247923537,
+AP@0.5IOU/enter: 0.022437662936697852,
+AP@0.5IOU/fall down: 0.1913729400012108,
+AP@0.5IOU/fight/hit (a person): 0.33869826417910914,
+AP@0.5IOU/get up: 0.11046598370903302,
+AP@0.5IOU/give/serve (an object) to (a person): 0.04165150003199611,
+AP@0.5IOU/grab (a person): 0.039442366284766966,
+AP@0.5IOU/hand clap: 0.0511105021063975,
+AP@0.5IOU/hand shake: 0.010261407092347795,
+AP@0.5IOU/hand wave: 0.004008741526772979,
+AP@0.5IOU/hit (an object): 0.00635673102300397,
+AP@0.5IOU/hug (a person): 0.12071949962695369,
+AP@0.5IOU/jump/leap: 0.04288684128713736,
+AP@0.5IOU/kiss (a person): 0.1509158942914109,
+AP@0.5IOU/lie/sleep: 0.49796421561453186,
+AP@0.5IOU/lift (a person): 0.048965276424816656,
+AP@0.5IOU/lift/pick up: 0.021571795788197068,
+AP@0.5IOU/listen (e.g., to music): 0.008597518435883253,
+AP@0.5IOU/listen to (a person): 0.5717068364857729,
+AP@0.5IOU/martial art: 0.30153108495935566,
+AP@0.5IOU/open (e.g., a window, a car door): 0.13374910597196993,
+AP@0.5IOU/play musical instrument: 0.06300166361621182,
+AP@0.5IOU/point to (an object): 0.0009608316917870056,
+AP@0.5IOU/pull (an object): 0.006314960498212668,
+AP@0.5IOU/push (an object): 0.007886200720014886,
+AP@0.5IOU/push (another person): 0.04178496002131167,
+AP@0.5IOU/put down: 0.009678644121314455,
+AP@0.5IOU/read: 0.12988728095972746,
+AP@0.5IOU/ride (e.g., a bike, a car, a horse): 0.35723030069750433,
+AP@0.5IOU/run/jog: 0.3304660793110652,
+AP@0.5IOU/sail boat: 0.09961189675108656,
+AP@0.5IOU/shoot: 0.002028200868641035,
+AP@0.5IOU/sing to (e.g., self, a person, a group): 0.07922409715996187,
+AP@0.5IOU/sit: 0.769997196390207,
+AP@0.5IOU/smoke: 0.027182118963007835,
+AP@0.5IOU/stand: 0.7644546148083041,
+AP@0.5IOU/swim: 0.34791666666666665,
+AP@0.5IOU/take (an object) from (a person): 0.026775853194284386,
+AP@0.5IOU/take a photo: 0.02549066470092448,
+AP@0.5IOU/talk to (e.g., self, a person, a group): 0.7072203473798517,
+AP@0.5IOU/text on/look at a cellphone: 0.007649665742978625,
+AP@0.5IOU/throw: 0.02350848266675922,
+AP@0.5IOU/touch (an object): 0.3272209015074646,
+AP@0.5IOU/turn (e.g., a screwdriver): 0.01293785657008335,
+AP@0.5IOU/walk: 0.5949790093227657,
+AP@0.5IOU/watch (a person): 0.624513189952497,
+AP@0.5IOU/watch (e.g., TV): 0.0817558010886299,
+AP@0.5IOU/work on a computer: 0.14103543044480588,
+AP@0.5IOU/write: 0.04247217386708656,
+mAP@0.5IOU: 0.18390837880780497
 ```
