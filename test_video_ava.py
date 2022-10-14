@@ -35,7 +35,7 @@ def parse_args():
     # model
     parser.add_argument('-v', '--version', default='yowo', type=str,
                         help='build YOWO')
-    parser.add_argument('--weight', default='weight/',
+    parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--topk', default=40, type=int,
                         help='NMS threshold')
@@ -97,7 +97,7 @@ def run(args, d_cfg, model, device, transform, class_names):
             for bbox in bboxes:
                 x1, y1, x2, y2 = bbox[:4]
                 det_conf = float(bbox[4])
-                cls_out = [det_conf * cls_conf.cpu().numpy() for cls_conf in bbox[5]]
+                cls_out = [det_conf * cls_conf for cls_conf in bbox[5:]]
             
                 # rescale bbox
                 x1, x2 = int(x1 * orig_w), int(x2 * orig_w)
