@@ -102,6 +102,13 @@ python test.py --cuda -d ucf24 -v yowo --weight path/to/weight --show
 python test.py --cuda -d ava_v2.2 -v yowo --weight path/to/weight --show
 ```
 
+##  Test YOWO on AVA video
+```Shell
+python test_video_ava.py --cuda -d ava_v2.2 -v yowo --weight path/to/weight --video path/to/video --show
+```
+
+Note that you can set ```path/to/video``` to other videos in your local device, not AVA videos.
+
 ## Evaluate YOWO
 * UCF101-24
 
