@@ -28,7 +28,7 @@ def parse_args():
                         help='use cuda.')
     parser.add_argument('--save_folder', default='det_results/', type=str,
                         help='Dir to save results')
-    parser.add_argument('-vs', '--vis_thresh', default=0.35, type=float,
+    parser.add_argument('-vs', '--vis_thresh', default=0.3, type=float,
                         help='threshold for visualization')
     parser.add_argument('--video', default='9Y_l9NsnYE0.mp4', type=str,
                         help='AVA video name.')
