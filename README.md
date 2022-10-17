@@ -18,6 +18,14 @@ conda activate yowo
 pip install -r requirements.txt 
 ```
 
+# Visualization
+
+![image](./img_files/v_Basketball_g07_c04.gif)
+![image](./img_files/v_Biking_g01_c01.gif)
+![image](./img_files/v_HorseRiding_g01_c03.gif)
+![image](./img_files/v_IceDancing_g02_c05.gif)
+![image](./img_files/v_SalsaSpin_g03_c01.gif)
+
 # Dataset
 You can download **UCF24** and **JHMDB21** from the following links:
 
@@ -391,3 +399,11 @@ AP@0.5IOU/work on a computer: 0.14103543044480588,
 AP@0.5IOU/write: 0.04247217386708656,
 mAP@0.5IOU: 0.18390837880780497
 ```
+
+## Demo
+```Shell
+# run demo
+python eval.py --cuda -d ucf24 -v yowo -size 224 --weight path/to/weight --video path/to/video
+                      -d ava_v2.2
+```
+
