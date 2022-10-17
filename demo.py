@@ -138,9 +138,9 @@ def detect(args, d_cfg, model, device, transform, class_names, class_colors):
 
             # transform
             x, _ = transform(video_clip)
-            # List [T, 3, H, W] -> [T, 3, H, W]
-            x = torch.stack(x)
-            x = x.unsqueeze(0).to(device) # [B, T, 3, H, W], B=1
+            # List [T, 3, H, W] -> [3, T, H, W]
+            x = torch.stack(x, dim=1)
+            x = x.unsqueeze(0).to(device) # [B, 3, T, H, W], B=1
 
             t0 = time.time()
             # inference
