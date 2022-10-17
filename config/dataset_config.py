@@ -45,6 +45,7 @@ dataset_config = {
         'warmup_factor': 0.00066667,
         'wp_iter': 500,
         # class names
+        'valid_num_classes': 24,
         'label_map': (
                     'Basketball',     'BasketballDunk',    'Biking',            'CliffDiving',
                     'CricketBowling', 'Diving',            'Fencing',           'FloorGymnastics', 
@@ -159,6 +160,7 @@ dataset_config = {
         'warmup_factor': 0.00066667,
         'wp_iter': 500,
         # class names
+        'valid_num_classes': 80,
         'label_map': (
                     'bend/bow(at the waist)', 'crawl', 'crouch/kneel', 'dance', 'fall down',  # 1-5
                     'get up', 'jump/leap', 'lie/sleep', 'martial art', 'run/jog',             # 6-10
