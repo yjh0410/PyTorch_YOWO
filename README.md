@@ -63,7 +63,7 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |  YOWO (Ours)  |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
 |  YOWO (Ours)  |     32     |   21.6    |    25   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_21.6.pth)  |
 |  YOWO-Nano    |     16     |   18.4    |   100   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_nano_ava_v2.2_18.4.pth)  |
-|  YOWO-Nano    |     32     |       |       |  [github]()  |
+|  YOWO-Nano    |     32     |       |   95    |  [github]()  |
 
 ## Train YOWO
 * UCF101-24
