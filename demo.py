@@ -254,9 +254,6 @@ if __name__ == '__main__':
     # to eval
     model = model.to(device).eval()
 
-    # inference mode
-    model.set_inference_mode(args.inf_mode)
-
     # run
     detect(args=args,
             d_cfg=d_cfg,
