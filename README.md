@@ -142,7 +142,7 @@ python eval.py \
         --cal_frame_mAP \
 ```
 
-Our YOWO's result of frame mAP@0.5 IoU on UCF101-24:
+Our YOWO-Plus's result of frame mAP@0.5 IoU on UCF101-24:
 ```Shell
 AP: 85.25% (1)
 AP: 96.94% (10)
@@ -212,7 +212,7 @@ python eval.py \
         --cal_video_mAP \
 ```
 
-Our YOWO's result of video mAP@0.5 IoU on UCF101-24:
+Our YOWO-Plus's result of video mAP@0.5 IoU on UCF101-24:
 ```Shell
 -------------------------------
 V-mAP @ 0.05 IoU:
@@ -280,7 +280,7 @@ python eval.py \
         --weight path/to/weight
 ```
 
-Our YOWO's result of frame mAP@0.5 IoU on AVA-v2.2:
+Our YOWO-Plus's result of frame mAP@0.5 IoU on AVA-v2.2:
 ```Shell
 AP@0.5IOU/answer phone: 0.6200712155913068,
 AP@0.5IOU/bend/bow (at the waist): 0.3684199174015223,
