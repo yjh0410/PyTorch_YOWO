@@ -1,6 +1,15 @@
 # YOWO-Plus: An incremental improvement
 
-Big thanks to [YOWO](https://github.com/wei-tim/YOWO) for their open source. I reimplemented ```YOWO``` and reproduced the performance. On the ```AVA``` dataset, my reproduced YOWO is better than the official YOWO. I hope that such a real-time action detector with simple structure and superior performance can attract your interest in the task of spatio-temporal action detection.
+Big thanks to [YOWO](https://github.com/wei-tim/YOWO) for their open source. I reimplemented ```YOWO``` and reproduced the performance. On the ```AVA``` dataset, my reproduced YOWO is better than the official YOWO. We named this YOWO as **YOWO-Plus**. I hope that such a real-time action detector with simple structure and superior performance can attract your interest in the task of spatio-temporal action detection.
+
+# Improvement
+- Better 2D backbone: We use the weights of YOLOv2 from our [project](https://github.com/yjh0410/PyTorch_YOLOv2). Our YOLOv2 achieves a significantly higher AP on the COCO dataset.
+
+- Better label assignment: For a groundtruth, we assign the anchor boxes with IoU higher than the threshold 0.5, so each groundtruth might be assigned
+with multiple anchor boxes.
+
+- Better loss: We deploy *GIoU loss* as the box regression loss. As for the conference loss and classification loss, they are same as the ones used in
+YOWO. Finally, all the losses are normalized by the batch size.
 
 # Requirements
 - We recommend you to use Anaconda to create a conda environment:
@@ -60,8 +69,8 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |      Model   |  Clip  | GFLOPs | Frame mAP | Video mAP |   FPS   |    Weight    |
 |--------------|--------|--------|-----------|-----------|---------|--------------|
 |     YOWO     |   16   |  43.8  |    80.4   |   48.8    |    -    |       -      |
-|  YOWO (Ours) |   16   |  43.8  |    84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
-|  YOWO-Nano   |   16   |   6.0  |    81.0   |   49.7    |    91   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_nano_81.0.pth)   |
+|  YOWO-Plus   |   16   |  43.8  |    84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
+|  YOWO-Nano   |   16   |   6.0  |    81.0   |   49.7    |    91   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_nano_ucf24_81.0.pth)   |
 
 * AVA v2.2
 
@@ -69,10 +78,10 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |---------------|------------|-----------|---------|--------------|
 |     YOWO      |     16     |   17.9    |    31   |       -      |
 |     YOWO      |     32     |   19.1    |    23   |       -      |
-|  YOWO (Ours)  |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
-|  YOWO (Ours)  |     32     |   21.6    |    25   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_21.6.pth)  |
+|  YOWO-Plus    |     16     |   20.6    |    33   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_20.6.pth)  |
+|  YOWO-Plus    |     32     |   21.6    |    25   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ava_v2.2_K32_21.6.pth)  |
 |  YOWO-Nano    |     16     |   18.4    |   100   |  [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_nano_ava_v2.2_18.4.pth)  |
-|  YOWO-Nano    |     32     |       |   95    |  [github]()  |
+|  YOWO-Nano    |     32     |   19.5    |   95    |  [github]()  |
 
 ## Train YOWO
 * UCF101-24
