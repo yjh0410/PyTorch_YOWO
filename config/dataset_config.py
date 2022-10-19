@@ -133,7 +133,7 @@ dataset_config = {
         'saturation': 1.5,
         'exposure': 1.5,
         'sampling_rate': 1,
-        'len_clip': 32,
+        'len_clip': 16,
         # cls label
         'multi_hot': True,  # multi hot
         # post process
