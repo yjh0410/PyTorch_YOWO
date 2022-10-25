@@ -71,7 +71,7 @@ You can use instructions from [here](https://github.com/yjh0410/AVA_Dataset) to 
 |      Model   |  Clip  | GFLOPs | Frame mAP | Video mAP |   FPS   |    Weight    |
 |--------------|--------|--------|-----------|-----------|---------|--------------|
 |     YOWO     |   16   |  43.8  |    80.4   |   48.8    |    -    |       -      |
-|  YOWO-Plus   |   16   |  43.8  |    84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_84.9.pth)   |
+|  YOWO-Plus   |   16   |  43.8  |    84.9   |   50.5    |    36   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_ucf24_84.9.pth)   |
 |  YOWO-Nano   |   16   |   6.0  |    81.0   |   49.7    |    91   | [github](https://github.com/yjh0410/PyTorch_YOWO/releases/download/yowo-weight/yowo_nano_ucf24_81.0.pth)   |
 
 * AVA v2.2
