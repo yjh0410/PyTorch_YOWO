@@ -11,3 +11,5 @@ scipy
 matplotlib
 
 numpy
+
+imageio

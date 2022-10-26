@@ -414,7 +414,7 @@ mAP@0.5IOU: 0.18390837880780497
 ## Demo
 ```Shell
 # run demo
-python eval.py --cuda -d ucf24 -v yowo -size 224 --weight path/to/weight --video path/to/video
+python demo.py --cuda -d ucf24 -v yowo -size 224 --weight path/to/weight --video path/to/video
                       -d ava_v2.2
 ```
 
