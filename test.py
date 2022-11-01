@@ -37,7 +37,7 @@ def parse_args():
                         help='start index to test.')
 
     # model
-    parser.add_argument('-v', '--version', default='yowo', type=str,
+    parser.add_argument('-v', '--version', default='yowo', type=str, choices=['yowo', 'yowo_nano'],
                         help='build YOWO')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')

@@ -54,7 +54,7 @@ def parse_args():
                         type=str, help='save inference results.')
 
     # Model
-    parser.add_argument('-v', '--version', default='yowo', type=str,
+    parser.add_argument('-v', '--version', default='yowo', type=str, choices=['yowo', 'yowo_nano'],
                         help='build YOWO')
     parser.add_argument('--topk', default=40, type=int,
                         help='topk candidates for evaluation')
