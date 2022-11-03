@@ -423,3 +423,14 @@ python demo.py --cuda -d ucf24 -v yowo -size 224 --weight path/to/weight --video
                       -d ava_v2.2
 ```
 
+## References
+If you are using our code, please consider citing our paper.
+
+```
+@article{yang2022yowo,
+  title={YOWO-Plus: An Incremental Improvement},
+  author={Yang, Jianhua},
+  journal={arXiv preprint arXiv:2210.11219},
+  year={2022}
+}
+```
